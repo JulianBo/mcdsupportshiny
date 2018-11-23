@@ -1,0 +1,27 @@
+Package: mcdsupportshiny
+Type: Package
+Title: Customisable graphical application to support for multi-criteria decision problems using shiny
+Version: 0.1.0
+Authors@R: person("Julian", "Bothe", email = "julian.bothe@geographie.uni-muenchen.de",
+                  role = c("aut", "cre"))
+Description: Using Shiny, a graphical user interface is created where users can weight 
+    differenct criteria in relation to each other. Those weighted criteria are then used
+    to find the best among several supplied alternatives. Alternatives and criteria are 
+    supplied according to your decision problem, so that this package can be used for
+    different cases. While the majority of criteria must be quantified, the importance of 
+    non-quantifiable criteria can also be asessed. The application is ready for multi-user 
+    contexts. The weights of users can be stored and evaluated within the program.
+License: What license is it under?
+Encoding: UTF-8
+LazyData: true
+Depends: 
+  data.table 
+Imports:
+  ggplot2
+Suggests:
+  googlesheets,
+  pool, 
+  RMySQL,
+  shiny,
+  shinyBS
+RoxygenNote: 6.0.1
