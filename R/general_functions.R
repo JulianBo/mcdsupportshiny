@@ -65,4 +65,18 @@ crossjoinFunc<-  function(x1,x2)
 #'
 getwidth <- function(x1,x2,share=20)  (x2-x1)/share
 
-
+#' Fallback for Null-Value.
+#'
+#' Useful for example for reinitialising inputs.
+#'
+#' @param a First value.
+#' @param b Fallback.
+#'
+#' @return if (!is.null(a)) a else b
+#' @export
+#'
+#' @note see \url{https://stackoverflow.com/questions/33137546/switch-between-layouts-reactively-with-shiny?noredirect=1&lq=1}.
+#' @examples
+`%||%` <- function(a, b) {
+  if (!is.null(a)) a else b
+}

@@ -9,8 +9,9 @@
 #' @param description Label for Slider.
 #' @param min Slider minimu value.
 #' @param max Slider maximum value.
-#' @param value Slider initial value.
-#' @param default Value to be returned if Checkbox is active.
+#' @param value Slider initial value. If NA, Checkbox will be activated and default returned.
+#' @param default Value to be returned if Checkbox is active. #TODO: use default when
+#'                initialising module, instead of having to pass it another time to sliderCheckbox().
 #' @param cb_title Description Label for Checkbox.
 #'
 #' @return fluidrow with slider and checkbox for Input, Values as described below.
@@ -25,6 +26,7 @@ sliderCheckboxInput <- function(id,description="",
                                 min = 0,
                                 max = 100,
                                 value = 30,
+                                default=30 ,
                                 cb_title = "I don't know"){
   ns <- NS(id)
 
@@ -34,11 +36,11 @@ sliderCheckboxInput <- function(id,description="",
                        paste0(description, collapse=""),
                        min = min,
                        max = max,
-                       value = value)
+                       value = ifelse(is.na(value),default,value))
     ),
     column(width=2,
            checkboxInput(ns("active"),
-                         cb_title, value=FALSE )
+                         cb_title, value=is.na(value) )
     )
   )
 }
@@ -47,7 +49,7 @@ sliderCheckboxInput <- function(id,description="",
 #' @describeIn sliderCheckboxInput returns slider Value if Checkbox is FALSE, else default.
 #' @export
 sliderCheckbox<- function(input, output, session,
-                          default=NA #TODO: set default when initialising module
+                          default=NA #TODO: use default when initialising module
                           #, name=NULL
                           ) {
 
