@@ -9,16 +9,19 @@
 
 library(shiny)
 library(shinyBS)
+library(shinyjs)
+
 
 library(mcdsupportshiny)
 
-#source("Setup.R", encoding="UTF-8") #local=FALSE, auch in ui.R sichtbar
-source("Setup_INOLA.R", encoding="UTF-8") #local=FALSE, auch in ui.R sichtbar
+source("Setup.R", encoding="UTF-8") #local=FALSE, auch in ui.R sichtbar
+#source("Setup_INOLA.R", encoding="UTF-8") #local=FALSE, auch in ui.R sichtbar
 
 
 
 # Define UI for application
 shinyUI(fluidPage(
+      useShinyjs(),
       rColorSliders(configList),
 
   # Application title
@@ -28,7 +31,7 @@ shinyUI(fluidPage(
   sidebarLayout(
     sidebarPanel(
       tags$p("Bitte stellen sie ein, wie wichtig Ihnen die einzelnen Indikatoren im Verhältnis zu den anderen Indikatoren sind."),
-      rSliderGui(configList)
+      rSliderGui(configList,cb_title="Ich weiß nicht")
     ),#end of sidebarPanel
 
     # Show Results, Description, ...
@@ -56,7 +59,8 @@ shinyUI(fluidPage(
                           br(),
                           tags$p("Sind Sie auf der linken Seite mit den Einstellungen zufrieden? Dann können Sie diese absenden und das Ergebnis ansehen"),
                           actionButton("speichernBtn", "Fertig? Speichern und Ergebnis ansehen")
-                   )
+                   ),
+                   textOutput("Aux_to_initialise_rv_dtGewichtungen")
                  )
                  ##TODO: Alternativen beschreiben
                  # ,

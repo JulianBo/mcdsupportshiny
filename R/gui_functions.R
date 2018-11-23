@@ -5,10 +5,11 @@
 #'
 #' @param x Configuration list, see \code{\link{validateConfig}}.
 #' @param parents_name Label used to name root when creating fold-out-panel for root.
-#' @param minweight standard minimum slider weight.
-#' @param maxweight standard maximum slider weight.
-#' @param standardweight standard slider weight.
+#' @param minweight Standard minimum slider weight.
+#' @param maxweight Standard maximum slider weight.
+#' @param standardweight Standard slider weight.
 #' @param open.maxdepth From which depth on to create fold-out-panels, if not declared otherwise in x.
+#' @param cb_title Default description label for checkbox.
 #'
 #' @return List of Sliders.
 #' @export
@@ -16,11 +17,12 @@
 #' @examples
 rSliderGui<-function(x, parents_name="Genauer",
                      minweight=0,maxweight=100, standardweight=30,
-                     open.maxdepth=Inf
+                     open.maxdepth=Inf,
+                     cb_title= "I don't know"
 ){
   recSliderGui(x,depth=0, parents_name = parents_name, minweight = minweight,
                maxweight = maxweight, standardweight = standardweight,
-               open.maxdepth = open.maxdepth)
+               open.maxdepth = open.maxdepth, cb_title=cb_title)
 }
 
 #' Internal Version of rSliderGui
@@ -37,7 +39,7 @@ rSliderGui<-function(x, parents_name="Genauer",
 
 recSliderGui<-function(x, depth=0, parents_name="Genauer",
                      minweight=0,maxweight=100, standardweight=30,
-                     open.maxdepth=Inf
+                     open.maxdepth=Inf, cb_title= "I don't know"
 ){
   # Ziel: Elemente für innerhalb sidebarPanel zurückliefern.
 
@@ -70,19 +72,21 @@ recSliderGui<-function(x, depth=0, parents_name="Genauer",
     #Falls Element. GGf. Child-Elemente parsen
     ## Hier Slider selbst
     if("class" %in% names(list.elem)){
-      returnvalue <-tagList(sliderInput(paste0("sl",names,  collapse="_"),
-                                        paste0(this.description, collapse=""),
+      returnvalue <-tagList(sliderCheckboxInput(names,
+                                        description = paste0(this.description, collapse=""),
                                         min = this.minweight,
                                         max = this.maxweight,
-                                        value = this.standardweight)
-      )
+                                        value = this.standardweight,
+                                        cb_title = cb_title)
+                            )
 
       #Rekursion
       if(list.elem$class=="elements")
         returnvalue <-tagList(returnvalue, recSliderGui(list.elem,depth+1,names,
                                                       minweight = this.minweight, maxweight=this.maxweight,
                                                       standardweight = this.standardweight,
-                                                      open.maxdepth = open.maxdepth) )
+                                                      open.maxdepth = open.maxdepth,
+                                                      cb_title = cb_title) )
 
 
       #Je nach Tiefe zusammenfügen

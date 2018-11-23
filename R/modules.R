@@ -1,5 +1,5 @@
 
-# Slider with Not Known-Checkbox ------------------------------------------
+# Slider with Checkbox ------------------------------------------
 
 #' Module sliderCheckbox: Slider with
 #'
@@ -10,7 +10,7 @@
 #' @param min Slider minimu value.
 #' @param max Slider maximum value.
 #' @param value Slider initial value.
-#' @param default Value to be returned if Checkbox is active.#TODO: set default when initialising module
+#' @param default Value to be returned if Checkbox is active.
 #' @param cb_title Description Label for Checkbox.
 #'
 #' @return fluidrow with slider and checkbox for Input, Values as described below.
@@ -30,14 +30,14 @@ sliderCheckboxInput <- function(id,description="",
 
   fluidRow(
     column(width=9,
-           sliderInput(ns("sl"), ##TODO: Change rest to Namespace
+           sliderInput(ns("sl"),
                        paste0(description, collapse=""),
                        min = min,
                        max = max,
                        value = value)
     ),
     column(width=2,
-           checkboxInput(ns("active"), ##TODO: Change rest to Namespace
+           checkboxInput(ns("active"),
                          cb_title, value=FALSE )
     )
   )
@@ -45,19 +45,33 @@ sliderCheckboxInput <- function(id,description="",
 
 #'
 #' @describeIn sliderCheckboxInput returns slider Value if Checkbox is FALSE, else default.
-#' @examples
+#' @export
 sliderCheckbox<- function(input, output, session,
-                          default=NA) {
+                          default=NA, name=NULL) { #TODO: set default when initialising module
+
+  oldvalue<- reactiveVal()
+
   observeEvent(input$active, {
-    message(input$active ) #For Development
+    message(paste(input$active, name, collapse=";") ) #For Development
+    if (input$active){
+      oldvalue(input$sl)
+      disable("sl")
+      updateSliderInput(session, "sl", value=default)
+    }else {
+      updateSliderInput(session, "sl", value=oldvalue())
+      enable("sl")
+    }
+
     toggleState("sl", !input$active)
   })
 
-  onclick("sl",updateCheckboxInput(session, "active", value=FALSE))
+  onclick("sl",
+    if(input$active) updateCheckboxInput(session, "active", value=FALSE)
+ )
 
   return ( reactive({
     if (input$active){
-      NA
+      default
     }else {
       input$sl
     }

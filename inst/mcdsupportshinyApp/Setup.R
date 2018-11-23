@@ -31,7 +31,7 @@ configList <- list (
   util_scale=100,
 
   #Kindelemente
-  Geschwindigkeit= list(class="mapping", Attribname="Geschwindigkeit"),
+  #Geschwindigkeit= list(class="mapping", Attribname="Geschwindigkeit"),
   Innenraum= list(class="mapping",Attribname="Innenraum"),
   Kosten= list (
     class="elements",

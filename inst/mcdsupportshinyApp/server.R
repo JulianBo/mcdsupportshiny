@@ -12,6 +12,8 @@
 
 
 library(shiny)
+library(shinyjs)
+
 library (data.table)
 library(ggplot2)
 
@@ -20,8 +22,8 @@ library(mcdsupportshiny)
 
 # Initialisieren#########
 
-#source("Setup.R", encoding="UTF-8") #local=FALSE, auch in ui.R sichtbar
-source("Setup_INOLA.R", encoding="UTF-8") #local=FALSE, auch in ui.R sichtbar
+source("Setup.R", encoding="UTF-8") #local=FALSE, auch in ui.R sichtbar
+#source("Setup_INOLA.R", encoding="UTF-8") #local=FALSE, auch in ui.R sichtbar
 
 
 validateConfig(configList,dtAlternativen)
@@ -50,6 +52,17 @@ dtIndikatorensettings[,slname:=paste0("sl",name)]
 dtIndikatorensettings[,colors:=rColorVector(configList, color="blue")]
 
 setkey(dtIndikatorensettings,name)
+
+# columns: bscName bscName.parent - Get each parent-child-combination.
+dtBscCombinations <- unique(merge(dtIndikatorensettings ,
+                                 dtIndikatorensettings[,.(name, bscName )],
+                                 by.x="parent", by.y = "name", suffixes = c("", ".parent"))
+                           [, .(bscName,bscName.parent) ])
+dtBscCombinations[,timesClicked:=0]
+dtBscCombinations[,opened:=FALSE]
+dtBscCombinations[,lastState:=""]
+#visible:=FALSE, Visible lässt sich nur hinterher über opened berechnen, aufgrund BUG
+
 
 dtAlternativen_long <- merge(melt(dtAlternativen, id.vars=c("titel", "rahmenszenario")),
                              dtIndikatorensettings, by.x="variable", by.y="Attribname" )
@@ -124,7 +137,7 @@ dtNutzen <- dcast(dtAlternativen_long,titel +rahmenszenario~name,  value.var = "
 
 ##Füge weitere Spalten hinzu, um sie später zu füllen
 # Alle Spalten von Gruppierungen
-dtNutzen[,dtIndikatorensettings[!(is_mapping),name]  :=NA]
+if (any(!dtIndikatorensettings$is_mapping) )dtNutzen[,dtIndikatorensettings[!(is_mapping),name]  :=NA]
 # Alle Spalten von Gruppierungen von nicht zugeordneten Attributen
 #NA= Nicht gewusst; 0 = Ausschließen
 dtNutzen[,dtIndikatorensettings[is_mapping& is.na(Attribname),name]  :=0]
@@ -161,7 +174,10 @@ shinyServer(function(input, output, session) {
 
    #print(sapply( dtGewichtungen$slname, function(x) input[[x]]))
 
-    dtGewichtungen[,originalweights:=sapply(slname, function(x) input[[x]])]
+    dtGewichtungen[,originalweights:=sapply(name,
+                                            function(x) callModule(sliderCheckbox,x, name=x) ()#call module inmediately, nowhere else needed
+                                            )]
+                   #originalweights:=sapply(slname, function(x) input[[x]])] ##alt
 
    # print(dtGewichtungen)
 
@@ -333,18 +349,9 @@ shinyServer(function(input, output, session) {
   # Reactive Values & Aktionen durchführen ----------------------------------------------------
 
 
-  rv<- reactiveValues(bscValues=data.table(# bscName bscName.parent
-                                           unique(merge(dtIndikatorensettings ,
-                                                        dtIndikatorensettings[,.(name, bscName )],
-                                                        by.x="parent", by.y = "name", suffixes = c("", ".parent"))
-                                                  [, .(bscName,bscName.parent) ]),
-
-                                             #unique(dtIndikatorensettings[!is.na(bscName), bscName] ),
-                                           timesClicked=0,
-                                           opened=FALSE,
-                                           #visible=FALSE, Visible lässt sich nur hinterher über opened berechnen, aufgrund BUG
-                                           lastState=""),
+  rv<- reactiveValues(bscValues=dtBscCombinations,
                       #https://stackoverflow.com/questions/32536940/shiny-reactivity-fails-with-data-tables
+                      #because no reactivity inside data.tables, extra value to trigger update
                       bscValues_update=0,
 
                       data=data.table()
@@ -485,6 +492,12 @@ shinyServer(function(input, output, session) {
   output$EntscheidungenTable<- renderTable({rv_dtSzenarioergebnis()})
 
   ####GUI Updaten ---Rest ####
+
+  #Dummy Call Um Observer im Modul "sliderCheckbox" zu initialisieren
+  output$Aux_to_initialise_rv_dtGewichtungen <- renderTable({
+    rv_dtGewichtungen()[,sum(originalweights)]
+    ""
+  })
 
   #Direkte Gewichtungen berechnen
   output$DirGewichtungenTable<-renderTable( rv_dtGewichtungen())
