@@ -47,12 +47,14 @@ sliderCheckboxInput <- function(id,description="",
 #' @describeIn sliderCheckboxInput returns slider Value if Checkbox is FALSE, else default.
 #' @export
 sliderCheckbox<- function(input, output, session,
-                          default=NA, name=NULL) { #TODO: set default when initialising module
+                          default=NA #TODO: set default when initialising module
+                          #, name=NULL
+                          ) {
 
   oldvalue<- reactiveVal()
 
   observeEvent(input$active, {
-    message(paste(input$active, name, collapse=";") ) #For Development
+    #message(paste(input$active, name, collapse=";") ) #For Development
     if (input$active){
       oldvalue(input$sl)
       disable("sl")
@@ -78,3 +80,4 @@ sliderCheckbox<- function(input, output, session,
   }))
 
 }
+

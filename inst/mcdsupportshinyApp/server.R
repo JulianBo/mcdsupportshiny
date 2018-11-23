@@ -165,6 +165,15 @@ shinyServer(function(input, output, session) {
   ##Bisherige Daten laden.
 
 
+# Load Modules -----------------------------
+  sliderCheckboxModules <-sapply(dtGewichtungen$name,
+                                 #TODO: standardweight when creating sliderCheckboxInput
+                                 function(x) callModule(sliderCheckbox,x,
+                                                        default =dtGewichtungen[name==x,]$standardweight
+                                                        #,name=x
+                                                        )
+                                 )
+
 # Reactives berechnen -----------------------------------------------------
 
   rv_dtGewichtungen <- reactive({
@@ -175,7 +184,8 @@ shinyServer(function(input, output, session) {
    #print(sapply( dtGewichtungen$slname, function(x) input[[x]]))
 
     dtGewichtungen[,originalweights:=sapply(name,
-                                            function(x) callModule(sliderCheckbox,x, name=x) ()#call module inmediately, nowhere else needed
+                                            function(x) sliderCheckboxModules[[x]] ()*1.
+
                                             )]
                    #originalweights:=sapply(slname, function(x) input[[x]])] ##alt
 
@@ -496,7 +506,7 @@ shinyServer(function(input, output, session) {
   #Dummy Call Um Observer im Modul "sliderCheckbox" zu initialisieren
   output$Aux_to_initialise_rv_dtGewichtungen <- renderTable({
     rv_dtGewichtungen()[,sum(originalweights)]
-    ""
+    return("")
   })
 
   #Direkte Gewichtungen berechnen
@@ -550,14 +560,11 @@ shinyServer(function(input, output, session) {
   ####GUI Updaten ---R Helferfunktionen ####
 
   # ##R Helferfunktionen; um anzuschauen was abgeht.
-  # output$RoutputPrint<- renderPrint({
-  #   # print(unique(dtIndikatorensettings[!is.na(bscName), bscName]))
-  #   # rv[["bscValues"]]
-  #   # rv[["i"]]
-  #   #
-  #   rv$bscValues
-  #
-  # })
+  output$RoutputPrint<- renderPrint({
+
+    str(sliderCheckboxModules)
+
+  })
   #
   # output$RoutputTable1<- renderTable({
   #

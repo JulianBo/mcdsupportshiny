@@ -60,7 +60,8 @@ getIndikatorensetting<- function(x,
                                  util_scale=100,
                                  agg_func="weighted.sum", #alternative: weighted.mean
                                  include_parent=TRUE,
-                                 open.maxdepth=Inf ){
+                                 open.maxdepth=Inf,
+                                 standardweight=30){
 
 
 
@@ -70,7 +71,8 @@ getIndikatorensetting<- function(x,
                                                   util_offset = util_offset, util_scale = util_scale,
                                                   agg_func=agg_func,
                                                   include_parent=include_parent                                                  ,
-                                                  open.maxdepth=open.maxdepth )
+                                                  open.maxdepth=open.maxdepth ,
+                                                  standardweight = standardweight)
 
   return(dtIndikatorensetting)
 
@@ -100,7 +102,8 @@ rgetIndikatorensetting<- function(x, depth=0, parent="Szenarioergebnis",
                                   agg_func="weighted.sum", #alternative: weighted.mean
                                   include_parent=TRUE,
                                   open.maxdepth=Inf,
-                                  color=NA){
+                                  color=NA,
+                                  standardweight=30){
 
   stopifnot(depth>=0)
   stopifnot(is.list(x))
@@ -122,6 +125,8 @@ rgetIndikatorensetting<- function(x, depth=0, parent="Szenarioergebnis",
     this.agg_func <- ifelse("agg_func" %in% names(list.elem),  list.elem$agg_func, agg_func)
     this.include_parent <- ifelse("include_parent" %in% names(list.elem),
                                   list.elem$include_parent, include_parent)
+    this.standardweight <- ifelse("standardweight" %in% names(list.elem),
+                                  list.elem$standardweight, standardweight)
 
 
     #Falls Element. GGf. Child-Elemente parsen
@@ -138,7 +143,8 @@ rgetIndikatorensetting<- function(x, depth=0, parent="Szenarioergebnis",
                              parent=parent,
                              bscName=ifelse(depth>= open.maxdepth,
                                             paste0("bsc",parent,  collapse="_") ,
-                                            NA)
+                                            NA),
+                             standardweight = ifelse(this.include_parent,this.standardweight, standardweight)
       )
 
       #Rekursion
@@ -150,7 +156,8 @@ rgetIndikatorensetting<- function(x, depth=0, parent="Szenarioergebnis",
                                                            util_scale = this.util_scale,
                                                            agg_func=this.agg_func,
                                                            include_parent=this.include_parent,
-                                                           open.maxdepth = open.maxdepth)
+                                                           open.maxdepth = open.maxdepth,
+                                                           standardweight = this.standardweight)
         )
 
 

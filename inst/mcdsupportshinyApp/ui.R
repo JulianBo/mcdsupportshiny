@@ -115,12 +115,12 @@ shinyUI(fluidPage(
                       Weitere Informationen unter: ", tags$a(href="http://inola-region.de", "inola-region.de") ),
                           tags$p("Technische Umsetzung: Julian Bothe") )
         )
-        # ,
-        # tabPanel("R Helper",
-        #          textOutput("RoutputPrint"),
-        #          tableOutput("RoutputTable1"),
-        #          tableOutput("RoutputTable")
-        #)
+        ,
+        tabPanel("R Helper",
+                 textOutput("RoutputPrint"),
+                 tableOutput("RoutputTable1"),
+                 tableOutput("RoutputTable")
+        )
       ) #tabsetpanel
     ) #mainPanel
   ) #sidebarLayout
