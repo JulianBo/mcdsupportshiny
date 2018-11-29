@@ -4,6 +4,22 @@
 #' Creates List of Sliders.
 #'
 #' @param x Configuration list, see \code{\link{validateConfig}}.
+#' @param breaking Should SliderGui be split up into a list of several pages, or deliver
+#'                 one single list of sliders?
+#'                 \describe{
+#'                    \item{Null or FALSE}{No pagination.}
+#'                    \item{TRUE}{Put all subordinate elements of first order
+#'                                on extra pages, add main page containing only first order elements.}
+#'                    \item{Integer}{Put all subordinate elements of nth order on extra pages, add
+#'                                   main page containing elements up to nth order.
+#'                                   1 corresponds to TRUE.}
+#'                 }
+#'                 Maybe in future versions possibilities for putting special Elements on
+#'                 extra pages by name will be added, right now this is not possible.
+#' @param mainpageposition One of "first", "last", "none".
+#'                         Should main page be first or last or be omitted?
+#' @param reusingvalues Should old slider values be used? Needed when creating sliderGuis on
+#'                      several pages, and Sliders should be set to old values again.
 #' @param parents_name Label used to name root when creating fold-out-panel for root.
 #' @param minweight Standard minimum slider weight.
 #' @param maxweight Standard maximum slider weight.
@@ -11,16 +27,23 @@
 #' @param open.maxdepth From which depth on to create fold-out-panels, if not declared otherwise in x.
 #' @param cb_title Default description label for checkbox.
 #'
-#' @return List of Sliders.
+#' @return Slidergui: List of Sliders (breaking== NULL or breaking==FALSE)
+#'                    or list of SliderGui-pages (breaking==TRUE or Breaking>0).
 #' @export
 #'
 #' @examples
-rSliderGui<-function(x, parents_name="Genauer",
+rSliderGui<-function(x,
+                     breaking=NULL,mainpageposition=c("first","last", "none"),
+                     reusingvalues=!is.null(breaking),
+                     parents_name="genauer",
                      minweight=0,maxweight=100, standardweight=30,
                      open.maxdepth=Inf,
                      cb_title= "I don't know"
                      ){
-  recSliderGui(x,depth=0, parents_name = parents_name, minweight = minweight,
+  recSliderGui(x,depth=0,
+               breaking=breaking,mainpageposition=mainpageposition,
+               reusingvalues = reusingvalues,
+               parents_name = parents_name, minweight = minweight,
                maxweight = maxweight, standardweight = standardweight,
                open.maxdepth = open.maxdepth, cb_title=cb_title)
 }
@@ -29,15 +52,23 @@ rSliderGui<-function(x, parents_name="Genauer",
 #'
 #' @param x
 #' @param depth actual depth
+#' @param breaking
+#' @param mainpageposition
+#' @param reusingvalues
 #' @param parents_name
 #' @param minweight
 #' @param maxweight
 #' @param standardweight
 #' @param open.maxdepth
+#' @param cb_title
+#'
 #'
 #' @return
 
-recSliderGui<-function(x, depth=0, parents_name="Genauer",
+recSliderGui<-function(x, depth=0,
+                       breaking=NULL, mainpageposition=c("first","last", "none"),
+                       reusingvalues=!is.null(breaking),
+                       parents_name="genauer",
                      minweight=0,maxweight=100, standardweight=30,
                      open.maxdepth=Inf, cb_title= "I don't know"
 ){
@@ -57,6 +88,7 @@ recSliderGui<-function(x, depth=0, parents_name="Genauer",
 
   ret <- tagList()
 
+  #Durch Elemente des aktuellen Knotens iterieren
   for(i in 1:length(x) ){
     list.elem <- x[[i]]
     names <- names(x)[i]
@@ -70,8 +102,8 @@ recSliderGui<-function(x, depth=0, parents_name="Genauer",
                                list.elem$description, names)
 
     #Falls Element. GGf. Child-Elemente parsen
-    ## Hier Slider selbst
     if("class" %in% names(list.elem)){
+      ## Hier Slider selbst
       returnvalue <-tagList(sliderCheckboxInput(names,
                                         description = paste0(this.description, collapse=""),
                                         min = this.minweight,
@@ -80,7 +112,7 @@ recSliderGui<-function(x, depth=0, parents_name="Genauer",
                                         cb_title = cb_title)
                             )
 
-      #Rekursion
+      #Ggf. Rekursion
       if(list.elem$class=="elements")
         returnvalue <-tagList(returnvalue, recSliderGui(list.elem,depth+1,names,
                                                       minweight = this.minweight, maxweight=this.maxweight,
@@ -89,8 +121,8 @@ recSliderGui<-function(x, depth=0, parents_name="Genauer",
                                                       cb_title = cb_title) )
 
 
-      #Je nach Tiefe zusammenfügen
-
+      ##Je nach Tiefe zusammenfügen
+      # Falls noch offen. Je nach Tiefe eingerückt
       if (depth<open.maxdepth){
 
         #zurückgeben
@@ -104,7 +136,7 @@ recSliderGui<-function(x, depth=0, parents_name="Genauer",
 
       }#if (depth<open.maxdepth)
 
-
+      #Falls nicht mehr offen; nicht einrücken
       if (depth>= open.maxdepth){
         ret<- tagList(ret,returnvalue)
       }#  if (depth>= open.maxdepth)
@@ -115,6 +147,7 @@ recSliderGui<-function(x, depth=0, parents_name="Genauer",
 
   result <- ret
 
+  #Falls nicht mehr offen, muss komplete Sliderliste in ein bsCollapsePanel gepackt werden
   if (depth>= open.maxdepth)
     result <- bsCollapse(id=paste0("bsc",parents_name,  collapse="_"),
                          bsCollapsePanel(title=paste0("Faktor ",parents_name," einstellen",  collapse=""), ##Hier beschreibung einstellen
@@ -143,6 +176,7 @@ recSliderGui<-function(x, depth=0, parents_name="Genauer",
 #' @export
 #'
 #' @examples
+#' TODO: adapt to breaking funcitonality. - numbering of sliders is not fixed any more!
 rColorVector <- function(x, color="", color_parent=TRUE){
 
 
@@ -207,6 +241,7 @@ recColorVector<-function(x,num=0, color="", color_parent=TRUE){
 #' @describeIn rColorVector Vector of colors converted into a vector of CSS-Styles to use for ION.rangeSlider.
 #'
 #' @export
+#' TODO: adapt to breaking functonality in rSliderGui - numbering of sliders is not fixed any more!
 rColorSliders<-function(x, color_parent=TRUE){
 
   colorsVector <- rColorVector(x, color_parent =color_parent)
