@@ -504,7 +504,7 @@ shinyServer(function(input, output, session) {
   ####GUI Updaten ---Rest ####
 
   #Dummy Call Um Observer im Modul "sliderCheckbox" zu initialisieren
-  output$Aux_to_initialise_rv_dtGewichtungen <- renderTable({
+  output$Aux_to_initialise_rv_dtGewichtungen <- renderText({
     rv_dtGewichtungen()[,sum(originalweights)]
     return("")
   })

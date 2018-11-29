@@ -19,7 +19,7 @@ rSliderGui<-function(x, parents_name="Genauer",
                      minweight=0,maxweight=100, standardweight=30,
                      open.maxdepth=Inf,
                      cb_title= "I don't know"
-){
+                     ){
   recSliderGui(x,depth=0, parents_name = parents_name, minweight = minweight,
                maxweight = maxweight, standardweight = standardweight,
                open.maxdepth = open.maxdepth, cb_title=cb_title)
