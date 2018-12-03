@@ -115,7 +115,7 @@ rgetIndikatorensetting<- function(x, depth=0, parent="Szenarioergebnis",
 
   for(i in 1:length(x) ){
     list.elem <- x[[i]]
-    names <- names(x)[i]
+    elem.name<- names(x)[i]
 
     #Attribute parsen
     this.util_func <- ifelse("util_func" %in% names(list.elem), list.elem$util_func, util_func)
@@ -131,7 +131,7 @@ rgetIndikatorensetting<- function(x, depth=0, parent="Szenarioergebnis",
 
     #Falls Element. GGf. Child-Elemente parsen
     if("class" %in% names(list.elem)){
-      retvalue <- data.table(name=names,
+      retvalue <- data.table(name=elem.name,
                              is_mapping = list.elem$class=="mapping",
                              Attribname=ifelse(list.elem$class=="mapping",list.elem$Attribname, NA),
                              level=depth,
@@ -149,7 +149,7 @@ rgetIndikatorensetting<- function(x, depth=0, parent="Szenarioergebnis",
 
       #Rekursion
       if(list.elem$class=="elements")
-        retvalue <-rbind(retvalue, rgetIndikatorensetting (list.elem,depth=depth+1, parent=names,
+        retvalue <-rbind(retvalue, rgetIndikatorensetting (list.elem,depth=depth+1, parent=elem.name,
                                                            util_func=this.util_func,
                                                            util_mean = this.util_mean,
                                                            util_offset = this.util_offset,

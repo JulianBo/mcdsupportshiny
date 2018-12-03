@@ -91,7 +91,7 @@ recSliderGui<-function(x, depth=0,
   #Durch Elemente des aktuellen Knotens iterieren
   for(i in 1:length(x) ){
     list.elem <- x[[i]]
-    names <- names(x)[i]
+    elem.name <- names(x)[i]
 
     #Attribute parsen
     this.minweight <- ifelse("minweight" %in% names(list.elem), list.elem$minweight, minweight)
@@ -99,12 +99,12 @@ recSliderGui<-function(x, depth=0,
     this.standardweight <- ifelse("standardweight" %in% names(list.elem),
                                   list.elem$standardweight, standardweight)
     this.description <- ifelse("description" %in% names(list.elem),
-                               list.elem$description, names)
+                               list.elem$description, elem.name)
 
     #Falls Element. GGf. Child-Elemente parsen
     if("class" %in% names(list.elem)){
       ## Hier Slider selbst
-      returnvalue <-tagList(sliderCheckboxInput(names,
+      returnvalue <-tagList(sliderCheckboxInput(elem.name,
                                         description = paste0(this.description, collapse=""),
                                         min = this.minweight,
                                         max = this.maxweight,
@@ -114,7 +114,7 @@ recSliderGui<-function(x, depth=0,
 
       #Ggf. Rekursion
       if(list.elem$class=="elements")
-        returnvalue <-tagList(returnvalue, recSliderGui(list.elem,depth+1,names,
+        returnvalue <-tagList(returnvalue, recSliderGui(list.elem,depth+1,elem.name,
                                                       minweight = this.minweight, maxweight=this.maxweight,
                                                       standardweight = this.standardweight,
                                                       open.maxdepth = open.maxdepth,
@@ -168,15 +168,16 @@ recSliderGui<-function(x, depth=0,
 #' @param x Configuration list, see \code{\link{validateConfig}}.
 #' @param color Default color.
 #' @param color_parent Should parent itself also be colored in new color or only the children?
+#' @param collapse should all styles be collapsed into a single style-tag (default), or not (collapse=NULL)
 #'
-#' @return Vector of colors, corresponding to flatted list.
+#' @return named vector of colors, corresponding to flatted list. names: element names.
 #'
 #' @note See \url{https://stackoverflow.com/questions/36906265/how-to-color-sliderbar-sliderinput.}
 #'
 #' @export
 #'
 #' @examples
-#' TODO: adapt to breaking funcitonality. - numbering of sliders is not fixed any more!
+#'
 rColorVector <- function(x, color="", color_parent=TRUE){
 
 
@@ -206,7 +207,7 @@ recColorVector<-function(x,num=0, color="", color_parent=TRUE){
 
 
     list.elem <- x[[i]]
-    names <- names(x)[i]
+    elem.name <- names(x)[i]
 
 
     #
@@ -218,7 +219,7 @@ recColorVector<-function(x,num=0, color="", color_parent=TRUE){
 
       #message(sprintf("num = %i, color= %s", num, color) )
 
-      ret <- c(ret, ifelse(this.color_parent, this.color,color) )
+      ret <- c(ret,setNames( ifelse(this.color_parent, this.color,color),elem.name ) )
       num<-num+1
 
       ##Recursion
@@ -241,15 +242,18 @@ recColorVector<-function(x,num=0, color="", color_parent=TRUE){
 #' @describeIn rColorVector Vector of colors converted into a vector of CSS-Styles to use for ION.rangeSlider.
 #'
 #' @export
-#' TODO: adapt to breaking functonality in rSliderGui - numbering of sliders is not fixed any more!
-rColorSliders<-function(x, color_parent=TRUE){
+
+rColorSliders<-function(x, color_parent=TRUE, collapse="\n"){
+  ## TODO: Do this directly in SliderCheckbox-Module!
 
   colorsVector <- rColorVector(x, color_parent =color_parent)
 
-  lapply(1:length(colorsVector), function(x){
-    tags$style(HTML(
-      sprintf(".js-irs-%1$i .irs-single, .js-irs-%1$i .irs-bar-edge, .js-irs-%1$i .irs-bar {background: %2$s}",
-              x-1, colorsVector[x])) )
+  ret<-lapply(1:length(colorsVector), function(x){
+
+      sprintf("[for=\"%1$s\"]+span>.irs>.irs-single, [for=\"%1$s\"]+span>.irs-bar-edge, [for=\"%1$s\"]+span>.irs-bar {background: %2$s}"
+              ,#Correcting for Namespace of module!
+              paste0(names(colorsVector)[x],"-sl"), colorsVector[x])
   })
+  tags$style(HTML(paste(ret, collapse = collapse)))
 
 }

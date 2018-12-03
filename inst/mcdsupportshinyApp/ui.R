@@ -22,7 +22,7 @@ source("Setup.R", encoding="UTF-8") #local=FALSE, auch in ui.R sichtbar
 # Define UI for application
 shinyUI(fluidPage(
       useShinyjs(),
-      rColorSliders(configList),
+      rColorSliders(configList) ,
 
   # Application title
   titlePanel("Gewichtungen"),
