@@ -16,6 +16,7 @@
 #'                 }
 #'                 Maybe in future versions possibilities for putting special Elements on
 #'                 extra pages by name will be added, right now this is not possible.
+#' @param title_text Which paragraph should be added as first element of each page?
 #' @param mainpageposition One of "first", "last", "none".
 #'                         Should main page be first or last or be omitted?
 #' @param reusingvalues Should old slider values be used? If yes, provide list of values to be accessed by name
@@ -36,7 +37,8 @@
 #'
 #' @examples
 rSliderGui<-function(x,
-                     breaking=NULL,mainpageposition=c("first","last", "none"),
+                     breaking=NULL,title_text="Bitte einstellen",
+                     mainpageposition=c("first","last", "none"),
                      reusingvalues=!is.null(breaking),
                      parents_name="genauer",
                      minweight=0,maxweight=100, standardweight=30,
@@ -61,6 +63,7 @@ rSliderGui<-function(x,
                         open.maxdepth = open.maxdepth, cb_title=cb_title)
   # ###For debugging
   # breaking=1
+  # title_text="Bitte einstellen"
   # mainpageposition="last" #"none" #
   # slGui<-recSliderGui(configList, breaking = breaking)
   # ###
@@ -86,7 +89,9 @@ rSliderGui<-function(x,
     lapply( unique(slGui_attribs$page_nr[!is.na(slGui_attribs$page_n)]),
           function(x){
             #print(x)
-            slGui[slGui_attribs[page_nr==x,position]]
+            c(list(tags$p(title_text)),
+              slGui[slGui_attribs[page_nr==x,position]]
+            )
             })
   )
 
@@ -166,7 +171,7 @@ recSliderGui<-function(x, depth=0,
                                                   description = paste0(this.description, collapse=""),
                                                   min = this.minweight,
                                                   max = this.maxweight,
-                                                  value =reusingvalues[elem.name] %||%this.standardweight,
+                                                  value =reusingvalues[[elem.name]] %||%this.standardweight,
                                                   cb_title = cb_title)
         )
       } else {

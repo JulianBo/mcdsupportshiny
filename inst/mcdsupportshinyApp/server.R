@@ -63,7 +63,7 @@ dtBscCombinations[,opened:=FALSE]
 dtBscCombinations[,lastState:=""]
 #visible:=FALSE, Visible lässt sich nur hinterher über opened berechnen, aufgrund BUG
 
-
+##TODO: Warning.
 dtAlternativen_long <- merge(melt(dtAlternativen, id.vars=c("titel", "rahmenszenario")),
                              dtIndikatorensettings, by.x="variable", by.y="Attribname" )
 
@@ -363,8 +363,8 @@ shinyServer(function(input, output, session) {
                       #https://stackoverflow.com/questions/32536940/shiny-reactivity-fails-with-data-tables
                       #because no reactivity inside data.tables, extra value to trigger update
                       bscValues_update=0,
-
-                      data=data.table()
+                      data=data.table(),
+                      page = 1
                       )
 
 
@@ -407,12 +407,14 @@ shinyServer(function(input, output, session) {
   ## Ausklapp Gruppen, zum zählen wie häufig geöffnet.
   # Siehe https://stackoverflow.com/questions/38950886/generate-observers-for-dynamic-number-of-inputs
   observers <- lapply(unique(dtIndikatorensettings[!is.na(bscName), bscName]), function(x){
-   # print(x)
+    #print(x)
+    #print( dtBscCombinations)
 
     #Observe Closing as well, Ignore first time.
-    observeEvent(input[[x]], ignoreNULL = FALSE, ignoreInit = TRUE,{
+    observeEvent(input[[x]], ignoreNULL = TRUE, ignoreInit = TRUE,{
 
       #print( rv$bscValues)
+
       rv$bscValues[bscName==x,':='(timesClicked=timesClicked+1,
                                    opened=!opened,
                                    #Aufgrund BUG in bsCollapse;
@@ -457,6 +459,173 @@ shinyServer(function(input, output, session) {
 
 # GUI Updaten -------------------------------------------------------------
 
+  ####GUI Updaten ---DEFINE PAGES ####
+  NUM_PAGES <- 4
+
+
+  ##TODO: Weil am Ende alles reinitialisiert wird, wird immer TabPanel auf 1 gesetzt.
+  ## Müsste auch reinitialisiwert werden.
+  ## Oder doch: UI auf userseite - und dann synchronisieren!
+  ## Am besten mit SliderGui als Module und neuem namespace!
+  ## SIehe: https://stackoverflow.com/questions/21863898/r-shiny-multiple-use-in-ui-of-same-renderui-in-server/21888816#21888816
+  uilist <- reactive(
+    c(
+
+      ##TODO Reusingvalues
+      ##- Problem ist dass hier das Modul gebraucht wird, aber noch nicht existiert,
+      ##    und dass das Modul intern kein Fallback auf NULL hat
+      ##- ---> Gelöst, Modul hat jetzt Fallback auf NULL. und Reusing funktioniert weitestgehend.
+      ##- Aber jetzt funktioniert active-Checkbox nicht.
+      ##    Komische Wechselwirkungen in den Reactives.
+      ##-- Wahrscheinlich wegen der Reinitialisierung
+      ##- Wegen Reaktivität wird SLiderGui immer wieder neu initialisiert, wenn etwas geklickt wird.
+
+      rSliderGui(configList,breaking=1,title_text=NULL,
+                 cb_title="Ich weiß nicht" ,
+                 reusingvalues = lapply(sliderCheckboxModules,function(x){
+
+                   print("resuingvalues")
+                   #print(x)
+                   print(x())
+                   x()
+                   }
+                   ) #input
+                 ),
+      #print(sliderCheckboxModules),
+      #print(length(sliderCheckboxModules)),
+      #print(sliderCheckboxModules[[1]]()),
+      # print(lapply(sliderCheckboxModules,function(x){
+      #  x()
+      # })),
+      # print(names(input)),
+      ######Final Page
+      ### Sidebar with a slider inputs
+      list(
+    sidebarLayout(
+      sidebarPanel(
+        tags$p("Bitte stellen sie ein, wie wichtig Ihnen die einzelnen Indikatoren im Verhältnis zu den anderen Indikatoren sind."),
+        rSliderGui(configList,breaking=0,title_text=NULL,
+                   cb_title="Ich weiß nicht" ,
+                   reusingvalues = lapply(sliderCheckboxModules,function(x)x() )#input ##TODO
+                   )
+      ),#end of sidebarPanel
+
+      # Show Results, Description, ...
+      mainPanel(
+        tabsetPanel(id="MainTabset",
+                    tabPanel("Informationen",
+                             tags$p(texte$begruessungstext),tags$p(texte$begruessungstext2),
+                             h3("Weiter zur Auswertung"),
+                             fluidRow(
+                               #Weitere Abfragen
+                               column(width=6,
+                                      selectInput("PlaceSlct",texte$ortstext ,choices=texte$ortslist,
+                                                  selected = "Nein, woanders"),
+                                      selectInput("FirsttimeSlct","Haben Sie dieses Tool schon einmal benutzt?" ,
+                                                  choices=list("Nein", "Ja")),
+                                      selectInput("GenderSlct","Welches ist Ihr Geschlecht?" ,
+                                                  choices=list("Nicht angegeben/weitere", "Weiblich", "Männlich")),
+                                      sliderInput("AgeSl", "Wie alt sind Sie?", min=0, max=100, value=0)
+
+                               ),
+                               #Speicher-Button
+                               column(width=6,
+                                      selectInput("ChoiceSlct","Welche Alternative gefällt ihnen spontan am Besten?" ,
+                                                  choices=levels(dtAlternativen$titel) ),
+                                      br(),
+                                      tags$p("Sind Sie auf der linken Seite mit den Einstellungen zufrieden? Dann können Sie diese absenden und das Ergebnis ansehen"),
+                                      actionButton("speichernBtn", "Fertig? Speichern und Ergebnis ansehen")
+                               )
+                             )
+                             ##TODO: Alternativen beschreiben
+                             # ,
+                             # h3("Informationen zu den Alternativen"),
+                             # textOutput("InformationenText")
+                             ,
+                             textOutput("Aux_to_initialise")
+
+                    ),
+                    tabPanel("Entscheidungen",
+                             h2("Gesamtergebnis"),
+                             fluidRow(column(width=6,
+                                             plotOutput("ErgebnisPlot")
+                             ),
+                             column(width=6,
+                                    tags$p("Mit den aktuellen Einstellungen präferieren Sie:",
+                                           textOutput("ErgebnisText")),
+                                    tags$p("Ursprünglich ausgewählt hatten Sie:",
+                                           textOutput("ChoiceText")),
+                                    tableOutput("ErgebnisTable"),
+                                    tags$p("Mit den Einstellungen zufrieden? Dann auch diese speichern!"),
+                                    actionButton("addBtn", "Aktuelle Einstellungen speichern")
+
+
+                             )
+                             )
+                             ,
+                             h2("Ergebnisse im Einzelnen und nach Szenario"),
+                             plotOutput("EntscheidungenPlot"),
+                             tableOutput("EntscheidungenTable")
+
+                    ),
+                    tabPanel("Endgültige Gewichtungen",
+                             tableOutput("DirGewichtungenTable")
+                    ),
+                    tabPanel("Alternativen",
+                             tableOutput("AlternativenTable")
+                    ),
+                    tabPanel("Nutzen-Funktionen",
+                             plotOutput("NutzenPlot")
+                    )
+                    ,
+                    tabPanel("Bisherige Gewichtungen",
+                             plotOutput("BisherigeDecsPlot"),
+                             plotOutput("BisherigeHistsPlot")
+                             # ,
+                             # tableOutput("BisherigeTable")
+                    ),
+                    tabPanel("Einstellungen für die Indikatoren",
+                             tableOutput("Indikatorensettings")
+                    ),
+                    tabPanel("Über dieses Programm",
+                             tags$div(tags$p("Dieses Programm wurde im Rahmen des Projektes INOLA erstellt.
+                                             Weitere Informationen unter: ", tags$a(href="http://inola-region.de", "inola-region.de") ),
+                                      tags$p("Technische Umsetzung: Julian Bothe") )
+                             )
+                    ,
+                    tabPanel("R Helper",
+                             textOutput("RoutputPrint"),
+                             tableOutput("RoutputTable1"),
+                             tableOutput("RoutputTable")
+                    )
+                    ) #tabsetpanel
+        ) #mainPanel
+    ) #sidebarLayout
+    )#list (final Page)
+
+  )#c
+  )#reactive (pagelist)
+
+  ####GUI Updaten ---RenderGUI ####
+  observeEvent(rv$page,{
+
+    output$ui<- renderUI(uilist()[[rv$page]])
+    toggleState(id = "nextBtn", condition = rv$page < NUM_PAGES)
+    toggleState(id = "prevBtn", condition = rv$page > 1 &
+                  #  Am Ende geht es nicht mehr zurück
+                  rv$page < NUM_PAGES)
+
+
+
+  })
+
+  navPage <- function(direction) {
+    rv$page <- rv$page + direction
+  }
+
+  observeEvent(input$prevBtn, navPage(-1))
+  observeEvent(input$nextBtn, navPage(1))
+
   ####GUI Updaten ---Entscheidungen ####
 
   output$ErgebnisPlot<- renderPlot({
@@ -476,7 +645,6 @@ shinyServer(function(input, output, session) {
 
     # print(rv_dtErgebnis()[rv_dtErgebnis()[, .I[Gesamtergebnis==max(Gesamtergebnis)],], unique(titel)],
     #       max.levels=0, row.names=FALSE)
-
 
 
 
@@ -504,8 +672,14 @@ shinyServer(function(input, output, session) {
   ####GUI Updaten ---Rest ####
 
   #Dummy Call Um Observer im Modul "sliderCheckbox" zu initialisieren
-  output$Aux_to_initialise_rv_dtGewichtungen <- renderText({
+
+  output$Aux_to_initialise<- renderText({
+
+    ##Fehler, falls direkt in ui.R definiert: Error in if: argument is of length zero
+    ##-Verschwindet auf dritter Seite. Da scheinen dann alle Slider initialisiert worden sein,
+    ## selbst wenn einige noch in CollapsePanel sind.
     rv_dtGewichtungen()[,sum(originalweights)]
+
     return("")
   })
 

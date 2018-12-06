@@ -74,7 +74,10 @@ sliderCheckbox<- function(input, output, session,
  )
 
   return ( reactive({
-    if (input$active){
+    ##Implement Fallback, if notyet initialised
+    if (is.null(input$active) ){
+      NULL
+    } else if (input$active){
       default
     }else {
       input$sl

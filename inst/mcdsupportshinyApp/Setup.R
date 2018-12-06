@@ -19,7 +19,7 @@ summary(dtAlternativen)
 
 configList <- list (
   class="elements",
-  open.maxdepth=1,
+  open.maxdepth=2,
   #Attribute, zum Weiterreichen
   minweight=0,
   maxweight=100,
@@ -45,12 +45,13 @@ configList <- list (
   Ausstattung = list (
     class="elements",
     color="green",
-    Bordkino= list(class="mapping",Attribname="Kinoanlage"),
+    Bordkino= list(class="mapping",Attribname="Kinoanlage") ,
     Fahrhilfen = list (
       class="elements",
       color="grey",
       color_parent="FALSE",
-      AntiBlockiersystem= list(class="mapping",standardweight=80, Attribname="AntiBlockiersystem"),
+      AntiBlockiersystem= list(class="mapping",standardweight=80, Attribname="AntiBlockiersystem")
+      ,
       Abstandshalter1= list(
         class="elements",
         Abstandshalter= list(class="mapping",standardweight=20, Attribname="Abstandshalter")
