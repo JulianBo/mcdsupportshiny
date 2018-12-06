@@ -33,32 +33,32 @@ configList <- list (
   #Kindelemente
   #Geschwindigkeit= list(class="mapping", Attribname="Geschwindigkeit"),
   Innenraum= list(class="mapping",Attribname="Innenraum")
-  # ,
-  # Kosten= list (
-  #   class="elements",
-  #   standardweight=45, color="red",
-  #   util_func="antiprop",   util_offset=10,
-  #   include_parent=FALSE,
-  #   Kaufpreis= list(class="mapping",Attribname="Preis"),
-  #   Treibstoffkosten= list(class="mapping",Attribname="Treibstoffkosten")
-  # ),
-  # Ausstattung = list (
-  #   class="elements",
-  #   color="green",
-  #   Bordkino= list(class="mapping",Attribname="Kinoanlage"),
-  #   Fahrhilfen = list (
-  #     class="elements",
-  #     color="grey",
-  #     color_parent="FALSE",
-  #     AntiBlockiersystem= list(class="mapping",standardweight=80, Attribname="AntiBlockiersystem"),
-  #     Abstandshalter1= list(
-  #       class="elements",
-  #       Abstandshalter= list(class="mapping",standardweight=20, Attribname="Abstandshalter")
-  #     )
-  #   ),
-  #   Fensterheber = list(class="mapping",Attribname="Fensterheber")
-  # ),
-  # NichtvorhandenesAttribut= list(class="mapping", Attribname=NA)
+  ,
+  Kosten= list (
+    class="elements",
+    standardweight=45, color="red",
+    util_func="antiprop",   util_offset=10,
+    include_parent=FALSE,
+    Kaufpreis= list(class="mapping",Attribname="Preis"),
+    Treibstoffkosten= list(class="mapping",Attribname="Treibstoffkosten")
+  ),
+  Ausstattung = list (
+    class="elements",
+    color="green",
+    Bordkino= list(class="mapping",Attribname="Kinoanlage"),
+    Fahrhilfen = list (
+      class="elements",
+      color="grey",
+      color_parent="FALSE",
+      AntiBlockiersystem= list(class="mapping",standardweight=80, Attribname="AntiBlockiersystem"),
+      Abstandshalter1= list(
+        class="elements",
+        Abstandshalter= list(class="mapping",standardweight=20, Attribname="Abstandshalter")
+      )
+    ),
+    Fensterheber = list(class="mapping",Attribname="Fensterheber")
+  ),
+  NichtvorhandenesAttribut= list(class="mapping", Attribname=NA)
 
 )
 

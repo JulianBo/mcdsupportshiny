@@ -44,7 +44,7 @@ rSliderGui<-function(x,
                      cb_title= "I don't know"
                      ){
 
-
+  ##Tests
   stopifnot(is.list(x))
 
   if (is.null(breaking)){
@@ -52,14 +52,45 @@ rSliderGui<-function(x,
   } else  if (is.logical(breaking)){breaking<-as.integer(breaking)
   } else  stopifnot(breaking>=0)
 
-
+  ##Generate Gui
   slGui <- recSliderGui(x,depth=0,
                         breaking=breaking,
                         reusingvalues = reusingvalues,
                         parents_name = parents_name, minweight = minweight,
                         maxweight = maxweight, standardweight = standardweight,
                         open.maxdepth = open.maxdepth, cb_title=cb_title)
-  slGui
+  # ###For debugging
+  # breaking=1
+  # mainpageposition="last" #"none" #
+  # slGui<-recSliderGui(configList, breaking = breaking)
+  # ###
+
+  slGui_attribs<-data.table(element_name =sapply(slGui, function (x) attr(x,"element_name")),
+                            depth= sapply(slGui, function(x)attr(x,"depth")),
+                            parent_name =sapply(slGui, function (x) attr(x,"parent_name"))
+                            )
+  slGui_attribs[,position:=1:.N]
+
+
+  ####Reorder Gui according to breaking
+  ##Make vector of paging - using that slGui is ordered
+  slGui_attribs[,new_page:=depth>=breaking&shift(depth, fill=0)<breaking]
+  slGui_attribs[depth>=breaking,page_nr:=cumsum(new_page)]
+  slGui_attribs[depth<breaking, page_nr:=switch(first(mainpageposition), #only first argument
+                                                first=0,
+                                                last=max(slGui_attribs$page_nr, na.rm=TRUE)+1,
+                                                none=NA )]
+
+  ##For every page-number return extra list element. Remove NA to remove mainpage if asked for
+  return(
+    lapply( unique(slGui_attribs$page_nr[!is.na(slGui_attribs$page_n)]),
+          function(x){
+            #print(x)
+            slGui[slGui_attribs[page_nr==x,position]]
+            })
+  )
+
+
 }
 
 #' Internal Version of rSliderGui
@@ -77,7 +108,12 @@ rSliderGui<-function(x,
 #' @param cb_title
 #'
 #'
-#' @return a list of rows as UIoutput - Sliders and collapsebars.
+#' @return a list of rows as UIoutput - Sliders and collapsebars
+#'         with attributes "depth" and "element_name". See code{\link{setNameDepth}}
+#'
+#' @examples
+#' test<-recSliderGui(configList)
+#' sapply(test, function(x){setNames(attr(x,"depth"),attr(x,"element_name"))})
 
 recSliderGui<-function(x, depth=0,
                        breaking=0,
@@ -144,26 +180,33 @@ recSliderGui<-function(x, depth=0,
       }
 
       ##Je nach Tiefe zusammenfügen
-      ##TODO: HIER LIEGT FEHLER! Alles muss in einzelne Reihe gesetzt werden!
       # Falls noch offen. Je nach Tiefe eingerückt
       if (depth<open.maxdepth){
 
         ##Falls Mainpage
         #Ganz normal einrücken
-        if (depth<=breaking) {
+        if (depth<breaking) {
 
           #zurückgeben
           ret<- c(ret,
-                  indentedRow(indention = depth,
-                              returnvalue)
+                  list(
+                    setSliderGuiAttribs(
+                      indentedRow(indention = depth,
+                                                 returnvalue)
+                      ,elem.name, depth,parents_name )
+                  )
           )
 
           ##Falls keine Mainpage
           #Einrückung um Tiefe des Breaks bereinigen
         } else {
           ret<- c(ret,
-                  indentedRow(indention = depth -breaking,
-                              returnvalue)
+                  list(
+                    setSliderGuiAttribs(
+                      indentedRow(indention = depth -breaking,
+                                                returnvalue)
+                                    ,elem.name, depth,parents_name )
+                  )
           )
 
         }
@@ -175,10 +218,11 @@ recSliderGui<-function(x, depth=0,
 
 
       ##Ggf. REKURSION
-      ##Slider (Element selbst) mit evtl. Child-Knoten zusammensetzen. mit c(): sollte list() sein.
+      ##Slider (Element selbst) mit evtl. Child-Knoten zusammensetzen.
+      #mit c(); ohne extra list(), damit Liste der einzelnen Zeilen nicht geschachtelt wird.
       if(list.elem$class=="elements")
         ret <-c(ret,
-                # tagList(
+                #list(  #If one uses list() here, there will be a nested list in the end.
                   recSliderGui(list.elem,depth+1,
                                      breaking = breaking,
                                      reusingvalues = reusingvalues,
@@ -187,7 +231,7 @@ recSliderGui<-function(x, depth=0,
                                      standardweight = this.standardweight,
                                      open.maxdepth = open.maxdepth,
                                      cb_title = cb_title)
-                # )
+                 #)
         )
 
 
@@ -197,13 +241,27 @@ recSliderGui<-function(x, depth=0,
 
   }#for
 
-  #Falls nicht mehr offen, muss komplete Sliderliste in ein bsCollapsePanel gepackt werden
+  ##Falls nicht mehr offen, muss komplete Sliderliste in ein bsCollapsePanel gepackt werden
+
   if (depth>= open.maxdepth){
-    result <- bsCollapse(id=paste0("bsc",parents_name,  collapse="_"),
-                         bsCollapsePanel(title=paste0("Faktor ",parents_name," einstellen",  collapse=""), ##Hier beschreibung einstellen
-                                         tagList(ret)
-                                         )#bsCollapsePanel
-                         )#bsCollapse
+    result <- tagList(
+      bsCollapse(id=paste0("bsc",parents_name,  collapse="_"),
+                 bsCollapsePanel(title=paste0("Faktor ",parents_name," einstellen",  collapse=""), ##Hier beschreibung einstellen
+                                 tagList(ret)
+                 )#bsCollapsePanel
+      )#bsCollapse
+    )#tagList
+
+    #If first level of collapsePanel: indent
+    if (depth==open.maxdepth) {
+      result<- list(
+        setSliderGuiAttribs(
+          indentedRow(indention = ifelse(depth<=breaking, depth, depth -breaking)-1,
+                                             result)
+          ,paste0("bsc",parents_name,  collapse="_"), depth,parents_name)
+      )
+    }
+
   } else result <- ret
 
   return(result)

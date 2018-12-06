@@ -31,7 +31,7 @@ shinyUI(fluidPage(
   sidebarLayout(
     sidebarPanel(
       tags$p("Bitte stellen sie ein, wie wichtig Ihnen die einzelnen Indikatoren im Verhältnis zu den anderen Indikatoren sind."),
-      rSliderGui(configList,cb_title="Ich weiß nicht")
+      rSliderGui(configList,breaking=0,cb_title="Ich weiß nicht")
     ),#end of sidebarPanel
 
     # Show Results, Description, ...

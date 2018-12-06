@@ -80,3 +80,28 @@ getwidth <- function(x1,x2,share=20)  (x2-x1)/share
 `%||%` <- function(a, b) {
   if (!is.null(a)) a else b
 }
+
+
+#' Setting Attributes of Elements within sliderGrui
+#'
+#' Returns x with attributes element_name, depth, and parent_name set to values
+#'
+#' @param x object
+#' @param element_name value for element_name-attribute
+#' @param depth value for depth-attribute
+#' @param parent_name value for parent_name-attribute
+#'
+#' @return x with attributes element_name, depth, and parent_name
+#'
+#' @note Setting attribute "names" (with \code{\link{stats:setNames}}) produces an errors, therefore
+#'       attribute "element_name" is used.
+#'
+#' @examples
+setSliderGuiAttribs<-function(x,element_name,depth, parent_name){
+  attr(x,"depth")<-depth
+  attr(x,"element_name")<-element_name
+  attr(x,"parent_name")<-parent_name
+
+  x
+  #setNames(x,name)
+}
