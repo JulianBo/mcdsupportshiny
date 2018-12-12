@@ -169,6 +169,8 @@ shinyServer(function(input, output, session) {
   sliderCheckboxModules <-sapply(dtGewichtungen$name,
                                  function(x) callModule(sliderCheckbox,x)
                                  )
+  slGui1<-callModule(rSliderGui,"slGui1", dtGewichtungen$name)
+  slGui2<-callModule(rSliderGui,"slGui2", dtGewichtungen$name)
 
 # Reactives berechnen -----------------------------------------------------
 
@@ -179,10 +181,7 @@ shinyServer(function(input, output, session) {
 
    #print(sapply( dtGewichtungen$slname, function(x) input[[x]]))
 
-    dtGewichtungen[,originalweights:=sapply(name,
-                                            function(x) sliderCheckboxModules[[x]] ()*1.
-
-                                            )]
+    dtGewichtungen[,originalweights:=slGui2()]
                    #originalweights:=sapply(slname, function(x) input[[x]])] ##alt
 
    # print(dtGewichtungen)

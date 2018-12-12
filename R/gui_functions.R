@@ -1,3 +1,4 @@
+# Module SliderGui -----------------------------------------------------------
 
 # GUI-Functions -----------------------------------------------------------
 
@@ -36,7 +37,7 @@
 #' @export
 #'
 #' @examples
-rSliderGui<-function(x,
+rSliderGuiInput<-function(id, x,
                      breaking=NULL,title_text="Bitte einstellen",
                      mainpageposition=c("first","last", "none"),
                      reusingvalues=!is.null(breaking),
@@ -48,6 +49,9 @@ rSliderGui<-function(x,
 
   ##Tests
   stopifnot(is.list(x))
+  stopifnot(is.character(id))
+
+  ns<-NS(id)
 
   if (is.null(breaking)){
     breaking <-0
@@ -55,7 +59,7 @@ rSliderGui<-function(x,
   } else  stopifnot(breaking>=0)
 
   ##Generate Gui
-  slGui <- recSliderGui(x,depth=0,
+  slGui <- recSliderGuiInput(id=id, x,depth=0,
                         breaking=breaking,
                         reusingvalues = reusingvalues,
                         parents_name = parents_name, minweight = minweight,
@@ -65,7 +69,7 @@ rSliderGui<-function(x,
   # breaking=1
   # title_text="Bitte einstellen"
   # mainpageposition="last" #"none" #
-  # slGui<-recSliderGui(configList, breaking = breaking)
+  # slGui<-recSliderGuiInput("sl1",configList, breaking = breaking)
   # ###
 
   slGui_attribs<-data.table(element_name =sapply(slGui, function (x) attr(x,"element_name")),
@@ -117,10 +121,10 @@ rSliderGui<-function(x,
 #'         with attributes "depth" and "element_name". See code{\link{setNameDepth}}
 #'
 #' @examples
-#' test<-recSliderGui(configList)
+#' test<-recSliderGuiInput("slg1", configList)
 #' sapply(test, function(x){setNames(attr(x,"depth"),attr(x,"element_name"))})
 
-recSliderGui<-function(x, depth=0,
+recSliderGuiInput<-function(id, x, depth=0,
                        breaking=0,
                        reusingvalues=!is.null(breaking),
                        parents_name="genauer",
@@ -135,6 +139,8 @@ recSliderGui<-function(x, depth=0,
 
   #Alle Sliders und Collapsepanels für sich als tagList (das meint: alle fluidrows, und collapsePanelGroups)
   #Dann  jeweils als Geschachtelte Liste.
+
+  ns=NS(id)
 
 
   #Ebene, ab wo mit AusklappPanels gearbeitet wird. Kann nur kleiner werden, nie größer
@@ -167,7 +173,7 @@ recSliderGui<-function(x, depth=0,
       ## Hier Slider selbst - Taglist!
       ## In Abhängigkeit davon, ob alte Werte wiederbenutzt werden sollen oder nicht.
       if (is.list(reusingvalues)) {
-        returnvalue <-tagList(sliderCheckboxInput(elem.name,
+        returnvalue <-tagList(sliderCheckboxInput(ns(elem.name),
                                                   description = paste0(this.description, collapse=""),
                                                   min = this.minweight,
                                                   max = this.maxweight,
@@ -175,7 +181,7 @@ recSliderGui<-function(x, depth=0,
                                                   cb_title = cb_title)
         )
       } else {
-        returnvalue <-tagList(sliderCheckboxInput(elem.name,
+        returnvalue <-tagList(sliderCheckboxInput(ns(elem.name),
                                                   description = paste0(this.description, collapse=""),
                                                   min = this.minweight,
                                                   max = this.maxweight,
@@ -228,7 +234,7 @@ recSliderGui<-function(x, depth=0,
       if(list.elem$class=="elements")
         ret <-c(ret,
                 #list(  #If one uses list() here, there will be a nested list in the end.
-                  recSliderGui(list.elem,depth+1,
+                  recSliderGuiInput(id,list.elem,depth+1,
                                      breaking = breaking,
                                      reusingvalues = reusingvalues,
                                      elem.name,
@@ -250,7 +256,7 @@ recSliderGui<-function(x, depth=0,
 
   if (depth>= open.maxdepth){
     result <- tagList(
-      bsCollapse(id=paste0("bsc",parents_name,  collapse="_"),
+      bsCollapse(id=ns(paste0("bsc",parents_name,  collapse="_")),
                  bsCollapsePanel(title=paste0("Faktor ",parents_name," einstellen",  collapse=""), ##Hier beschreibung einstellen
                                  tagList(ret)
                  )#bsCollapsePanel
@@ -274,7 +280,27 @@ recSliderGui<-function(x, depth=0,
 
 
 }
+#'
+#' @describeIn rSliderGuiInput
+#' @export
+rSliderGui<- function(input, output, session, slNames) {
 
+  sliderCheckboxModules<- sapply(slNames,
+                                 function(x) callModule(sliderCheckbox,x)
+                                 )
+
+
+  return(reactive({
+    sapply(slNames,
+           function(x) sliderCheckboxModules[[x]] ()*1.
+
+    )
+
+  }))
+}
+
+
+# General Gui-Functions -----------------------------------------------------------
 
 #' Creation of indented fluidrows
 #'
@@ -379,7 +405,7 @@ recColorVector<-function(x,num=0, color="", color_parent=TRUE){
 #'
 #' @export
 
-rColorSliders<-function(x, color_parent=TRUE, collapse="\n"){
+rColorSliders<-function(x, id=NULL, slidername="sl", color_parent=TRUE, collapse="\n"){
   ## TODO: Do this directly in SliderCheckbox-Module!
 
   colorsVector <- rColorVector(x, color_parent =color_parent)
@@ -388,7 +414,7 @@ rColorSliders<-function(x, color_parent=TRUE, collapse="\n"){
 
       sprintf("[for=\"%1$s\"]+span>.irs>.irs-single, [for=\"%1$s\"]+span>.irs-bar-edge, [for=\"%1$s\"]+span>.irs-bar {background: %2$s}"
               ,#Correcting for Namespace of module!
-              paste0(names(colorsVector)[x],"-sl"), colorsVector[x])
+              paste0(NS(id)(NS(names(colorsVector)[x])(slidername)) ), colorsVector[x])
   })
   tags$style(HTML(paste(ret, collapse = collapse)))
 

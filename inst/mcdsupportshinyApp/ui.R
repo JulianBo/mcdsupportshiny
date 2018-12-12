@@ -17,17 +17,15 @@ library(mcdsupportshiny)
 source("Setup.R", encoding="UTF-8") #local=FALSE, auch in ui.R sichtbar
 #source("Setup_INOLA.R", encoding="UTF-8") #local=FALSE, auch in ui.R sichtbar
 
-slGui1<-rSliderGui(configList,breaking=1,title_text=NULL,
+slGui1<-rSliderGuiInput("slGui1",configList,breaking=1,title_text=NULL,
                    cb_title="Ich weiß nicht")
 NUM_PAGES <- length(slGui1)
 
 # Define UI for application
 shinyUI(fluidPage(
       useShinyjs(),
-      ## See https://stackoverflow.com/questions/16970989/sliderinput-in-shiny-how-to-control-the-length-width-of-the-slider-in-shiny
-      ## TODO: Warum sind Slider nicht auf kompletter Fensterbreite
-      tags$head(tags$style(HTML('irs {max-width: 1000px}'))),
-      rColorSliders(configList) ,
+      rColorSliders(configList,"slGui1") ,
+      rColorSliders(configList,"slGui2") ,
 
   ## Application title ----
   titlePanel("Gewichtungen"),
@@ -36,19 +34,11 @@ shinyUI(fluidPage(
 
 
   hidden(
-    list( #list, weil diverse "divs" in einer Liste kombiniert werden - obwohl rSliderGui schon Liste von Pages liefert.
+    list( #list, weil diverse "divs" in einer Liste kombiniert werden - obwohl rSliderGuiInput schon Liste von Pages liefert.
 
       #### SliderGuis
-      ##TODO Reusingvalues . not any more, only needed if dynamic
-      ##- Problem ist dass hier das Modul gebraucht wird, aber noch nicht existiert,
-      ##    und dass das Modul intern kein Fallback auf NULL hat
-      ##- ---> Gelöst, Modul hat jetzt Fallback auf NULL. und Reusing funktioniert weitestgehend.
-      ##- Aber jetzt funktioniert active-Checkbox nicht.
-      ##    Komische Wechselwirkungen in den Reactives.
-      ##-- Wahrscheinlich wegen der Reinitialisierung
-      ##- Wegen Reaktivität wird SLiderGui immer wieder neu initialisiert, wenn etwas geklickt wird.
 
-      ##TODO: Namespaces in rSliderGUI
+      ##TODO: Namespaces in rSliderGUIInput
       ##TODO: Set SliderGui2 to values of SliderGui1 at last page before mainpage.
       ##        First step: Implement SliderGui as module, implement updateSliderGui()
 
@@ -63,11 +53,11 @@ shinyUI(fluidPage(
       div(class = "page", id = paste0("page", NUM_PAGES+1),
         sidebarLayout(
           sidebarPanel(
-            # tags$p("Bitte stellen sie ein, wie wichtig Ihnen die einzelnen Indikatoren im Verhältnis zu den anderen Indikatoren sind."),
-            # rSliderGui(configList,breaking=0,title_text=NULL,
-            #            cb_title="Ich weiß nicht" ,
-            #            reusingvalues = lapply(sliderCheckboxModules,function(x)x() )#input ##TODO
-            # )
+            tags$p("Bitte stellen sie ein, wie wichtig Ihnen die einzelnen Indikatoren im Verhältnis zu den anderen Indikatoren sind."),
+            rSliderGuiInput("slGui2",configList,breaking=0,title_text=NULL,
+                       cb_title="Ich weiß nicht"
+                       #, reusingvalues = lapply(sliderCheckboxModules,function(x)x() )#input ##TODO
+            )
           ),#end of sidebarPanel
 
           # Show Results, Description, ...

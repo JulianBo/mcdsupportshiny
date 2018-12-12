@@ -12,6 +12,7 @@
 #' @param value Slider initial value. If NA, Checkbox will be activated and default returned.
 #' @param default Value to be returned if Checkbox is active.
 #' @param cb_title Description Label for Checkbox.
+#' @param width The width of the \code{\link[shiny]{sliderInput}}, e.g. '400px', or '100\%'; see \code{\link[shiny]{validateCssUnit}}.
 #' @param session The \code{session} object passed to function given to \code{shinyServer}.
 #'
 #' @return fluidrow with slider and checkbox for Input, Values as described below.
@@ -27,7 +28,8 @@ sliderCheckboxInput <- function(id,description="",
                                 max = 100,
                                 value = 30,
                                 default=30 ,
-                                cb_title = "I don't know"){
+                                cb_title = "I don't know",
+                                width = "100%"){
   ns <- NS(id)
 
   if(!is.na(default)&!is.numeric(default)){
@@ -41,7 +43,8 @@ sliderCheckboxInput <- function(id,description="",
                        paste0(description, collapse=""),
                        min = min,
                        max = max,
-                       value = ifelse(is.na(value),default,value)),
+                       value = ifelse(is.na(value),default,value),
+                       width = width),
            hidden(numericInput(
              ns("defaultNumeric"), "If you can see this, you forgot useShinyjs()", default)
            )
@@ -83,15 +86,17 @@ sliderCheckbox<- function(input, output, session) {
 
   return ( reactive({
     ##Implement Fallback, if notyet initialised
-    ret<-  if (is.null(input$active) ){
-      NULL
-    } else if (input$active){
-      input$defaultNumeric
+    if (is.null(input$active) ){
+      ret<-NULL
+    } else {if (input$active){
+      ret<-input$defaultNumeric
     }else {
-      input$sl
+      ret<-input$sl
+    }
+      attr(ret, "oldvalue")<-oldvalue()
     }
 
-    attr(ret, "oldvalue")<-oldvalue()
+
 
     ret
     }))
