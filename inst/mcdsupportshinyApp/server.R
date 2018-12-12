@@ -167,11 +167,7 @@ shinyServer(function(input, output, session) {
 
 # Load Modules -----------------------------
   sliderCheckboxModules <-sapply(dtGewichtungen$name,
-                                 #TODO: standardweight when creating sliderCheckboxInput
-                                 function(x) callModule(sliderCheckbox,x,
-                                                        default =dtGewichtungen[name==x,]$standardweight
-                                                        #,name=x
-                                                        )
+                                 function(x) callModule(sliderCheckbox,x)
                                  )
 
 # Reactives berechnen -----------------------------------------------------
@@ -459,161 +455,24 @@ shinyServer(function(input, output, session) {
 
 # GUI Updaten -------------------------------------------------------------
 
-  ####GUI Updaten ---DEFINE PAGES ####
-  NUM_PAGES <- 4
-
-
-  ##TODO: Weil am Ende alles reinitialisiert wird, wird immer TabPanel auf 1 gesetzt.
-  ## Müsste auch reinitialisiwert werden.
-  ## Oder doch: UI auf userseite - und dann synchronisieren!
-  ## Am besten mit SliderGui als Module und neuem namespace!
-  ## SIehe: https://stackoverflow.com/questions/21863898/r-shiny-multiple-use-in-ui-of-same-renderui-in-server/21888816#21888816
-  uilist <- reactive(
-    c(
-
-      ##TODO Reusingvalues
-      ##- Problem ist dass hier das Modul gebraucht wird, aber noch nicht existiert,
-      ##    und dass das Modul intern kein Fallback auf NULL hat
-      ##- ---> Gelöst, Modul hat jetzt Fallback auf NULL. und Reusing funktioniert weitestgehend.
-      ##- Aber jetzt funktioniert active-Checkbox nicht.
-      ##    Komische Wechselwirkungen in den Reactives.
-      ##-- Wahrscheinlich wegen der Reinitialisierung
-      ##- Wegen Reaktivität wird SLiderGui immer wieder neu initialisiert, wenn etwas geklickt wird.
-
-      rSliderGui(configList,breaking=1,title_text=NULL,
-                 cb_title="Ich weiß nicht" ,
-                 reusingvalues = lapply(sliderCheckboxModules,function(x){
-
-                   print("resuingvalues")
-                   #print(x)
-                   print(x())
-                   x()
-                   }
-                   ) #input
-                 ),
-      #print(sliderCheckboxModules),
-      #print(length(sliderCheckboxModules)),
-      #print(sliderCheckboxModules[[1]]()),
-      # print(lapply(sliderCheckboxModules,function(x){
-      #  x()
-      # })),
-      # print(names(input)),
-      ######Final Page
-      ### Sidebar with a slider inputs
-      list(
-    sidebarLayout(
-      sidebarPanel(
-        tags$p("Bitte stellen sie ein, wie wichtig Ihnen die einzelnen Indikatoren im Verhältnis zu den anderen Indikatoren sind."),
-        rSliderGui(configList,breaking=0,title_text=NULL,
-                   cb_title="Ich weiß nicht" ,
-                   reusingvalues = lapply(sliderCheckboxModules,function(x)x() )#input ##TODO
-                   )
-      ),#end of sidebarPanel
-
-      # Show Results, Description, ...
-      mainPanel(
-        tabsetPanel(id="MainTabset",
-                    tabPanel("Informationen",
-                             tags$p(texte$begruessungstext),tags$p(texte$begruessungstext2),
-                             h3("Weiter zur Auswertung"),
-                             fluidRow(
-                               #Weitere Abfragen
-                               column(width=6,
-                                      selectInput("PlaceSlct",texte$ortstext ,choices=texte$ortslist,
-                                                  selected = "Nein, woanders"),
-                                      selectInput("FirsttimeSlct","Haben Sie dieses Tool schon einmal benutzt?" ,
-                                                  choices=list("Nein", "Ja")),
-                                      selectInput("GenderSlct","Welches ist Ihr Geschlecht?" ,
-                                                  choices=list("Nicht angegeben/weitere", "Weiblich", "Männlich")),
-                                      sliderInput("AgeSl", "Wie alt sind Sie?", min=0, max=100, value=0)
-
-                               ),
-                               #Speicher-Button
-                               column(width=6,
-                                      selectInput("ChoiceSlct","Welche Alternative gefällt ihnen spontan am Besten?" ,
-                                                  choices=levels(dtAlternativen$titel) ),
-                                      br(),
-                                      tags$p("Sind Sie auf der linken Seite mit den Einstellungen zufrieden? Dann können Sie diese absenden und das Ergebnis ansehen"),
-                                      actionButton("speichernBtn", "Fertig? Speichern und Ergebnis ansehen")
-                               )
-                             )
-                             ##TODO: Alternativen beschreiben
-                             # ,
-                             # h3("Informationen zu den Alternativen"),
-                             # textOutput("InformationenText")
-                             ,
-                             textOutput("Aux_to_initialise")
-
-                    ),
-                    tabPanel("Entscheidungen",
-                             h2("Gesamtergebnis"),
-                             fluidRow(column(width=6,
-                                             plotOutput("ErgebnisPlot")
-                             ),
-                             column(width=6,
-                                    tags$p("Mit den aktuellen Einstellungen präferieren Sie:",
-                                           textOutput("ErgebnisText")),
-                                    tags$p("Ursprünglich ausgewählt hatten Sie:",
-                                           textOutput("ChoiceText")),
-                                    tableOutput("ErgebnisTable"),
-                                    tags$p("Mit den Einstellungen zufrieden? Dann auch diese speichern!"),
-                                    actionButton("addBtn", "Aktuelle Einstellungen speichern")
-
-
-                             )
-                             )
-                             ,
-                             h2("Ergebnisse im Einzelnen und nach Szenario"),
-                             plotOutput("EntscheidungenPlot"),
-                             tableOutput("EntscheidungenTable")
-
-                    ),
-                    tabPanel("Endgültige Gewichtungen",
-                             tableOutput("DirGewichtungenTable")
-                    ),
-                    tabPanel("Alternativen",
-                             tableOutput("AlternativenTable")
-                    ),
-                    tabPanel("Nutzen-Funktionen",
-                             plotOutput("NutzenPlot")
-                    )
-                    ,
-                    tabPanel("Bisherige Gewichtungen",
-                             plotOutput("BisherigeDecsPlot"),
-                             plotOutput("BisherigeHistsPlot")
-                             # ,
-                             # tableOutput("BisherigeTable")
-                    ),
-                    tabPanel("Einstellungen für die Indikatoren",
-                             tableOutput("Indikatorensettings")
-                    ),
-                    tabPanel("Über dieses Programm",
-                             tags$div(tags$p("Dieses Programm wurde im Rahmen des Projektes INOLA erstellt.
-                                             Weitere Informationen unter: ", tags$a(href="http://inola-region.de", "inola-region.de") ),
-                                      tags$p("Technische Umsetzung: Julian Bothe") )
-                             )
-                    ,
-                    tabPanel("R Helper",
-                             textOutput("RoutputPrint"),
-                             tableOutput("RoutputTable1"),
-                             tableOutput("RoutputTable")
-                    )
-                    ) #tabsetpanel
-        ) #mainPanel
-    ) #sidebarLayout
-    )#list (final Page)
-
-  )#c
-  )#reactive (pagelist)
-
-  ####GUI Updaten ---RenderGUI ####
+  ####GUI Updaten ---PageChange ####
   observeEvent(rv$page,{
+    #NUM_Pages till now only length of slGUi1, without resultpage
+    NUM_PAGES <- 3 #TODO: dynamic
 
-    output$ui<- renderUI(uilist()[[rv$page]])
+    hide(selector = ".page") #To hide other pages.
+    show(paste0("page", rv$page))
+
+    ##Next nur bis vorletzte Seite
     toggleState(id = "nextBtn", condition = rv$page < NUM_PAGES)
-    toggleState(id = "prevBtn", condition = rv$page > 1 &
-                  #  Am Ende geht es nicht mehr zurück
-                  rv$page < NUM_PAGES)
+    ##Next ab letzter Seite unsichtbar
+    toggle(id = "nextBtn", condition = rv$page < NUM_PAGES)
+    ##SaveBtn nur auf letzter Seite
+    toggle(id = "saveBtn", condition = rv$page == NUM_PAGES)
+    ##PrevBtn nicht am Anfang
+    toggleState(id = "prevBtn", condition = rv$page > 1 )
+    ## PRevBtn am Ende nicht mehr sichtbar  Am Ende geht es nicht mehr zurück
+    toggle(id = "prevBtn", condition = rv$page <= NUM_PAGES)
 
 
 
@@ -625,6 +484,11 @@ shinyServer(function(input, output, session) {
 
   observeEvent(input$prevBtn, navPage(-1))
   observeEvent(input$nextBtn, navPage(1))
+  observeEvent(input$saveBtn, {
+    #TODO: hier SlGui2 updaten.
+    #TODO: hier speichern.
+    navPage(1)
+    })
 
   ####GUI Updaten ---Entscheidungen ####
 
