@@ -25,12 +25,12 @@ recursiveTrue <- function(names, states, parents){
 
     #only first parent
     parent<- data[names==x, first(parents)]
-    print(paste0("parent=",parent))
+    #print(paste0("parent=",parent))
 
     parentTrue<- ifelse(nrow(data[names==parent])==1,
                         rTrue(parent, data),
                         TRUE)
-    print(paste0("parentTrue=",parentTrue))
+    #print(paste0("parentTrue=",parentTrue))
 
     return (data[names==x, states] & parentTrue)
   }

@@ -142,7 +142,7 @@ rgetIndikatorensetting<- function(x, depth=0, parent="Szenarioergebnis",
                              agg_func=ifelse(this.include_parent,this.agg_func, agg_func),
                              parent=parent,
                              bscName=ifelse(depth>= open.maxdepth,
-                                            paste0("bsc",parent,  collapse="_") ,
+                                            NS(parent)("bsc") ,
                                             NA),
                              standardweight = ifelse(this.include_parent,this.standardweight, standardweight)
       )

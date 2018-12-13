@@ -48,7 +48,7 @@ initialize_datastorage( speicher_template, speichersettings$method, speichersett
 
 
 dtIndikatorensettings<-getIndikatorensetting(configList)
-dtIndikatorensettings[,slname:=paste0("sl",name)]
+dtIndikatorensettings[,slname:=NS(name)("sl")]
 dtIndikatorensettings[,colors:=rColorVector(configList, color="blue")]
 
 setkey(dtIndikatorensettings,name)
@@ -166,9 +166,9 @@ shinyServer(function(input, output, session) {
 
 
 # Load Modules -----------------------------
-  sliderCheckboxModules <-sapply(dtGewichtungen$name,
-                                 function(x) callModule(sliderCheckbox,x)
-                                 )
+  # sliderCheckboxModules <-sapply(dtGewichtungen$name,
+  #                                function(x) callModule(sliderCheckbox,x)
+  #                                )
   slGui1<-callModule(rSliderGui,"slGui1", dtGewichtungen$name)
   slGui2<-callModule(rSliderGui,"slGui2", dtGewichtungen$name)
 
@@ -181,7 +181,7 @@ shinyServer(function(input, output, session) {
 
    #print(sapply( dtGewichtungen$slname, function(x) input[[x]]))
 
-    dtGewichtungen[,originalweights:=slGui2()]
+    dtGewichtungen[,originalweights:=slGui2$sliderCheckBoxValues()]
                    #originalweights:=sapply(slname, function(x) input[[x]])] ##alt
 
    # print(dtGewichtungen)
@@ -406,14 +406,16 @@ shinyServer(function(input, output, session) {
     #print( dtBscCombinations)
 
     #Observe Closing as well, Ignore first time.
-    observeEvent(input[[x]], ignoreNULL = TRUE, ignoreInit = TRUE,{
+    ## HERE: slGui1
+    observeEvent(input[[NS("slGui1")(x)]],
+                 ignoreNULL = TRUE, ignoreInit = TRUE,{
 
       #print( rv$bscValues)
 
-      rv$bscValues[bscName==x,':='(timesClicked=timesClicked+1,
+      rv$bscValues[bscName==NS("slGui1")(x),':='(timesClicked=timesClicked+1,
                                    opened=!opened,
                                    #Aufgrund BUG in bsCollapse;
-                                   lastState=paste0(input[[x]],collapse=";")
+                                   lastState=paste0(input[[NS("slGui1")(x)]],collapse=";")
                                    )
                                 ]
       #Falls vorhanden, Eltern-Knoten anpassen, um die folgende -fehlerhafte-
@@ -424,7 +426,8 @@ shinyServer(function(input, output, session) {
                    ':='(timesClicked=timesClicked-1,
                         opened=!opened,
                         #Aufgrund BUG in bsCollapse;
-                        lastState=paste0(input[[x]],collapse=";")
+                        ##TODO
+                        lastState=paste0(input[[NS("slGui1")(x)]],collapse=";")
       )
       ]
 
@@ -440,7 +443,7 @@ shinyServer(function(input, output, session) {
     #Visible bei Kindknoten updaten, rekursiv
     #Sichtbarkeit der jeweiligen Level hinzufügen - geht nur außerhalb und nach Observer
 
-    rv$bscValues_update
+    rv$bscValues_update #To trigger update
 
     ret <- copy(rv$bscValues)
 
@@ -457,7 +460,7 @@ shinyServer(function(input, output, session) {
   ####GUI Updaten ---PageChange ####
   observeEvent(rv$page,{
     #NUM_Pages till now only length of slGUi1, without resultpage
-    NUM_PAGES <- 3 #TODO: dynamic
+    NUM_PAGES <- 1 #TODO: dynamic!!!
 
     hide(selector = ".page") #To hide other pages.
     show(paste0("page", rv$page))
@@ -599,22 +602,26 @@ shinyServer(function(input, output, session) {
   # ##R Helferfunktionen; um anzuschauen was abgeht.
   output$RoutputPrint<- renderPrint({
 
-    str(sliderCheckboxModules)
-
+    str(rv_dtformData())
   })
   #
-  # output$RoutputTable1<- renderTable({
-  #
-  #   print("updating RoutputTable1")
-  #   #rv$bscValues
-  #   rv_dtBscStates()
-  # })
-  #
-  # output$RoutputTable <- renderTable({
-  #   rv$data
-  #   #rv_dtformData_long()
-  #   #rv$bscValues
-  # })
+  output$RoutputTable1<- renderTable({
 
+    #print("updating RoutputTable1")
+    #rv$bscValues
+    rv_dtBscStates()
+  })
+
+  output$RoutputTable <- renderTable({
+    rv$data
+    #rv_dtformData_long()
+    #rv$bscValues
+  })
+
+  output$RoutputText2<- renderPrint({
+    #rv$data #NULL data.table
+    rv_dtBscStates()
+    str(rv_dtBscStates())
+  })
 
 })

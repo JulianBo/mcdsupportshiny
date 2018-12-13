@@ -11,11 +11,13 @@
 #' @param max Slider maximum value.
 #' @param value Slider initial value. If NA, Checkbox will be activated and default returned.
 #' @param default Value to be returned if Checkbox is active.
+#' @param oldvalue Value to be stored if value is NA. SLider will be set to oldvalue after Checkbox is
+#'                 deactivated.
 #' @param cb_title Description Label for Checkbox.
 #' @param width The width of the \code{\link[shiny]{sliderInput}}, e.g. '400px', or '100\%'; see \code{\link[shiny]{validateCssUnit}}.
-#' @param session The \code{session} object passed to function given to \code{shinyServer}.
+#' @param session Passing the \code{session} object to function which was given to \code{shinyServer}.
 #'
-#' @return fluidrow with slider and checkbox for Input, Values as described below.
+#' @return fluidrow with slider and checkbox for Input, values as described below.
 #' @export
 #'
 #' @note For Usage of Modules, see \url{https://shiny.rstudio.com/articles/modules.html}.
@@ -28,6 +30,7 @@ sliderCheckboxInput <- function(id,description="",
                                 max = 100,
                                 value = 30,
                                 default=30 ,
+                                oldvalue =value,
                                 cb_title = "I don't know",
                                 width = "100%"){
   ns <- NS(id)
@@ -45,8 +48,11 @@ sliderCheckboxInput <- function(id,description="",
                        max = max,
                        value = ifelse(is.na(value),default,value),
                        width = width),
-           hidden(numericInput(
-             ns("defaultNumeric"), "If you can see this, you forgot useShinyjs()", default)
+           hidden(
+             numericInput(ns("defaultNumeric"),
+                          "If you can see this, you forgot useShinyjs()", default),
+             numericInput(ns("oldvalueNumeric"),
+                          "If you can see this, you forgot useShinyjs()", oldvalue)
            )
 
     ),
@@ -63,16 +69,14 @@ sliderCheckboxInput <- function(id,description="",
 #' @export
 sliderCheckbox<- function(input, output, session) {
 
-  oldvalue<- reactiveVal(NA)
-
   observeEvent(input$active, {
     #message(paste(input$active, name, collapse=";") ) #For Development
     if (input$active){
-      oldvalue(input$sl)
+      updateNumericInput(session,"oldvalueNumeric", input$sl)
       disable("sl")
       updateSliderInput(session, "sl", value=input$defaultNumeric)
     }else {
-      updateSliderInput(session, "sl", value=oldvalue())
+      updateSliderInput(session, "sl", value=input$oldvalueNumeric)
       enable("sl")
     }
 
@@ -93,7 +97,7 @@ sliderCheckbox<- function(input, output, session) {
     }else {
       ret<-input$sl
     }
-      attr(ret, "oldvalue")<-oldvalue()
+      attr(ret, "oldvalue")<-input$oldvalueNumeric
     }
 
 
@@ -112,6 +116,7 @@ updateSliderCheckboxInput<- function( session, id,
                                       max = NULL,
                                       value = NULL,
                                       default=NULL ,
+                                      oldvalue =NULL,
                                       cb_title = NULL){
 
   ns<-NS(id)
@@ -133,5 +138,8 @@ updateSliderCheckboxInput<- function( session, id,
     updateSliderInput(session,ns("sl"),value=value)
   }
   }
+
+  #Updating oldvalue  -last, to override changes before.
+  if(!is.null(oldvalue))updateNumericInput(session,ns("oldvalueNumeric"), value=oldvalue)
 
 }

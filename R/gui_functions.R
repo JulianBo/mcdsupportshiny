@@ -256,7 +256,7 @@ recSliderGuiInput<-function(id, x, depth=0,
 
   if (depth>= open.maxdepth){
     result <- tagList(
-      bsCollapse(id=ns(paste0("bsc",parents_name,  collapse="_")),
+      bsCollapse(id=NS(ns(parents_name))("bsc"),
                  bsCollapsePanel(title=paste0("Faktor ",parents_name," einstellen",  collapse=""), ##Hier beschreibung einstellen
                                  tagList(ret)
                  )#bsCollapsePanel
@@ -269,7 +269,7 @@ recSliderGuiInput<-function(id, x, depth=0,
         setSliderGuiAttribs(
           indentedRow(indention = ifelse(depth<=breaking, depth, depth -breaking)-1,
                                              result)
-          ,paste0("bsc",parents_name,  collapse="_"), depth,parents_name)
+          ,NS(ns(parents_name))("bsc"), depth,parents_name)
       )
     }
 
@@ -281,22 +281,30 @@ recSliderGuiInput<-function(id, x, depth=0,
 
 }
 #'
-#' @describeIn rSliderGuiInput
+#' @describeIn rSliderGuiInput list of two: sliderCheckBoxValues and collapsePanelValues
 #' @export
 rSliderGui<- function(input, output, session, slNames) {
 
+  ##sliderCheckBoxValues
   sliderCheckboxModules<- sapply(slNames,
                                  function(x) callModule(sliderCheckbox,x)
                                  )
 
-
-  return(reactive({
+  sliderCheckBoxValues <- reactive({
     sapply(slNames,
-           function(x) sliderCheckboxModules[[x]] ()*1.
+           function(x) sliderCheckboxModules[[x]] () * 1.
+           )
+    })
 
-    )
+  ##collapsePanelValues
 
-  }))
+
+
+  ##TODO
+  return( list(sliderCheckBoxValues=sliderCheckBoxValues,
+               collapsePanelValues=NA #TODO
+               )
+          )
 }
 
 
@@ -413,8 +421,8 @@ rColorSliders<-function(x, id=NULL, slidername="sl", color_parent=TRUE, collapse
   ret<-lapply(1:length(colorsVector), function(x){
 
       sprintf("[for=\"%1$s\"]+span>.irs>.irs-single, [for=\"%1$s\"]+span>.irs-bar-edge, [for=\"%1$s\"]+span>.irs-bar {background: %2$s}"
-              ,#Correcting for Namespace of module!
-              paste0(NS(id)(NS(names(colorsVector)[x])(slidername)) ), colorsVector[x])
+              ,#Correcting for Namespace of module! - id-names(colorsVector)[x]-slidername
+              NS(c(id,names(colorsVector)[x]))(slidername) , colorsVector[x])
   })
   tags$style(HTML(paste(ret, collapse = collapse)))
 

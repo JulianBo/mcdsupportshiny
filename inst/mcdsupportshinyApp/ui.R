@@ -17,7 +17,7 @@ library(mcdsupportshiny)
 source("Setup.R", encoding="UTF-8") #local=FALSE, auch in ui.R sichtbar
 #source("Setup_INOLA.R", encoding="UTF-8") #local=FALSE, auch in ui.R sichtbar
 
-slGui1<-rSliderGuiInput("slGui1",configList,breaking=1,title_text=NULL,
+slGui1<-rSliderGuiInput("slGui1",configList,breaking=0,title_text=NULL,
                    cb_title="Ich weiß nicht")
 NUM_PAGES <- length(slGui1)
 
@@ -146,7 +146,8 @@ shinyUI(fluidPage(
                         tabPanel("R Helper",
                                  textOutput("RoutputPrint"),
                                  tableOutput("RoutputTable1"),
-                                 tableOutput("RoutputTable")
+                                 tableOutput("RoutputTable"),
+                                 textOutput("RoutputText2")
                         )
                         ) #tabsetpanel
             ) #mainPanel
