@@ -48,16 +48,17 @@ initialize_datastorage( speicher_template, speichersettings$method, speichersett
 
 
 dtIndikatorensettings<-getIndikatorensetting(configList)
-dtIndikatorensettings[,slname:=NS(name)("sl")]
+dtIndikatorensettings[,slname:=paste(name,"sl", sep = ns.sep)] #shiny:ns.sep; NS() not vectorised
 dtIndikatorensettings[,colors:=rColorVector(configList, color="blue")]
 
 setkey(dtIndikatorensettings,name)
 
-# columns: bscName bscName.parent - Get each parent-child-combination.
+# columns: bscName bscName.parent - Get each parent-child-combination.Only of collapsePanels.
+# Parent=NA --> Top-level.
 dtBscCombinations <- unique(merge(dtIndikatorensettings ,
                                  dtIndikatorensettings[,.(name, bscName )],
                                  by.x="parent", by.y = "name", suffixes = c("", ".parent"))
-                           [, .(bscName,bscName.parent) ])
+                           [!is.na(bscName), .(bscName,bscName.parent) ], na.rm=TRUE)
 dtBscCombinations[,timesClicked:=0]
 dtBscCombinations[,opened:=FALSE]
 dtBscCombinations[,lastState:=""]
@@ -169,8 +170,10 @@ shinyServer(function(input, output, session) {
   # sliderCheckboxModules <-sapply(dtGewichtungen$name,
   #                                function(x) callModule(sliderCheckbox,x)
   #                                )
-  slGui1<-callModule(rSliderGui,"slGui1", dtGewichtungen$name)
-  slGui2<-callModule(rSliderGui,"slGui2", dtGewichtungen$name)
+
+  #copy(dtBscCombinations) to separate Counting. Otherwise call-by-reference, to same data.table.
+  slGui1<-callModule(rSliderGui,"slGui1", dtGewichtungen$name,copy(dtBscCombinations) )
+  slGui2<-callModule(rSliderGui,"slGui2", dtGewichtungen$name,copy(dtBscCombinations) )
 
 # Reactives berechnen -----------------------------------------------------
 
@@ -179,13 +182,7 @@ shinyServer(function(input, output, session) {
     #Zum Testen:
    # dtGewichtungen[,originalweights:= c(0:10*10, 10,10)]
 
-   #print(sapply( dtGewichtungen$slname, function(x) input[[x]]))
-
     dtGewichtungen[,originalweights:=slGui2$sliderCheckBoxValues()]
-                   #originalweights:=sapply(slname, function(x) input[[x]])] ##alt
-
-   # print(dtGewichtungen)
-
 
     ##HIER EIGENTLICHE LOGIK
     #getrennt nach allen leveln aufaggregieren
@@ -281,7 +278,7 @@ shinyServer(function(input, output, session) {
 
   rv_dtErgebnis <- reactive({
     rv_dtSzenarioergebnis()[,.(Gesamtergebnis=mean(Szenarioergebnis) ),by=titel]
-  #dt_Ergebnis = dtNutzen[,.(Gesamtergebnis=mean(Szenarioergebnis) ),by=titel] #zum testen
+  dt_Ergebnis = dtNutzen[,.(Gesamtergebnis=mean(Szenarioergebnis) ),by=titel] #zum testen
 
   })
 
@@ -332,10 +329,10 @@ shinyServer(function(input, output, session) {
       setNames(rv_dtGewichtungen()$finalweight_in_level_corrected,
                paste0(rv_dtGewichtungen()$slname, ".finalweight_in_level_corrected"  )),
       ## Status CollapsePanels
-      setNames(rv_dtBscStates()$timesClicked ,
-               paste0(rv_dtBscStates()$bscName, ".timesClicked"  )),
-      setNames(rv_dtBscStates()$visible ,
-               paste0(rv_dtBscStates()$bscName, ".visible"  ))
+      setNames(slGui2$collapsePanelValues()$timesClicked ,
+               paste0(slGui2$collapsePanelValues()$bscName, ".timesClicked"  )),
+      setNames(slGui2$collapsePanelValues()$visible ,
+               paste0(slGui2$collapsePanelValues()$bscName, ".visible"  ))
 
 
       )
@@ -354,11 +351,7 @@ shinyServer(function(input, output, session) {
   # Reactive Values & Aktionen durchführen ----------------------------------------------------
 
 
-  rv<- reactiveValues(bscValues=dtBscCombinations,
-                      #https://stackoverflow.com/questions/32536940/shiny-reactivity-fails-with-data-tables
-                      #because no reactivity inside data.tables, extra value to trigger update
-                      bscValues_update=0,
-                      data=data.table(),
+  rv<- reactiveValues(data=data.table(),
                       page = 1
                       )
 
@@ -399,60 +392,7 @@ shinyServer(function(input, output, session) {
   })
 
 
-  ## Ausklapp Gruppen, zum zählen wie häufig geöffnet.
-  # Siehe https://stackoverflow.com/questions/38950886/generate-observers-for-dynamic-number-of-inputs
-  observers <- lapply(unique(dtIndikatorensettings[!is.na(bscName), bscName]), function(x){
-    #print(x)
-    #print( dtBscCombinations)
 
-    #Observe Closing as well, Ignore first time.
-    ## HERE: slGui1
-    observeEvent(input[[NS("slGui1")(x)]],
-                 ignoreNULL = TRUE, ignoreInit = TRUE,{
-
-      #print( rv$bscValues)
-
-      rv$bscValues[bscName==NS("slGui1")(x),':='(timesClicked=timesClicked+1,
-                                   opened=!opened,
-                                   #Aufgrund BUG in bsCollapse;
-                                   lastState=paste0(input[[NS("slGui1")(x)]],collapse=";")
-                                   )
-                                ]
-      #Falls vorhanden, Eltern-Knoten anpassen, um die folgende -fehlerhafte-
-      # Aktivierung der Observer der übergeordneten collapsePanels auszugleichen
-      rv$bscValues[
-                   #Elternknoten über dtIndikatorensettings herausfinden
-                   bscName==dtIndikatorensettings[name==dtIndikatorensettings[x==bscName,unique(parent)], bscName],
-                   ':='(timesClicked=timesClicked-1,
-                        opened=!opened,
-                        #Aufgrund BUG in bsCollapse;
-                        ##TODO
-                        lastState=paste0(input[[NS("slGui1")(x)]],collapse=";")
-      )
-      ]
-
-      #Um Reaktivität trotz data.table zu triggern.
-      #https://stackoverflow.com/questions/32536940/shiny-reactivity-fails-with-data-tables
-      rv$bscValues_update<-rv$bscValues_update+1
-
-    })
-
-  })
-
-  rv_dtBscStates <- reactive({
-    #Visible bei Kindknoten updaten, rekursiv
-    #Sichtbarkeit der jeweiligen Level hinzufügen - geht nur außerhalb und nach Observer
-
-    rv$bscValues_update #To trigger update
-
-    ret <- copy(rv$bscValues)
-
-    ret[,visible:=recursiveTrue(bscName, opened,bscName.parent )
-        ]
-    # print("visible updated")
-    # print(ret)
-    return(ret)
-  })
 
 
 # GUI Updaten -------------------------------------------------------------
@@ -486,8 +426,12 @@ shinyServer(function(input, output, session) {
 
   observeEvent(input$prevBtn, navPage(-1))
   observeEvent(input$nextBtn, navPage(1))
+
   observeEvent(input$saveBtn, {
     #TODO: hier SlGui2 updaten.
+    ## TODO:BUG: Warum funktiuoniert oldvalue nicht.
+    print("jetzt: parallelizeSliderGuiInput")
+    parallelizeSliderGuiInput(session,slGui2, slGui1)
     #TODO: hier speichern.
     navPage(1)
     })
@@ -600,28 +544,30 @@ shinyServer(function(input, output, session) {
   ####GUI Updaten ---R Helferfunktionen ####
 
   # ##R Helferfunktionen; um anzuschauen was abgeht.
-  output$RoutputPrint<- renderPrint({
 
-    str(rv_dtformData())
-  })
+  # output$RoutputPrint<- renderPrint({
+  #
+  #   str(rv_dtformData())
+  # })
   #
   output$RoutputTable1<- renderTable({
 
-    #print("updating RoutputTable1")
-    #rv$bscValues
-    rv_dtBscStates()
+    slGui2$collapsePanelValues()
   })
+  output$RoutputTable2<- renderTable({
 
+    slGui1$collapsePanelValues()
+  })
   output$RoutputTable <- renderTable({
     rv$data
     #rv_dtformData_long()
     #rv$bscValues
   })
 
-  output$RoutputText2<- renderPrint({
-    #rv$data #NULL data.table
-    rv_dtBscStates()
-    str(rv_dtBscStates())
-  })
+  # output$RoutputText2<- renderPrint({
+  #   #rv$data #NULL data.table
+  #   slGui2$collapsePanelValues()
+  #   str(slGui2$collapsePanelValues())
+  # })
 
 })

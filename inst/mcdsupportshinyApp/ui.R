@@ -146,6 +146,7 @@ shinyUI(fluidPage(
                         tabPanel("R Helper",
                                  textOutput("RoutputPrint"),
                                  tableOutput("RoutputTable1"),
+                                 tableOutput("RoutputTable2"),
                                  tableOutput("RoutputTable"),
                                  textOutput("RoutputText2")
                         )

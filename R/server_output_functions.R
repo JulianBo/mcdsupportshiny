@@ -35,6 +35,7 @@ recursiveTrue <- function(names, states, parents){
     return (data[names==x, states] & parentTrue)
   }
 
+  #message(sapply(data$names,function(x) rTrue(x,data)) )
   sapply(data$names,function(x) rTrue(x,data))
 
 

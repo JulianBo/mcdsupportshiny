@@ -1,6 +1,8 @@
-# Module SliderGui -----------------------------------------------------------
 
 # GUI-Functions -----------------------------------------------------------
+
+
+# Module SliderGui -----------------------------------------------------------
 
 #' Creates List of Sliders.
 #'
@@ -8,7 +10,7 @@
 #' @param breaking Should SliderGui be split up into a list of several pages, or deliver
 #'                 one single list of sliders?
 #'                 \describe{
-#'                    \item{Null or FALSE}{No pagination.}
+#'                    \item{NULL or FALSE}{No pagination.}
 #'                    \item{TRUE}{Put all subordinate elements of first order
 #'                                on extra pages, add main page containing only first order elements.}
 #'                    \item{Integer}{Put all subordinate elements of nth order on extra pages, add
@@ -20,10 +22,6 @@
 #' @param title_text Which paragraph should be added as first element of each page?
 #' @param mainpageposition One of "first", "last", "none".
 #'                         Should main page be first or last or be omitted?
-#' @param reusingvalues Should old slider values be used? If yes, provide list of values to be accessed by name
-#'                      Usually this is done by \code{isolate(input)} or a variation thereof. Values which are not
-#'                      in this list will be set to the default value.
-#'                      Needed when creating sliderGuis on several pages, and Sliders should be set to old values again.
 #' @param parents_name Label used to name root when creating fold-out-panel for root.
 #' @param minweight Standard minimum slider weight.
 #' @param maxweight Standard maximum slider weight.
@@ -40,7 +38,6 @@
 rSliderGuiInput<-function(id, x,
                      breaking=NULL,title_text="Bitte einstellen",
                      mainpageposition=c("first","last", "none"),
-                     reusingvalues=!is.null(breaking),
                      parents_name="genauer",
                      minweight=0,maxweight=100, standardweight=30,
                      open.maxdepth=Inf,
@@ -61,7 +58,6 @@ rSliderGuiInput<-function(id, x,
   ##Generate Gui
   slGui <- recSliderGuiInput(id=id, x,depth=0,
                         breaking=breaking,
-                        reusingvalues = reusingvalues,
                         parents_name = parents_name, minweight = minweight,
                         maxweight = maxweight, standardweight = standardweight,
                         open.maxdepth = open.maxdepth, cb_title=cb_title)
@@ -108,7 +104,6 @@ rSliderGuiInput<-function(id, x,
 #' @param depth actual depth - root is 0
 #' @param breaking
 #' @param mainpageposition
-#' @param reusingvalues
 #' @param parents_name
 #' @param minweight
 #' @param maxweight
@@ -126,7 +121,6 @@ rSliderGuiInput<-function(id, x,
 
 recSliderGuiInput<-function(id, x, depth=0,
                        breaking=0,
-                       reusingvalues=!is.null(breaking),
                        parents_name="genauer",
                      minweight=0,maxweight=100, standardweight=30,
                      open.maxdepth=Inf, cb_title= "I don't know"
@@ -171,24 +165,14 @@ recSliderGuiInput<-function(id, x, depth=0,
     if("class" %in% names(list.elem)){
 
       ## Hier Slider selbst - Taglist!
-      ## In Abhängigkeit davon, ob alte Werte wiederbenutzt werden sollen oder nicht.
-      if (is.list(reusingvalues)) {
-        returnvalue <-tagList(sliderCheckboxInput(ns(elem.name),
-                                                  description = paste0(this.description, collapse=""),
-                                                  min = this.minweight,
-                                                  max = this.maxweight,
-                                                  value =reusingvalues[[elem.name]] %||%this.standardweight,
-                                                  cb_title = cb_title)
-        )
-      } else {
-        returnvalue <-tagList(sliderCheckboxInput(ns(elem.name),
+      returnvalue <-tagList(sliderCheckboxInput(ns(elem.name),
                                                   description = paste0(this.description, collapse=""),
                                                   min = this.minweight,
                                                   max = this.maxweight,
                                                   value = this.standardweight,
                                                   cb_title = cb_title)
-        )
-      }
+                            )
+
 
       ##Je nach Tiefe zusammenfügen
       # Falls noch offen. Je nach Tiefe eingerückt
@@ -236,7 +220,6 @@ recSliderGuiInput<-function(id, x, depth=0,
                 #list(  #If one uses list() here, there will be a nested list in the end.
                   recSliderGuiInput(id,list.elem,depth+1,
                                      breaking = breaking,
-                                     reusingvalues = reusingvalues,
                                      elem.name,
                                      minweight = this.minweight, maxweight=this.maxweight,
                                      standardweight = this.standardweight,
@@ -258,6 +241,7 @@ recSliderGuiInput<-function(id, x, depth=0,
     result <- tagList(
       bsCollapse(id=NS(ns(parents_name))("bsc"),
                  bsCollapsePanel(title=paste0("Faktor ",parents_name," einstellen",  collapse=""), ##Hier beschreibung einstellen
+                                 value=NS(ns(parents_name))("bscPanel"),
                                  tagList(ret)
                  )#bsCollapsePanel
       )#bsCollapse
@@ -280,31 +264,153 @@ recSliderGuiInput<-function(id, x, depth=0,
 
 
 }
+
 #'
 #' @describeIn rSliderGuiInput list of two: sliderCheckBoxValues and collapsePanelValues
 #' @export
-rSliderGui<- function(input, output, session, slNames) {
+rSliderGui<- function(input, output, session, slCbNames,dtBscCombinations) {
 
   ##sliderCheckBoxValues
-  sliderCheckboxModules<- sapply(slNames,
-                                 function(x) callModule(sliderCheckbox,x)
+  sliderCheckboxModules<- sapply(slCbNames,
+                                 function(x) callModule(sliderCheckbox,x),
+                                 simplify = FALSE #otherwise all sliderCheckboxModules (lists!) will be simplified to one big list.
                                  )
-
-  sliderCheckBoxValues <- reactive({
-    sapply(slNames,
-           function(x) sliderCheckboxModules[[x]] () * 1.
-           )
+  sliderCheckBoxValues <- reactive({sapply(slCbNames,
+                                     function(x) {
+                                       sliderCheckboxModules[[x]]$value() * 1.
+                                     }
+                                     )
     })
 
+
+
   ##collapsePanelValues
+  rv<- reactiveValues(bscValues=dtBscCombinations,
+                      #https://stackoverflow.com/questions/32536940/shiny-reactivity-fails-with-data-tables
+                      #because no reactivity inside data.tables, extra value to trigger update
+                      bscValues_triggerupdate=0
+                      )
 
 
+  ## Ausklapp Gruppen, zum zählen wie häufig geöffnet.
+  # Siehe https://stackoverflow.com/questions/38950886/generate-observers-for-dynamic-number-of-inputs
+  observers <- lapply(unique(dtBscCombinations[!is.na(bscName), bscName]), function(x){
+    # print(x)
+    # print( dtBscCombinations)
 
-  ##TODO
+    #Observe Closing as well, Ignore first time.ignoreNULL = FALSE to catch closing
+    observeEvent(input[[x]],
+                 ignoreNULL = FALSE, ignoreInit = TRUE,{
+
+                   print(paste0("catching event, ",x,"=",input[[x]]))
+
+
+                   rv$bscValues[bscName==x,':='(timesClicked=timesClicked+1,
+                                                opened=!opened
+                                                ##TODO
+                                                #Aufgrund BUG in bsCollapse;
+                                                ,lastState=paste0(input[[x]],collapse=";")
+                   )
+                   ]
+                   ##TODO
+                   #Falls vorhanden, Eltern-Knoten anpassen, um die folgende -fehlerhafte-
+                   # Aktivierung der Observer der übergeordneten collapsePanels auszugleichen
+                   rv$bscValues[
+                     #Elternknoten über dtBscCombinations herausfinden
+                     bscName==dtBscCombinations[x==bscName,unique(bscName.parent)],
+                     ':='(timesClicked=timesClicked-1,
+                          opened=!opened
+                          #Aufgrund BUG in bsCollapse;
+                          ##TODO BUG
+                          , lastState=paste0(input[[x]],collapse=";")
+                     )
+                     ]
+
+                   #Um Reaktivität trotz data.table zu triggern.
+                   #https://stackoverflow.com/questions/32536940/shiny-reactivity-fails-with-data-tables
+                   rv$bscValues_triggerupdate<-rv$bscValues_triggerupdate+1
+
+                   # print(x)
+                   # print( rv$bscValues)
+
+
+                  })
+
+  })
+
+  collapsePanelValues <- reactive({
+    #Visible bei Kindknoten updaten, rekursiv
+    #Sichtbarkeit der jeweiligen Level hinzufügen - geht nur außerhalb und nach Observer
+
+    rv$bscValues_triggerupdate #To trigger update
+
+    ret <- copy(rv$bscValues)
+    ret[,visible:=recursiveTrue(bscName, opened,bscName.parent )]
+    # print("visible updated")
+    # print(ret)
+    return(ret)
+  })
+
+  ##Return  #TODO
   return( list(sliderCheckBoxValues=sliderCheckBoxValues,
-               collapsePanelValues=NA #TODO
+               sliderCheckboxModules=sliderCheckboxModules,
+               collapsePanelValues=collapsePanelValues,
+               syncmodules=function(oldmodule){
+                 #TODO
+               },
+               setvalues=function(){#TODO
+                 }
                )
           )
+}
+
+
+#' Setting one SliderGuiInput to the state of another
+#'
+#' @param session  Passing the \code{session} object to function which was given to \code{shinyServer}.
+#' @param id       Modules id.
+#' @param oldSliderGui the old slider Gui (list object, without Parenthesis.)
+#'
+#' @return
+#' @export
+#'
+#' @examples
+parallelizeSliderGuiInput <- function(session, sliderGui, oldSliderGui){
+
+  print(names(oldSliderGui$sliderCheckBoxValues() ))
+  print(oldSliderGui$sliderCheckBoxValues() )
+
+  ##SliderCheckboxes
+  lapply(names(oldSliderGui$sliderCheckBoxValues()  ),
+         function(x){
+           message(paste(x,oldSliderGui$sliderCheckboxModules[[x]]$print() )                   )
+           sliderGui$sliderCheckboxModules[[x]]$syncModules(oldSliderGui$sliderCheckboxModules[[x]])
+         }
+         )
+
+  ##collapsePanels.
+
+  lapply(oldSliderGui$collapsePanelValues()$bscName,
+         function(x){
+           print(paste0("updating ", x))
+           print(paste0("opening",oldSliderGui$collapsePanelValues()[bscName==x &opened,
+                                                                    .(open=paste0(x,"Panel") )]
+                       )
+                 )
+
+           updateCollapse(session=session, x,
+                          open=oldSliderGui$collapsePanelValues()[bscName==x &opened,
+                                                                  .(open=paste0(x,"Panel") )],
+                          close=oldSliderGui$collapsePanelValues()[bscName==x &!opened,
+                                                                   .(close=paste0(x,"Panel") )]
+
+                          )
+
+           #Todo: Update bscValues! correction - inner BscPanel is clicked, if outer Panel is
+           #  opened (or closed?).
+         })
+
+
 }
 
 

@@ -32,16 +32,15 @@ configList <- list (
 
   #Kindelemente
   #Geschwindigkeit= list(class="mapping", Attribname="Geschwindigkeit"),
-  Innenraum= list(class="mapping",Attribname="Innenraum")
-  ,
-  Kosten= list (
-    class="elements",
-    standardweight=45, color="red",
-    util_func="antiprop",   util_offset=10,
-    include_parent=FALSE,
-    Kaufpreis= list(class="mapping",Attribname="Preis"),
-    Treibstoffkosten= list(class="mapping",Attribname="Treibstoffkosten")
-  ),
+  Innenraum= list(class="mapping",Attribname="Innenraum") ,
+  # Kosten= list (
+  #   class="elements",
+  #   standardweight=45, color="red",
+  #   util_func="antiprop",   util_offset=10,
+  #   include_parent=FALSE,
+  #   Kaufpreis= list(class="mapping",Attribname="Preis"),
+  #   Treibstoffkosten= list(class="mapping",Attribname="Treibstoffkosten")
+  # ),
   Ausstattung = list (
     class="elements",
     color="green",
@@ -52,9 +51,12 @@ configList <- list (
       color_parent="FALSE",
       AntiBlockiersystem= list(class="mapping",standardweight=80, Attribname="AntiBlockiersystem")
       ,
-      Abstandshalter1= list(
+      Abstandshalter2= list(
         class="elements",
-        Abstandshalter= list(class="mapping",standardweight=20, Attribname="Abstandshalter")
+        Abstandshalter1= list(
+          class="elements",
+          Abstandshalter= list(class="mapping",standardweight=20, Attribname="Abstandshalter")
+        )
       )
     ),
     Fensterheber = list(class="mapping",Attribname="Fensterheber")
