@@ -278,7 +278,7 @@ shinyServer(function(input, output, session) {
 
   rv_dtErgebnis <- reactive({
     rv_dtSzenarioergebnis()[,.(Gesamtergebnis=mean(Szenarioergebnis) ),by=titel]
-  dt_Ergebnis = dtNutzen[,.(Gesamtergebnis=mean(Szenarioergebnis) ),by=titel] #zum testen
+  #dt_Ergebnis = dtNutzen[,.(Gesamtergebnis=mean(Szenarioergebnis) ),by=titel] #zum testen
 
   })
 
@@ -329,7 +329,8 @@ shinyServer(function(input, output, session) {
       setNames(rv_dtGewichtungen()$finalweight_in_level_corrected,
                paste0(rv_dtGewichtungen()$slname, ".finalweight_in_level_corrected"  )),
       ## Status CollapsePanels
-      setNames(slGui2$collapsePanelValues()$timesClicked ,
+      #Add timesClicked of slGui1 and slGui2
+      setNames(slGui1$collapsePanelValues()$timesClicked + slGui2$collapsePanelValues()$timesClicked ,
                paste0(slGui2$collapsePanelValues()$bscName, ".timesClicked"  )),
       setNames(slGui2$collapsePanelValues()$visible ,
                paste0(slGui2$collapsePanelValues()$bscName, ".visible"  ))
@@ -356,31 +357,6 @@ shinyServer(function(input, output, session) {
                       )
 
 
-  observeEvent(input$speichernBtn, once=TRUE, {
-    message(input$speichernBtn)
-    if(input$speichernBtn>0){
-
-
-
-      daten<- rv_dtformData()
-
-      rv$data=rbind(rv$data,daten )
-
-      saveData(daten,speichersettings$method, speichersettings$place )
-
-      updateTabsetPanel(session,"MainTabset", "Entscheidungen")
-      #print(rv$data)
-
-      #TODO
-      #<li class="active">
-      # <a href="#tab-4365-1" data-toggle="tab" data-value="Informationen">Informationen</a>
-      #   </li>
-      #<div class="tab-pane active" data-value="Informationen" id="tab-4365-1">
-
-      #removeUI()
-    }
-  })
-
   observeEvent(input$addBtn,{
 
     daten<- rv_dtformData()
@@ -399,22 +375,22 @@ shinyServer(function(input, output, session) {
 
   ####GUI Updaten ---PageChange ####
   observeEvent(rv$page,{
-    #NUM_Pages till now only length of slGUi1, without resultpage
-    NUM_PAGES <- 1 #TODO: dynamic!!!
+    #NUM_Pages including resultpage
+    NUM_PAGES <- input$NUM_PAGES
 
     hide(selector = ".page") #To hide other pages.
     show(paste0("page", rv$page))
 
     ##Next nur bis vorletzte Seite
-    toggleState(id = "nextBtn", condition = rv$page < NUM_PAGES)
-    ##Next ab letzter Seite unsichtbar
-    toggle(id = "nextBtn", condition = rv$page < NUM_PAGES)
+    toggleState(id = "nextBtn", condition = rv$page <= NUM_PAGES -2)
+    ##Next ab vorletzter Seite unsichtbar
+    toggle(id = "nextBtn", condition = rv$page <= NUM_PAGES -2)
     ##SaveBtn nur auf letzter Seite
-    toggle(id = "saveBtn", condition = rv$page == NUM_PAGES)
+    toggle(id = "saveBtn", condition = rv$page == NUM_PAGES -1)
     ##PrevBtn nicht am Anfang
     toggleState(id = "prevBtn", condition = rv$page > 1 )
     ## PRevBtn am Ende nicht mehr sichtbar  Am Ende geht es nicht mehr zurück
-    toggle(id = "prevBtn", condition = rv$page <= NUM_PAGES)
+    toggle(id = "prevBtn", condition = rv$page < NUM_PAGES)
 
 
 
@@ -424,16 +400,24 @@ shinyServer(function(input, output, session) {
     rv$page <- rv$page + direction
   }
 
+  output$pageNrText=renderText(paste0("Seite ",rv$page," von ", input$NUM_PAGES))
+
   observeEvent(input$prevBtn, navPage(-1))
   observeEvent(input$nextBtn, navPage(1))
 
   observeEvent(input$saveBtn, {
-    #TODO: hier SlGui2 updaten.
-    ## TODO:BUG: Warum funktiuoniert oldvalue nicht.
-    print("jetzt: parallelizeSliderGuiInput")
-    parallelizeSliderGuiInput(session,slGui2, slGui1)
-    #TODO: hier speichern.
+    #TODO: SlGui2 updaten - inclduing collapsePanels!.
+
+    syncSliderGuiInputs(slGui2, slGui1)
+
     navPage(1)
+
+    daten<- rv_dtformData()
+
+    rv$data=rbind(rv$data,daten )
+
+    saveData(daten,speichersettings$method, speichersettings$place )
+
     })
 
   ####GUI Updaten ---Entscheidungen ####
@@ -452,10 +436,6 @@ shinyServer(function(input, output, session) {
   output$ChoiceText <- renderText({
     input$ChoiceSlct
   })
-
-    # print(rv_dtErgebnis()[rv_dtErgebnis()[, .I[Gesamtergebnis==max(Gesamtergebnis)],], unique(titel)],
-    #       max.levels=0, row.names=FALSE)
-
 
 
 

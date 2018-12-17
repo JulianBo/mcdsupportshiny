@@ -17,9 +17,16 @@ library(mcdsupportshiny)
 source("Setup.R", encoding="UTF-8") #local=FALSE, auch in ui.R sichtbar
 #source("Setup_INOLA.R", encoding="UTF-8") #local=FALSE, auch in ui.R sichtbar
 
-slGui1<-rSliderGuiInput("slGui1",configList,breaking=0,title_text=NULL,
+slGui1<-rSliderGuiInput("slGui1",configList,breaking=1,
+                        beschreibungs_text=texte$begruessungstext2,
+                        title_text=TRUE,
                    cb_title="Ich weiß nicht")
-NUM_PAGES <- length(slGui1)
+slGui2<-rSliderGuiInput("slGui2",configList,breaking=0,
+                        beschreibungs_text = "Wenn sie jetzt die Einstellungen verändern, können sie verfolgen, wie sich dies auf das Ergebnis auswirkt.",
+                        title_text="Gewichtungen",
+                        cb_title="Ich weiß nicht")
+
+NUM_PAGES_slGUI <- length(slGui1)
 
 # Define UI for application
 shinyUI(fluidPage(
@@ -28,7 +35,7 @@ shinyUI(fluidPage(
       rColorSliders(configList,"slGui2") ,
 
   ## Application title ----
-  titlePanel("Gewichtungen"),
+  titlePanel("Multikriterieller Pfadvergleich"),
 
   ## List of pages - Main Part    ----
 
@@ -37,65 +44,54 @@ shinyUI(fluidPage(
     list( #list, weil diverse "divs" in einer Liste kombiniert werden - obwohl rSliderGuiInput schon Liste von Pages liefert.
 
       #### SliderGuis
+      ##Begrüßung und Alternativen beschreiben
+      div(class = "page", id = paste0("page", 1), #change according to paging
 
-      ##TODO: Namespaces in rSliderGUIInput
-      ##TODO: Set SliderGui2 to values of SliderGui1 at last page before mainpage.
-      ##        First step: Implement SliderGui as module, implement updateSliderGui()
+          tags$p(texte$begruessungstext),
+
+          tags$p(texte$auswahlaufforderungstext),
+          selectInput("ChoiceSlct","Welche Alternative gefällt ihnen spontan am Besten?" ,
+                      choices=levels(dtAlternativen$titel) ),
+
+          h3("Informationen zu den Alternativen"),
+          textOutput("InformationenText")
+      ),
+
 
       ##SliderGui1 - several pages
-      lapply(seq(NUM_PAGES),
+      lapply(seq(NUM_PAGES_slGUI),
              function(i)div(class = "page",
-                            id = paste0("page", i),slGui1[[i]])),
+                            id = paste0("page", i+1),slGui1[[i]])),#change according to paging
 
+      #### Demographic Data
+      div(class = "page", id = paste0("page", NUM_PAGES_slGUI+2), #change according to paging
+          p("Bitte geben Sie zum Abschluss noch einige persönliche Daten ein."),
+          h2("Demographische Daten"),
+          selectInput("PlaceSlct",texte$ortstext ,choices=texte$ortslist,
+                      selected = "Nein, woanders"),
+          selectInput("FirsttimeSlct","Haben Sie dieses Tool schon einmal benutzt?" ,
+                      choices=list("Nein", "Ja")),
+          selectInput("GenderSlct","Welches ist Ihr Geschlecht?" ,
+                      choices=list("Nicht angegeben/weitere", "Weiblich", "Männlich")),
+          sliderInput("AgeSl", "Wie alt sind Sie?", min=0, max=100, value=0)
+
+          ),
 
       ######Final Page
       ### Sidebar with a slider inputs
-      div(class = "page", id = paste0("page", NUM_PAGES+1),
+      div(class = "page", id = paste0("page", NUM_PAGES_slGUI+3), #change according to paging
+          hidden(numericInput("NUM_PAGES", label=NULL,value=NUM_PAGES_slGUI+3)), #CHANGE to maximum number of Pages
         sidebarLayout(
           sidebarPanel(
-            tags$p("Bitte stellen sie ein, wie wichtig Ihnen die einzelnen Indikatoren im Verhältnis zu den anderen Indikatoren sind."),
-            rSliderGuiInput("slGui2",configList,breaking=0,title_text=NULL,
-                       cb_title="Ich weiß nicht"
-                       #, reusingvalues = lapply(sliderCheckboxModules,function(x)x() )#input ##TODO
-            )
+            slGui2,
+
+            textOutput("Aux_to_initialise")
           ),#end of sidebarPanel
 
           # Show Results, Description, ...
           mainPanel(
             tabsetPanel(id="MainTabset",
-                        tabPanel("Informationen",
-                                 tags$p(texte$begruessungstext),tags$p(texte$begruessungstext2),
-                                 h3("Weiter zur Auswertung"),
-                                 fluidRow(
-                                   #Weitere Abfragen
-                                   column(width=6,
-                                          selectInput("PlaceSlct",texte$ortstext ,choices=texte$ortslist,
-                                                      selected = "Nein, woanders"),
-                                          selectInput("FirsttimeSlct","Haben Sie dieses Tool schon einmal benutzt?" ,
-                                                      choices=list("Nein", "Ja")),
-                                          selectInput("GenderSlct","Welches ist Ihr Geschlecht?" ,
-                                                      choices=list("Nicht angegeben/weitere", "Weiblich", "Männlich")),
-                                          sliderInput("AgeSl", "Wie alt sind Sie?", min=0, max=100, value=0)
-
-                                   ),
-                                   #Speicher-Button
-                                   column(width=6,
-                                          selectInput("ChoiceSlct","Welche Alternative gefällt ihnen spontan am Besten?" ,
-                                                      choices=levels(dtAlternativen$titel) ),
-                                          br(),
-                                          tags$p("Sind Sie auf der linken Seite mit den Einstellungen zufrieden? Dann können Sie diese absenden und das Ergebnis ansehen"),
-                                          actionButton("speichernBtn", "Fertig? Speichern und Ergebnis ansehen")
-                                   )
-                                 )
-                                 ##TODO: Alternativen beschreiben
-                                 # ,
-                                 # h3("Informationen zu den Alternativen"),
-                                 # textOutput("InformationenText")
-                                 ,
-                                 textOutput("Aux_to_initialise")
-
-                        ),
-                        tabPanel("Entscheidungen",
+                        tabPanel("Ergebnis",
                                  h2("Gesamtergebnis"),
                                  fluidRow(column(width=6,
                                                  plotOutput("ErgebnisPlot")
@@ -163,6 +159,9 @@ shinyUI(fluidPage(
   br(),
   actionButton("prevBtn", "< Zurück"),
   actionButton("nextBtn", "Weiter >"),
-  hidden(actionButton("saveBtn", "Speichern und Ergebnis ansehen >" ))
+  hidden(actionButton("saveBtn", "Speichern und Ergebnis ansehen >" )),
+  br(),
+  textOutput("pageNrText")
+
 
 )) #shinyUI(fluidPage

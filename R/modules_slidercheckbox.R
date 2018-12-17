@@ -118,8 +118,9 @@ sliderCheckbox<- function(input, output, session,
   }
 
   value<-reactive({
-    message(paste0("GETVALUE. active:",input$active,
-                   "; sl:", input$sl,"; oldvalue:", rv$oldvalue) )
+    # message(paste0("GETVALUE. active:",input$active,
+    #                "; sl:", input$sl,"; oldvalue:", rv$oldvalue) )
+
     ##Implement Fallback, if notyet initialised
     if (is.null(input$active) ){
       NULL

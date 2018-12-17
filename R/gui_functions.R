@@ -36,9 +36,11 @@
 #'
 #' @examples
 rSliderGuiInput<-function(id, x,
-                     breaking=NULL,title_text="Bitte einstellen",
+                     breaking=NULL,
+                     beschreibungs_text=NULL,
+                     title_text="Please adjust the sliders according to your preferences.",
                      mainpageposition=c("first","last", "none"),
-                     parents_name="genauer",
+                     parents_name="Hauptkategorien",
                      minweight=0,maxweight=100, standardweight=30,
                      open.maxdepth=Inf,
                      cb_title= "I don't know"
@@ -55,18 +57,15 @@ rSliderGuiInput<-function(id, x,
   } else  if (is.logical(breaking)){breaking<-as.integer(breaking)
   } else  stopifnot(breaking>=0)
 
+
+
   ##Generate Gui
   slGui <- recSliderGuiInput(id=id, x,depth=0,
                         breaking=breaking,
                         parents_name = parents_name, minweight = minweight,
                         maxweight = maxweight, standardweight = standardweight,
                         open.maxdepth = open.maxdepth, cb_title=cb_title)
-  # ###For debugging
-  # breaking=1
-  # title_text="Bitte einstellen"
-  # mainpageposition="last" #"none" #
-  # slGui<-recSliderGuiInput("sl1",configList, breaking = breaking)
-  # ###
+
 
   slGui_attribs<-data.table(element_name =sapply(slGui, function (x) attr(x,"element_name")),
                             depth= sapply(slGui, function(x)attr(x,"depth")),
@@ -75,21 +74,42 @@ rSliderGuiInput<-function(id, x,
   slGui_attribs[,position:=1:.N]
 
 
+
+
   ####Reorder Gui according to breaking
   ##Make vector of paging - using that slGui is ordered
   slGui_attribs[,new_page:=depth>=breaking&shift(depth, fill=0)<breaking]
   slGui_attribs[depth>=breaking,page_nr:=cumsum(new_page)]
-  slGui_attribs[depth<breaking, page_nr:=switch(first(mainpageposition), #only first argument
+  slGui_attribs[depth<breaking, page_nr:=switch(first(mainpageposition), #only first argument used
                                                 first=0,
                                                 last=max(slGui_attribs$page_nr, na.rm=TRUE)+1,
                                                 none=NA )]
+
+  ####Generate title_text
+  if(isTRUE(title_text)){
+    title_text=slGui_attribs[, .(title_text= paste(ifelse(first(depth)<first(breaking),
+                                                          switch(first(mainpageposition), #only first argument used
+                                                                 first="Zuerst ",
+                                                                 last="Zum Schluss ",
+                                                                 none="NA" ) ,
+                                                          switch(first(mainpageposition),
+                                                                 first="Bitte jetzt Faktor ",
+                                                                 last="Bitte zuerst Faktor ",
+                                                                 none="NA" )
+                                                          ),
+                                                   first(parent_name), " einstellen", sep="")
+                                 ),
+                             by=page_nr]$title_text
+  }
+
 
   ##For every page-number return extra list element. Remove NA to remove mainpage if asked for
   return(
     lapply( unique(slGui_attribs$page_nr[!is.na(slGui_attribs$page_n)]),
           function(x){
-            #print(x)
-            c(list(tags$p(title_text)),
+            c(list(
+              tags$p(beschreibungs_text),
+              tags$h2(title_text[x+1])),
               slGui[slGui_attribs[page_nr==x,position]]
             )
             })
@@ -240,8 +260,8 @@ recSliderGuiInput<-function(id, x, depth=0,
   if (depth>= open.maxdepth){
     result <- tagList(
       bsCollapse(id=NS(ns(parents_name))("bsc"),
-                 bsCollapsePanel(title=paste0("Faktor ",parents_name," einstellen",  collapse=""), ##Hier beschreibung einstellen
-                                 value=NS(ns(parents_name))("bscPanel"),
+                 bsCollapsePanel(title=paste0(parents_name," genauer einstellen",  collapse=""), ##Hier beschreibung einstellen
+                                 value=NS(parents_name)("bscPanel"), #No relation to outer namespace; none needed
                                  tagList(ret)
                  )#bsCollapsePanel
       )#bsCollapse
@@ -269,6 +289,9 @@ recSliderGuiInput<-function(id, x, depth=0,
 #' @describeIn rSliderGuiInput list of two: sliderCheckBoxValues and collapsePanelValues
 #' @export
 rSliderGui<- function(input, output, session, slCbNames,dtBscCombinations) {
+  # message(id_string)
+  # ns<-NS(id_string)
+  # message(paste0( "ns(TEST)", ns("TEST") ))
 
   ##sliderCheckBoxValues
   sliderCheckboxModules<- sapply(slCbNames,
@@ -302,16 +325,16 @@ rSliderGui<- function(input, output, session, slCbNames,dtBscCombinations) {
     observeEvent(input[[x]],
                  ignoreNULL = FALSE, ignoreInit = TRUE,{
 
-                   print(paste0("catching event, ",x,"=",input[[x]]))
+                   print(paste0("catching event, ",x,"=",first(paste0(input[[x]],collapse="") )  )) #first because of BUG
 
 
                    rv$bscValues[bscName==x,':='(timesClicked=timesClicked+1,
-                                                opened=!opened
-                                                ##TODO
-                                                #Aufgrund BUG in bsCollapse;
-                                                ,lastState=paste0(input[[x]],collapse=";")
-                   )
-                   ]
+                                                opened= !opened,
+                                                lastState=first(paste0(input[[x]],collapse=""))#Aufgrund BUG in bsCollapse;
+                                                )
+                                ]
+
+                   print("Anpassen")
                    ##TODO
                    #Falls vorhanden, Eltern-Knoten anpassen, um die folgende -fehlerhafte-
                    # Aktivierung der Observer der übergeordneten collapsePanels auszugleichen
@@ -320,10 +343,7 @@ rSliderGui<- function(input, output, session, slCbNames,dtBscCombinations) {
                      bscName==dtBscCombinations[x==bscName,unique(bscName.parent)],
                      ':='(timesClicked=timesClicked-1,
                           opened=!opened
-                          #Aufgrund BUG in bsCollapse;
-                          ##TODO BUG
-                          , lastState=paste0(input[[x]],collapse=";")
-                     )
+                          )
                      ]
 
                    #Um Reaktivität trotz data.table zu triggern.
@@ -351,64 +371,90 @@ rSliderGui<- function(input, output, session, slCbNames,dtBscCombinations) {
     return(ret)
   })
 
+  setStates<- function(oldSliderCheckboxModules=NULL,oldCollapsePanelValues=NULL){
+    # #Debug-
+    #print(names(oldSliderCheckboxModules ))
+    #str(oldSliderCheckboxModules )
+    # #End of Debug-
+
+    ##SliderCheckboxes
+    if (!is.null(oldSliderCheckboxModules))lapply(
+      names(oldSliderCheckboxModules  ),
+      function(x){
+        # #Debug-
+        # message(paste(x,oldSliderCheckboxModules[[x]]$print() ))
+        # #End of Debug-
+        sliderCheckboxModules[[x]]$syncModules(oldSliderCheckboxModules[[x]])
+      }
+    )
+
+    ##collapsePanels.
+
+    ###TODO: Does not work.
+    ## Maybe OK without - simply reopen.
+    ##  for final counting add slGui1$oldCollapsePanelValues()$timesClicked and slGui2$oldCollapsePanelValues()$timesClicked
+
+
+    # if (!is.null(oldCollapsePanelValues))lapply(
+    #   oldCollapsePanelValues()$bscName,
+    #   function(x){
+    #     #Debug-
+    #     print(paste0("updating ", x) )
+    #     print(paste0("opening ",oldCollapsePanelValues()[bscName==x &opened,
+    #                                                                .(open=paste0(x,"Panel")  )]
+    #     ))
+    #     # print(paste0("closing ",oldCollapsePanelValues()[bscName==x &!opened,
+    #     #                                                  .(close=paste0(x,"Panel")  )]
+    #     # ))
+    #
+    #     #End of Debug-
+    #
+    #     updateCollapse(session=session, id= x,
+    #                    open=oldCollapsePanelValues()[bscName==x &opened,
+    #                                                  .(open=paste0(x,"Panel")  )]
+    #                    # ,
+    #                    # close=oldCollapsePanelValues()[bscName==x &!opened,
+    #                    #                                .(close=paste0(x,"Panel")  )
+    #                    #                                ]
+    #
+    #     )
+    #
+    #     #Todo: Update bscValues! correction - inner BscPanel is clicked, if outer Panel is
+    #     #  opened (or closed?).
+    #   })
+
+
+  }
+
+  syncModules <- function(oldmodule){
+    setStates(oldmodule$sliderCheckboxModules,oldmodule$collapsePanelValues)
+  }
+
   ##Return  #TODO
   return( list(sliderCheckBoxValues=sliderCheckBoxValues,
                sliderCheckboxModules=sliderCheckboxModules,
                collapsePanelValues=collapsePanelValues,
-               syncmodules=function(oldmodule){
-                 #TODO
-               },
-               setvalues=function(){#TODO
-                 }
+               syncModules=syncModules,
+               setStates=setStates
                )
           )
 }
 
 
+
+
+
 #' Setting one SliderGuiInput to the state of another
 #'
-#' @param session  Passing the \code{session} object to function which was given to \code{shinyServer}.
-#' @param id       Modules id.
+#' @param sliderGui    The sliderGui to be synched with the other.
 #' @param oldSliderGui the old slider Gui (list object, without Parenthesis.)
 #'
 #' @return
 #' @export
 #'
 #' @examples
-parallelizeSliderGuiInput <- function(session, sliderGui, oldSliderGui){
-
-  print(names(oldSliderGui$sliderCheckBoxValues() ))
-  print(oldSliderGui$sliderCheckBoxValues() )
-
-  ##SliderCheckboxes
-  lapply(names(oldSliderGui$sliderCheckBoxValues()  ),
-         function(x){
-           message(paste(x,oldSliderGui$sliderCheckboxModules[[x]]$print() )                   )
-           sliderGui$sliderCheckboxModules[[x]]$syncModules(oldSliderGui$sliderCheckboxModules[[x]])
-         }
-         )
-
-  ##collapsePanels.
-
-  lapply(oldSliderGui$collapsePanelValues()$bscName,
-         function(x){
-           print(paste0("updating ", x))
-           print(paste0("opening",oldSliderGui$collapsePanelValues()[bscName==x &opened,
-                                                                    .(open=paste0(x,"Panel") )]
-                       )
-                 )
-
-           updateCollapse(session=session, x,
-                          open=oldSliderGui$collapsePanelValues()[bscName==x &opened,
-                                                                  .(open=paste0(x,"Panel") )],
-                          close=oldSliderGui$collapsePanelValues()[bscName==x &!opened,
-                                                                   .(close=paste0(x,"Panel") )]
-
-                          )
-
-           #Todo: Update bscValues! correction - inner BscPanel is clicked, if outer Panel is
-           #  opened (or closed?).
-         })
+syncSliderGuiInputs <- function( sliderGui, oldSliderGui){
+  sliderGui$syncModules(oldSliderGui)
 
 
 }
