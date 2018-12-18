@@ -16,7 +16,7 @@ summary(dtAlternativen)
 
 configList <- list (
   class="elements",
-  open.maxdepth=1,
+  open.maxdepth = 2,
   #Attribute, zum Weiterreichen
   minweight=0,
   maxweight=100,
@@ -104,9 +104,12 @@ configList <- list (
 # Texte --------------------------------------------------------
 
 texte <- list (
-  auswahlaufforderungstext="Bitte wählen sie zuerst aus, welche ALternative Ihnen spontan am besten gefällt.",
-  begruessungstext="Dieses Programm ist eine Entscheidungshilfe. Gewichten sie auf der linken Seite die verschiedenen Attribute. Auf welches Attribut legen Sie wie viel Wert? Mit Klick auf die Textboxen können Sie die Attribute dann noch feiner einstellen.",
-  begruessungstext2= "Stellen Sie die Gewichtungen erst einmal ein und geben Sie unten ein paar Informationen an. Nach einem Klick auf Speichern können Sie dann interaktiv die Auswirkungen verschiedener Gewichtungen testen.",
+
+  begruessungstext="Dieses Programm ist eine Entscheidungshilfe. Auf den nächsten Seiten können sie gewichten, wie wichtig ihnen verschiedene Eigenschaften sind. Auf welches Attribut legen Sie wie viel Wert? Das Programm berechnet dann, welches der verschiedenen Alternativen am meisten Ihren Präferenzen entspricht.",
+  auswahlaufforderungstext="Bitte wählen sie jedoch zuerst aus, welche Alternative Ihnen spontan am besten gefällt.Die einzelnen Alternativen sind unten beschrieben",
+
+  begruessungstext2= "Bitte stellen sie ein, wie wichtig Ihnen die einzelnen Indikatoren im Verhältnis zu den anderen Indikatoren sind.",
+
   ortstext="Wohnen Sie im bayerischen Oberland?",
   ortslist=list("Ja, Landkreis Bad Tölz-Wolfratshausen",
                 "Ja, Landkreis Garmisch-Partenkirchen",

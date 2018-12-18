@@ -14,8 +14,8 @@ library(shinyjs)
 
 library(mcdsupportshiny)
 
-source("Setup.R", encoding="UTF-8") #local=FALSE, auch in ui.R sichtbar
-#source("Setup_INOLA.R", encoding="UTF-8") #local=FALSE, auch in ui.R sichtbar
+#source("Setup.R", encoding="UTF-8") #local=FALSE, auch in ui.R sichtbar
+source("Setup_INOLA.R", encoding="UTF-8") #local=FALSE, auch in ui.R sichtbar
 
 slGui1<-rSliderGuiInput("slGui1",configList,breaking=1,
                         beschreibungs_text=texte$begruessungstext2,
@@ -45,7 +45,7 @@ shinyUI(fluidPage(
 
       #### SliderGuis
       ##Begrüßung und Alternativen beschreiben
-      div(class = "page", id = paste0("page", 1), #change according to paging
+      div(class = "page", id = paste0("page", 1), #change according to paging. TODO: automatically
 
           tags$p(texte$begruessungstext),
 
@@ -65,12 +65,12 @@ shinyUI(fluidPage(
 
       #### Demographic Data
       div(class = "page", id = paste0("page", NUM_PAGES_slGUI+2), #change according to paging
-          p("Bitte geben Sie zum Abschluss noch einige persönliche Daten ein."),
-          h2("Demographische Daten"),
-          selectInput("PlaceSlct",texte$ortstext ,choices=texte$ortslist,
-                      selected = "Nein, woanders"),
+          p("Bitte geben Sie zum Abschluss noch einige Demographische Daten ein."),
+          h2("Bitte geben sie uns ein paar Informationen über sich."),
           selectInput("FirsttimeSlct","Haben Sie dieses Tool schon einmal benutzt?" ,
                       choices=list("Nein", "Ja")),
+          selectInput("PlaceSlct",texte$ortstext ,choices=texte$ortslist,
+                      selected = "Nein, woanders"),
           selectInput("GenderSlct","Welches ist Ihr Geschlecht?" ,
                       choices=list("Nicht angegeben/weitere", "Weiblich", "Männlich")),
           sliderInput("AgeSl", "Wie alt sind Sie?", min=0, max=100, value=0)
@@ -92,24 +92,29 @@ shinyUI(fluidPage(
           mainPanel(
             tabsetPanel(id="MainTabset",
                         tabPanel("Ergebnis",
-                                 h2("Gesamtergebnis"),
-                                 fluidRow(column(width=6,
-                                                 plotOutput("ErgebnisPlot")
-                                 ),
-                                 column(width=6,
-                                        tags$p("Mit den aktuellen Einstellungen präferieren Sie:",
-                                               textOutput("ErgebnisText")),
-                                        tags$p("Ursprünglich ausgewählt hatten Sie:",
-                                               textOutput("ChoiceText")),
-                                        tableOutput("ErgebnisTable"),
-                                        tags$p("Mit den Einstellungen zufrieden? Dann auch diese speichern!"),
-                                        actionButton("addBtn", "Aktuelle Einstellungen speichern")
-
-
-                                 )
+                                 h2("Ergebnis"),
+                                 tags$b(
+                                   tags$p("Mit den aktuellen Einstellungen präferieren Sie:",
+                                          textOutput("ErgebnisText")),
+                                   tags$p("Ursprünglich ausgewählt hatten Sie:",
+                                          textOutput("ChoiceText"))
                                  )
                                  ,
-                                 h2("Ergebnisse im Einzelnen und nach Szenario"),
+                                 tags$p("Sie können jetzt sowohl die Einstellungen/Gewichtungen als auch die präferierte Alternative verändern, und dabei sehen, wie sich die Ergebnisse anpassen. Beachten sie, dass manche Indikatoren nicht in die Berechnung eingehen, weil sie nicht ohne weiteres quantifizierbar bzw. mit Zahlen abbildbar sind."),
+                                 tags$p("Wenn Sie mit den Einstellungen zufrieden sind, können Sie diese abspeichern. Damit gehen diese Werte in das Ergebnis ein."),
+
+                                 selectInput("ChoiceFinalSlct","Welche Alternative präferieren Sie, nachdem Sie diese Ergebnisse gesehen haben?" ,
+                                             choices=levels(dtAlternativen$titel)
+                                             #TODO: Add changecount!
+                                             ),
+                                 actionButton("addBtn", "Zufrieden? Dann aktuelle Einstellungen speichern und damit abstimmen!"),
+
+                                 h3("Gesamtergebnis"),
+                                 fluidRow(
+                                   column(width=6, plotOutput("ErgebnisPlot")),
+                                   column(width=6,tableOutput("ErgebnisTable"))
+                                   ),
+                                 h3("Ergebnisse im Einzelnen und nach Szenario"),
                                  plotOutput("EntscheidungenPlot"),
                                  tableOutput("EntscheidungenTable")
 

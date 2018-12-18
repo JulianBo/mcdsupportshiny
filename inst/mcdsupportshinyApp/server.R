@@ -22,8 +22,8 @@ library(mcdsupportshiny)
 
 # Initialisieren#########
 
-source("Setup.R", encoding="UTF-8") #local=FALSE, auch in ui.R sichtbar
-#source("Setup_INOLA.R", encoding="UTF-8") #local=FALSE, auch in ui.R sichtbar
+#source("Setup.R", encoding="UTF-8") #local=FALSE, auch in ui.R sichtbar
+source("Setup_INOLA.R", encoding="UTF-8") #local=FALSE, auch in ui.R sichtbar
 
 
 validateConfig(configList,dtAlternativen)
@@ -317,6 +317,9 @@ shinyServer(function(input, output, session) {
       GenderSlct=input$GenderSlct,
       AgeSl=input$AgeSl,
       ChoiceSlct=input$ChoiceSlct,
+      ChoiceSlctCount=rv$ChoiceSlctCount,
+      ChoiceFinalSlct=input$ChoiceFinalSlct,
+      ChoiceFinalSlctCount=rv$ChoiceFinalSlctCount,
       ## Ergebnis
       # Es können auch mehrere beste Ergebnisse sein
       BestesErgebnis= paste(levels(rv_BestesErgebnis())[rv_BestesErgebnis()], collapse=", " ),
@@ -353,7 +356,9 @@ shinyServer(function(input, output, session) {
 
 
   rv<- reactiveValues(data=data.table(),
-                      page = 1
+                      page = 1,
+                      ChoiceSlctCount=0,
+                      ChoiceFinalSlctCount=0
                       )
 
 
@@ -364,8 +369,21 @@ shinyServer(function(input, output, session) {
     rv$data=rbind(rv$data,daten )
 
     saveData(daten,speichersettings$method, speichersettings$place )
+    updateSelectInput(session,"ChoiceFinalSlct", selected = input$ChoiceSlct) #TODO BUG doesn't work
+    rv$ChoiceFinalSlctCount<-rv$ChoiceFinalSlctCount-1 #account for manual change.
+
 
   })
+
+  observeEvent(input$ChoiceSlct,
+               rv$ChoiceSlctCount<-rv$ChoiceSlctCount+1,
+               ignoreInit = TRUE
+  )
+
+  observeEvent(input$ChoiceFinalSlct,
+               rv$ChoiceFinalSlctCount<-rv$ChoiceFinalSlctCount+1,
+               ignoreInit = TRUE
+               )
 
 
 

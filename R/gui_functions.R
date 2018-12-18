@@ -87,17 +87,27 @@ rSliderGuiInput<-function(id, x,
 
   ####Generate title_text
   if(isTRUE(title_text)){
-    title_text=slGui_attribs[, .(title_text= paste(ifelse(first(depth)<first(breaking),
-                                                          switch(first(mainpageposition), #only first argument used
-                                                                 first="Zuerst ",
-                                                                 last="Zum Schluss ",
-                                                                 none="NA" ) ,
-                                                          switch(first(mainpageposition),
-                                                                 first="Bitte jetzt Faktor ",
-                                                                 last="Bitte zuerst Faktor ",
-                                                                 none="NA" )
-                                                          ),
-                                                   first(parent_name), " einstellen", sep="")
+    title_text=slGui_attribs[, .(title_text= ifelse(first(depth)<first(breaking),
+                                                    ##First: Mainpagetitle
+                                                    "Auf welche Bereiche legen Sie wie viel Wert?",
+                                                    ##Other Titles
+                                                    sprintf("Worauf legen sie im Bereich '%s' wie viel wert?",
+                                                            first(parent_name))
+    )
+
+                                                   # paste(ifelse(first(depth)<first(breaking),
+                                                   #        switch(first(mainpageposition), #only first argument used
+                                                   #               first="Zuerst ",
+                                                   #               last="Zum Schluss ",
+                                                   #               none="NA" ) ,
+                                                   #
+                                                   #
+                                                   #        switch(first(mainpageposition),
+                                                   #               first="Bitte jetzt Faktor ",
+                                                   #               last="Bitte zuerst Faktor ",
+                                                   #               none="NA" )
+                                                   #        ),
+                                                   # first(parent_name), " einstellen", sep="")
                                  ),
                              by=page_nr]$title_text
   }
