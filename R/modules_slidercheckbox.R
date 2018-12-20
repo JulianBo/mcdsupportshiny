@@ -32,7 +32,7 @@ sliderCheckboxInput <- function(id,description="",
                                 default=30 ,
                                 cb_title = "I don't know",
                                 width = "100%"){
-  ns <- NS(id)
+  ns <- NS(gsub(" ", "", id, fixed = TRUE))
 
   if(!is.na(default)&!is.numeric(default)){
     warning("default must be numeric or NA; set to NA")
@@ -158,7 +158,7 @@ updateSliderCheckboxInput<- function( session, id,
                                       default=NULL ,
                                       cb_title = NULL){
 
-  ns<-NS(id)
+  ns<-NS(gsub(" ", "", id, fixed = TRUE))
 
   #Updating Checkbox- without values
   if(!is.null(cb_title))updateCheckboxInput(session,ns("active"), label=cb_title)

@@ -269,9 +269,9 @@ recSliderGuiInput<-function(id, x, depth=0,
 
   if (depth>= open.maxdepth){
     result <- tagList(
-      bsCollapse(id=NS(ns(parents_name))("bsc"),
+      bsCollapse(id=NS(ns(gsub(" ", "", parents_name, fixed = TRUE)))("bsc"),
                  bsCollapsePanel(title=sprintf(">>> '%s' genauer einstellen",parents_name ), ##Hier beschreibung einstellen
-                                 value=NS(parents_name)("bscPanel"), #No relation to outer namespace; none needed
+                                 value=NS(gsub(" ", "", parents_name, fixed = TRUE))("bscPanel"), #No relation to outer namespace; none needed
                                  tagList(ret)
                  )#bsCollapsePanel
       )#bsCollapse
@@ -305,7 +305,9 @@ rSliderGui<- function(input, output, session, slCbNames,dtBscCombinations) {
 
   ##sliderCheckBoxValues
   sliderCheckboxModules<- sapply(slCbNames,
-                                 function(x) callModule(sliderCheckbox,x),
+                                 function(x) callModule(sliderCheckbox,
+                                                        gsub(" ", "", x, fixed = TRUE) #remove spaces
+                                                        ),
                                  simplify = FALSE #otherwise all sliderCheckboxModules (lists!) will be simplified to one big list.
                                  )
   sliderCheckBoxValues <- reactive({sapply(slCbNames,
@@ -332,7 +334,7 @@ rSliderGui<- function(input, output, session, slCbNames,dtBscCombinations) {
     # print( dtBscCombinations)
 
     #Observe Closing as well, Ignore first time.ignoreNULL = FALSE to catch closing
-    observeEvent(input[[x]],
+    observeEvent(input[[gsub(" ", "", x, fixed = TRUE)]],
                  ignoreNULL = FALSE, ignoreInit = TRUE,{
 
                    #print(paste0("catching event, ",x,"=",first(paste0(input[[x]],collapse="") )  )) #first because of BUG
@@ -382,7 +384,7 @@ rSliderGui<- function(input, output, session, slCbNames,dtBscCombinations) {
     return(ret)
   })
 
-  setStates<- function(oldSliderCheckboxModules=NULL,oldCollapsePanelValues=NULL){
+  setStates<- function(oldSliderCheckboxModules=NULL){
     # #Debug-
     #print(names(oldSliderCheckboxModules ))
     #str(oldSliderCheckboxModules )
@@ -438,7 +440,7 @@ rSliderGui<- function(input, output, session, slCbNames,dtBscCombinations) {
   }
 
   syncModules <- function(oldmodule){
-    setStates(oldmodule$sliderCheckboxModules,oldmodule$collapsePanelValues)
+    setStates(oldmodule$sliderCheckboxModules)
   }
 
   ##Return  #TODO
@@ -580,12 +582,13 @@ rColorSliders<-function(x, id=NULL, slidername="sl", color_parent=TRUE, collapse
   ## TODO: Do this directly in SliderCheckbox-Module!
 
   colorsVector <- rColorVector(x, color_parent =color_parent)
+  names<- gsub(" ", "", names(colorsVector), fixed = TRUE)
 
   ret<-lapply(1:length(colorsVector), function(x){
 
       sprintf("[for=\"%1$s\"]+span>.irs>.irs-single, [for=\"%1$s\"]+span>.irs-bar-edge, [for=\"%1$s\"]+span>.irs-bar {background: %2$s}"
               ,#Correcting for Namespace of module! - id-names(colorsVector)[x]-slidername
-              NS(c(id,names(colorsVector)[x]))(slidername) , colorsVector[x])
+              NS(c(id,names[ x]))(slidername), colorsVector[x])
   })
   tags$style(HTML(paste(ret, collapse = collapse)))
 
