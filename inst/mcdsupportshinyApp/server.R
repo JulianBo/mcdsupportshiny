@@ -65,7 +65,7 @@ dtBscCombinations[,lastState:=""]
 #visible:=FALSE, Visible lässt sich nur hinterher über opened berechnen, aufgrund BUG
 
 ##TODO: Warning.
-dtAlternativen_long <- merge(melt(dtAlternativen, id.vars=c("titel", "rahmenszenario")),
+dtAlternativen_long <- merge(melt(dtAlternativen, id.vars=c("Titel", "Rahmenszenario")),
                              dtIndikatorensettings, by.x="variable", by.y="Attribname" )
 
 #Berechne Mittelwert
@@ -134,7 +134,7 @@ setkey(dtGewichtungen, name)
 
 # benutze "name" anstatt "variable", um auf Indikatoren(Mappings)
 # anstatt auf Attribute(Alternativen) zu kommen
-dtNutzen <- dcast(dtAlternativen_long,titel +rahmenszenario~name,  value.var = "nutzen")
+dtNutzen <- dcast(dtAlternativen_long,Titel +Rahmenszenario~name,  value.var = "nutzen")
 
 ##Füge weitere Spalten hinzu, um sie später zu füllen
 # Alle Spalten von Gruppierungen
@@ -146,7 +146,7 @@ dtNutzen[,dtIndikatorensettings[is_mapping& is.na(Attribname),name]  :=0]
 dtNutzen[,dtIndikatorensettings[level==0,first(parent)]  :=NA]
 
 
-important_columns =c( "titel", "rahmenszenario","Szenarioergebnis")
+important_columns =c( "Titel", "Rahmenszenario","Szenarioergebnis")
 setcolorder(dtNutzen,  c(important_columns,
                            names(dtNutzen)[!(names(dtNutzen) %in% important_columns)]) )
 
@@ -250,7 +250,7 @@ shinyServer(function(input, output, session) {
 
     NutzenWerte<- as.matrix(dtNutzen[,.SD,
                                      .SDcols = names(dtNutzen)
-                                     [!(names(dtNutzen) %in% c( "titel", "rahmenszenario"))]
+                                     [!(names(dtNutzen) %in% c( "Titel", "Rahmenszenario"))]
                                      ]
                             )
 
@@ -271,19 +271,19 @@ shinyServer(function(input, output, session) {
 
     #print(NutzenWerte)
 
-  return( data.table(dtNutzen[,.(titel,rahmenszenario)], NutzenWerte))
-  #dtNutzen= data.table(dtNutzen[,.(titel,rahmenszenario)], NutzenWerte) #zum testen
+  return( data.table(dtNutzen[,.(Titel,Rahmenszenario)], NutzenWerte))
+  #dtNutzen= data.table(dtNutzen[,.(Titel,Rahmenszenario)], NutzenWerte) #zum testen
 
   })
 
   rv_dtErgebnis <- reactive({
-    rv_dtSzenarioergebnis()[,.(Gesamtergebnis=mean(Szenarioergebnis) ),by=titel]
-  #dt_Ergebnis = dtNutzen[,.(Gesamtergebnis=mean(Szenarioergebnis) ),by=titel] #zum testen
+    rv_dtSzenarioergebnis()[,.(Gesamtergebnis=mean(Szenarioergebnis) ),by=Titel]
+  #dt_Ergebnis = dtNutzen[,.(Gesamtergebnis=mean(Szenarioergebnis) ),by=Titel] #zum testen
 
   })
 
   rv_BestesErgebnis <- reactive({
-    rv_dtErgebnis()[rv_dtErgebnis()[, .I[Gesamtergebnis==max(Gesamtergebnis)],], unique(titel)]
+    rv_dtErgebnis()[rv_dtErgebnis()[, .I[Gesamtergebnis==max(Gesamtergebnis)],], unique(Titel)]
   })
 
 
@@ -372,6 +372,9 @@ shinyServer(function(input, output, session) {
     updateSelectInput(session,"ChoiceFinalSlct", selected = input$ChoiceSlct) #TODO BUG doesn't work
     rv$ChoiceFinalSlctCount<-rv$ChoiceFinalSlctCount-1 #account for manual change.
 
+    hide(id="abstimmungsDiv")
+    show(id="dankeDiv")
+
 
   })
 
@@ -441,7 +444,7 @@ shinyServer(function(input, output, session) {
   ####GUI Updaten ---Entscheidungen ####
 
   output$ErgebnisPlot<- renderPlot({
-    ggplot(rv_dtErgebnis(),aes(x=titel,y=Gesamtergebnis, fill=titel))+
+    ggplot(rv_dtErgebnis(),aes(x=Titel,y=Gesamtergebnis, fill=Titel))+
       geom_col()
   })
 
@@ -463,10 +466,10 @@ shinyServer(function(input, output, session) {
 
   output$EntscheidungenPlot<-renderPlot({
 
-    dtErgebnislong <- melt(rv_dtSzenarioergebnis(), id.vars=c("titel", "rahmenszenario"))
+    dtErgebnislong <- melt(rv_dtSzenarioergebnis(), id.vars=c("Titel", "Rahmenszenario"))
 
 
-    ggplot(dtErgebnislong, aes(y=value,fill=titel,x=titel,  shape=rahmenszenario))+
+    ggplot(dtErgebnislong, aes(y=value,fill=Titel,x=Titel,  shape=Rahmenszenario))+
       facet_wrap(~variable)+
       geom_col(position="dodge" )+
       scale_shape_manual(values=21:24)+
@@ -503,11 +506,11 @@ shinyServer(function(input, output, session) {
 
     # add width to position dodge, different for each facet.
     #See: https://stackoverflow.com/questions/48946222/ggplot-with-facets-provide-different-width-to-dodge-with-each-facet
-    ggplot(dtAlternativen_long,aes(x=value_dodgedx, y=nutzen, shape=rahmenszenario, fill=titel))+
-      #geom_col(aes(fill=titel),position = "dodge")+
+    ggplot(dtAlternativen_long,aes(x=value_dodgedx, y=nutzen, shape=Rahmenszenario, fill=Titel))+
+      #geom_col(aes(fill=Titel),position = "dodge")+
       geom_rect(aes(xmin=value_dodgedx-width_dodge/2,
                     xmax=value_dodgedx+width_dodge/2,
-                    ymax=nutzen , fill=titel),
+                    ymax=nutzen , fill=Titel),
                 ymin=0 )+
       scale_shape_manual(values=21:24)+
       geom_point(colour="Black")+

@@ -270,7 +270,7 @@ recSliderGuiInput<-function(id, x, depth=0,
   if (depth>= open.maxdepth){
     result <- tagList(
       bsCollapse(id=NS(ns(parents_name))("bsc"),
-                 bsCollapsePanel(title=paste0(parents_name," genauer einstellen",  collapse=""), ##Hier beschreibung einstellen
+                 bsCollapsePanel(title=sprintf(">>> '%s' genauer einstellen",parents_name ), ##Hier beschreibung einstellen
                                  value=NS(parents_name)("bscPanel"), #No relation to outer namespace; none needed
                                  tagList(ret)
                  )#bsCollapsePanel
@@ -335,7 +335,7 @@ rSliderGui<- function(input, output, session, slCbNames,dtBscCombinations) {
     observeEvent(input[[x]],
                  ignoreNULL = FALSE, ignoreInit = TRUE,{
 
-                   print(paste0("catching event, ",x,"=",first(paste0(input[[x]],collapse="") )  )) #first because of BUG
+                   #print(paste0("catching event, ",x,"=",first(paste0(input[[x]],collapse="") )  )) #first because of BUG
 
 
                    rv$bscValues[bscName==x,':='(timesClicked=timesClicked+1,
@@ -344,7 +344,8 @@ rSliderGui<- function(input, output, session, slCbNames,dtBscCombinations) {
                                                 )
                                 ]
 
-                   print("Anpassen")
+                   #print("Anpassen")
+
                    ##TODO
                    #Falls vorhanden, Eltern-Knoten anpassen, um die folgende -fehlerhafte-
                    # Aktivierung der Observer der übergeordneten collapsePanels auszugleichen

@@ -51,7 +51,7 @@ shinyUI(fluidPage(
 
           tags$p(texte$auswahlaufforderungstext),
           selectInput("ChoiceSlct","Welche Alternative gefällt ihnen spontan am Besten?" ,
-                      choices=levels(dtAlternativen$titel) ),
+                      choices=levels(dtAlternativen$Titel) ),
 
           h3("Informationen zu den Alternativen"),
           textOutput("InformationenText")
@@ -68,11 +68,10 @@ shinyUI(fluidPage(
           p("Bitte geben Sie zum Abschluss noch einige Demographische Daten ein."),
           h2("Bitte geben sie uns ein paar Informationen über sich."),
           selectInput("FirsttimeSlct","Haben Sie dieses Tool schon einmal benutzt?" ,
-                      choices=list("Nein", "Ja")),
-          selectInput("PlaceSlct",texte$ortstext ,choices=texte$ortslist,
-                      selected = "Nein, woanders"),
+                      choices=list("Nicht angegeben","Nein", "Ja")),
+          selectInput("PlaceSlct",texte$ortstext ,choices=c("Nicht angegeben",texte$ortslist)),
           selectInput("GenderSlct","Welches ist Ihr Geschlecht?" ,
-                      choices=list("Nicht angegeben/weitere", "Weiblich", "Männlich")),
+                      choices=list("Nicht angegeben", "Weiblich", "Männlich","Weitere/Divers")),
           sliderInput("AgeSl", "Wie alt sind Sie?", min=0, max=100, value=0)
 
           ),
@@ -101,14 +100,20 @@ shinyUI(fluidPage(
                                  )
                                  ,
                                  tags$p("Sie können jetzt sowohl die Einstellungen/Gewichtungen als auch die präferierte Alternative verändern, und dabei sehen, wie sich die Ergebnisse anpassen. Beachten sie, dass manche Indikatoren nicht in die Berechnung eingehen, weil sie nicht ohne weiteres quantifizierbar bzw. mit Zahlen abbildbar sind."),
-                                 tags$p("Wenn Sie mit den Einstellungen zufrieden sind, können Sie diese abspeichern. Damit gehen diese Werte in das Ergebnis ein."),
 
-                                 selectInput("ChoiceFinalSlct","Welche Alternative präferieren Sie, nachdem Sie diese Ergebnisse gesehen haben?" ,
-                                             choices=levels(dtAlternativen$titel)
-                                             #TODO: Add changecount!
-                                             ),
-                                 actionButton("addBtn", "Zufrieden? Dann aktuelle Einstellungen speichern und damit abstimmen!"),
-
+                                 div(id="abstimmungsDiv",
+                                   tags$p("Wenn Sie mit den Einstellungen zufrieden sind, können Sie diese abspeichern. Damit gehen diese Werte in das Ergebnis ein."),
+                                   selectInput("ChoiceFinalSlct","Welche Alternative präferieren Sie, nachdem Sie diese Ergebnisse gesehen haben?" ,
+                                               choices=levels(dtAlternativen$Titel)
+                                               #TODO: Add changecount!
+                                   ),
+                                   actionButton("addBtn", "Zufrieden? Dann aktuelle Einstellungen speichern und damit abstimmen!")
+                                 ),
+                                 hidden(
+                                   div(id="dankeDiv",
+                                       tags$p(tags$b("Vielen Dank. Ihre Präferenzen wurden gespeichert"))
+                                   )
+                                 ),
                                  h3("Gesamtergebnis"),
                                  fluidRow(
                                    column(width=6, plotOutput("ErgebnisPlot")),
