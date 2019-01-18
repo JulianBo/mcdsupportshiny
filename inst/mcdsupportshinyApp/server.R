@@ -551,19 +551,19 @@ shinyServer(function(input, output, session) {
   #   str(rv_dtformData())
   # })
   #
-  output$RoutputTable1<- renderTable({
-
-    slGui2$collapsePanelValues()
-  })
-  output$RoutputTable2<- renderTable({
-
-    slGui1$collapsePanelValues()
-  })
-  output$RoutputTable <- renderTable({
-    rv$data
-    #rv_dtformData_long()
-    #rv$bscValues
-  })
+  # output$RoutputTable1<- renderTable({
+  #
+  #   slGui2$collapsePanelValues()
+  # })
+  # output$RoutputTable2<- renderTable({
+  #
+  #   slGui1$collapsePanelValues()
+  # })
+  # output$RoutputTable <- renderTable({
+  #   rv$data
+  #   #rv_dtformData_long()
+  #   #rv$bscValues
+  # })
 
   # output$RoutputText2<- renderPrint({
   #   #rv$data #NULL data.table

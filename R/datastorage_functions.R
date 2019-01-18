@@ -14,8 +14,8 @@
 #' @examples
 #'
 gs_sheetexists<-function(place){
-  sheetlist <-gs_ls()
-  return( sheet  %in% sheetlist$sheet_title)
+  sheetlist <-googlesheets::gs_ls()
+  return( place  %in% sheetlist$sheet_title)
 }
 
 #TODO: Es ist möglich, dass Ergebnis mehrere Werte zurückliefert Ergebnis1,Ergebnis2, etc.
@@ -32,18 +32,24 @@ gs_sheetexists<-function(place){
 #'
 #' @examples
 initialize_datastorage <-function(data, method, place){
+  #TODO: Define returnvalue
   switch(method,
          CSV={
            #See https://stackoverflow.com/questions/4216753/check-existence-of-directory-and-create-if-doesnt-exist
-           ifelse(!dir.exists(place), dir.create(place), FALSE)
+           #This will return FALSE if the directory already exists or is uncreatable,
+           #and TRUE if it didn't exist but was succesfully created.
+           if(!dir.exists(place))  {
+             dir.create(place)
+             } else FALSE
          },
          GoogleSheets= {
+           if (!requireNamespace("googlesheets", quietly = TRUE))stop ("Package 'googlesheets' must be available for method 'GoogleSheets'.")
            if(gs_sheetexists(place)){
              print("sheet exists")
              return(TRUE)
            }else{
-             sheet <- gs_new(title=place, ws_title="Daten")
-             gs_edit_cells(sheet,ws = "Daten",
+             sheet <- googlesheets::gs_new(title=place, ws_title="Daten")
+             googlesheets::gs_edit_cells(sheet,ws = "Daten",
                            input= data,
                            #input= names(data),
                            byrow=TRUE )
@@ -81,9 +87,9 @@ saveData <- function(data, method, place) {
          },
          GoogleSheets= {
            # Grab the Google Sheet
-           sheet <- gs_title(place)
+           sheet <- googlesheets::gs_title(place)
            # Add the data as a new row
-           gs_add_row(sheet, input = data, ws ="Daten")
+           googlesheets::gs_add_row(sheet, input = data, ws ="Daten")
 
          } ,{
            stop(paste0("method -",method,"- not supported" ) )
@@ -113,9 +119,11 @@ loadData <- function(method, place) {
          },
          GoogleSheets= {
            # Grab the Google Sheet
-           sheet <- gs_title(place)
+           sheet <- googlesheets::gs_title(place)
            # Read the data
-           gs_read_csv(sheet, ws ="Daten")
+           googlesheets::gs_read_csv(sheet, ws ="Daten")
+
+
 
          } ,{
            stop(paste0("method -",method,"- not supported" ) )
