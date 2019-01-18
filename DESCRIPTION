@@ -1,7 +1,7 @@
 Package: mcdsupportshiny
 Type: Package
 Title: Customisable graphical application to support for multi-criteria decision problems using shiny
-Version: 0.1.0
+Version: 0.1.0.9999
 Authors@R: person("Julian", "Bothe", email = "julian.bothe@geographie.uni-muenchen.de",
                   role = c("aut", "cre"))
 Description: Using Shiny, a graphical user interface is created where users can weight 
