@@ -137,8 +137,8 @@ shinyUI(fluidPage(
                         tabPanel("Bisherige Gewichtungen",
                                  plotOutput("BisherigeDecsPlot"),
                                  plotOutput("BisherigeHistsPlot")
-                                 # ,
-                                 # tableOutput("BisherigeTable")
+                                 ,
+                                 tableOutput("BisherigeTable")
                         ),
                         tabPanel("Einstellungen für die Indikatoren",
                                  tableOutput("Indikatorensettings")

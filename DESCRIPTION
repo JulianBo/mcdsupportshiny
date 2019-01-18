@@ -22,6 +22,6 @@ Suggests:
   googlesheets,
   pool, 
   RMySQL,
-  shiny,
+  shiny>=1.1.0,
   shinyBS
 RoxygenNote: 6.0.1

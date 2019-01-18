@@ -19,6 +19,10 @@ library(ggplot2)
 library(googlesheets)
 
 
+library(promises)
+library(future)
+plan(multisession)
+
 library(mcdsupportshiny)
 
 # Initialisieren#########
@@ -42,7 +46,7 @@ validateConfig(configList,dtAlternativen)
 # )
 
 
-initialize_datastorage( speicher_template, speichersettings$method, speichersettings$place)
+datastorage <- future(initialize_datastorage( speicher_template, speichersettings$method, speichersettings$place) )
 
 
 # Globale Variablen berechnen ---------------------------------------------
@@ -162,7 +166,7 @@ shinyServer(function(input, output, session) {
   session_start= date()
   session_id = as.integer(runif(n=1, max=1000000) )
 
-  dtBisherige <- loadData(speichersettings$method, speichersettings$place )
+  dtBisherige <- future({ loadData(speichersettings$method, speichersettings$place ) })
 
   ##Bisherige Daten laden.
 
@@ -369,7 +373,10 @@ shinyServer(function(input, output, session) {
 
     rv$data=rbind(rv$data,daten )
 
-    saveData(daten,speichersettings$method, speichersettings$place )
+    future( {
+      saveData(daten,speichersettings$method, speichersettings$place )
+      message("saving after input$addBtn DONE")
+      })
     updateSelectInput(session,"ChoiceFinalSlct", selected = input$ChoiceSlct) #TODO BUG doesn't work
     rv$ChoiceFinalSlctCount<-rv$ChoiceFinalSlctCount-1 #account for manual change.
 
@@ -438,7 +445,10 @@ shinyServer(function(input, output, session) {
 
     rv$data=rbind(rv$data,daten )
 
-    saveData(daten,speichersettings$method, speichersettings$place )
+    future({
+      saveData(daten,speichersettings$method, speichersettings$place )
+      message("saving after input$saveBtn DONE")
+    })
 
     })
 
@@ -525,22 +535,27 @@ shinyServer(function(input, output, session) {
 
 
   #GUI - Bisheriges Abstimmungsverhalten anzeigen ---------
-  # output$BisherigeTable<-renderTable(dtBisherige)
+  output$BisherigeTable<-renderTable(value(dtBisherige) )
   output$BisherigeDecsPlot<- renderPlot({
-    ggplot(data=dtBisherige, mapping = aes(x=ChoiceSlct, fill=ChoiceSlct))+
-      geom_bar()
-
-
+    message("outside promise . plotting BisherigeDecsPlot")
+    dtBisherige %...>% {
+      message("inside promise . plotting BisherigeDecsPlot")
+      ggplot(., mapping = aes(x=ChoiceSlct, fill=ChoiceSlct))+
+        geom_bar()
+    }
   })
+
   output$BisherigeHistsPlot<- renderPlot({
-    ggplot(data=melt(dtBisherige,
-                     id.vars=c("Sessionstart", "session_id"),
-                     measure.vars=
-                       grep("^sl.*originalweights$", names(dtBisherige), fixed=FALSE, value=TRUE)
-                     ),
-           mapping = aes(x=value))+
-      geom_density()+
-      facet_grid(variable~.)
+    dtBisherige %...>% {
+      ggplot(data=melt( . ,
+                        id.vars=c("Sessionstart", "session_id"),
+                        measure.vars=
+                          grep("^sl.*originalweights$", names(.), fixed=FALSE, value=TRUE)
+      ),
+      mapping = aes(x=value))+
+        geom_density()+
+        facet_grid(variable~.)
+    }
   })
 
   ####GUI Updaten ---R Helferfunktionen ####
