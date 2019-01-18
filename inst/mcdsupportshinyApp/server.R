@@ -407,21 +407,21 @@ shinyServer(function(input, output, session) {
     #NUM_Pages including resultpage
     NUM_PAGES <- input$NUM_PAGES
 
-    hide(selector = ".page") #To hide other pages.
-    show(paste0("page", rv$page))
+    if (rv$page  > 0 & rv$page  <= NUM_PAGES){
+      hide(selector = ".page") #To hide other pages.
+      show(paste0("page", rv$page))
 
-    ##Next nur bis vorletzte Seite
-    toggleState(id = "nextBtn", condition = rv$page <= NUM_PAGES -2)
-    ##Next ab vorletzter Seite unsichtbar
-    toggle(id = "nextBtn", condition = rv$page <= NUM_PAGES -2)
-    ##SaveBtn nur auf letzter Seite
-    toggle(id = "saveBtn", condition = rv$page == NUM_PAGES -1)
-    ##PrevBtn nicht am Anfang
-    toggleState(id = "prevBtn", condition = rv$page > 1 )
-    ## PRevBtn am Ende nicht mehr sichtbar  Am Ende geht es nicht mehr zurück
-    toggle(id = "prevBtn", condition = rv$page < NUM_PAGES)
-
-
+      ##Next nur bis vorletzte Seite
+      toggleState(id = "nextBtn", condition = rv$page <= NUM_PAGES -2)
+      ##Next ab vorletzter Seite unsichtbar
+      toggle(id = "nextBtn", condition = rv$page <= NUM_PAGES -2)
+      ##SaveBtn nur auf letzter Seite
+      toggle(id = "saveBtn", condition = rv$page == NUM_PAGES -1)
+      ##PrevBtn nicht am Anfang
+      toggleState(id = "prevBtn", condition = rv$page > 1 )
+      ## PRevBtn am Ende nicht mehr sichtbar  Am Ende geht es nicht mehr zurück
+      toggle(id = "prevBtn", condition = rv$page < NUM_PAGES)
+    }
 
   })
 
