@@ -183,20 +183,23 @@ recSliderGuiInput<-function(id, x, depth=0,
     list.elem <- x[[i]]
     elem.name <- names(x)[i]
 
+    ##TODO: ifelse auf Performance und ggf. Vektorisierung prüfen, ersetzen
     #Attribute parsen
     this.minweight <- ifelse("minweight" %in% names(list.elem), list.elem$minweight, minweight)
     this.maxweight <- ifelse("maxweight" %in% names(list.elem),  list.elem$maxweight, maxweight)
     this.standardweight <- ifelse("standardweight" %in% names(list.elem),
                                   list.elem$standardweight, standardweight)
-    this.description <- ifelse("description" %in% names(list.elem),
-                               list.elem$description, elem.name)
+    if("description" %in% names(list.elem)){
+      this.description<-list.elem$description
+      }else this.description <-elem.name
+
 
     #Falls Element. GGf. Child-Elemente parsen
     if("class" %in% names(list.elem)){
 
       ## Hier Slider selbst - Taglist!
       returnvalue <-tagList(sliderCheckboxInput(ns(elem.name),
-                                                  description = paste0(this.description, collapse=""),
+                                                  description = this.description,
                                                   min = this.minweight,
                                                   max = this.maxweight,
                                                   value = this.standardweight,

@@ -42,7 +42,7 @@ sliderCheckboxInput <- function(id,description="",
   fluidRow(
     column(width=9,
            sliderInput(ns("sl"),
-                       paste0(description, collapse=""),
+                       description,
                        min = min,
                        max = max,
                        value = ifelse(is.na(value),default,value),

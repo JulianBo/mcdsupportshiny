@@ -1,12 +1,3 @@
-#
-# This is the server logic of a Shiny web application. You can run the
-# application by clicking 'Run App' above.
-#
-# Find out more about building applications with Shiny here:
-#
-#    http://shiny.rstudio.com/
-#
-
 
 # Vorbereiten  ------------------------------------------------------------
 
@@ -33,20 +24,6 @@ source("Setup_INOLA.R", encoding="UTF-8") #local=FALSE, auch in ui.R sichtbar
 
 validateConfig(configList,dtAlternativen)
 
-
-# Connection to Database --------------------------------------------------
-
-
-# pool <- dbPool(
-#   drv = RMySQL::MySQL(),
-#   dbname = "inola_test",
-#   host = "db4free.net",
-#   username = "inola_test_admin",
-#   password = "test2035test"
-# )
-
-
-datastorage <- future(initialize_datastorage( speicher_template, speichersettings$method, speichersettings$place) )
 
 
 # Globale Variablen berechnen ---------------------------------------------
@@ -81,6 +58,7 @@ dtAlternativen_long[,
                     by=variable]
 
 #Berechne Nutzen. Gruppiert, weil utilityfunc  einen single character vector für type erwartet (liegt am switch)
+# TODO: utilityfunc vektorisieren???
 #Ausgehend von Attributen, nicht von Indikatoren.
 dtAlternativen_long[,nutzen:=utilityfunc(x=value,
                                         type=first(util_func),
@@ -154,6 +132,20 @@ dtNutzen[,dtIndikatorensettings[level==0,first(parent)]  :=NA]
 important_columns =c( "Titel", "Rahmenszenario","Szenarioergebnis")
 setcolorder(dtNutzen,  c(important_columns,
                            names(dtNutzen)[!(names(dtNutzen) %in% important_columns)]) )
+
+# Connection to Database --------------------------------------------------
+
+
+# pool <- dbPool(
+#   drv = RMySQL::MySQL(),
+#   dbname = "inola_test",
+#   host = "db4free.net",
+#   username = "inola_test_admin",
+#   password = "test2035test"
+# )
+
+
+datastorage <- future(initialize_datastorage( speicher_template, speichersettings$method, speichersettings$place) )
 
 
 
