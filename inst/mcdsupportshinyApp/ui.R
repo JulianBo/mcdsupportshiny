@@ -29,7 +29,7 @@ slGui2<-rSliderGuiInput("slGui2",configList,breaking=0,
 NUM_PAGES_slGUI <- length(slGui1)
 
 # Define UI for application
-shinyUI(fluidPage(
+shinyUI(fluidPage(theme="mcdsupportshiny.css",
       useShinyjs(),
       rColorSliders(configList,"slGui1") ,
       rColorSliders(configList,"slGui2") ,

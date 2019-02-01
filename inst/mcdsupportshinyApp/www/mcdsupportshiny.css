@@ -1,0 +1,6 @@
+.control-label{ font-weight:normal; }
+.control-label em {
+    font-weight: bold;
+    font-style: normal;
+
+}
