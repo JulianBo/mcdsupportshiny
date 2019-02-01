@@ -79,13 +79,13 @@ validateConfig <- function (configList, dtAlternativen){
 
   colnames_in_Attribnames <- colnames(dtAlternativen) %in% Attribnames
 
-  message(paste0("Sie benutzen die Attribute: ",
-                 paste(colnames(dtAlternativen)[colnames_in_Attribnames], collapse=", "),
-                 ". Sie benutzen im Moment nicht: ",
-                 paste(colnames(dtAlternativen)[!colnames_in_Attribnames], collapse=", "),
-                 ". Nicht zugeordnet ist: ",
-                 paste(names(Attribnames)[is.na(Attribnames)], collapse=", ")
-                 ))
+  # message(paste0("Sie benutzen die Attribute: ",
+  #                paste(colnames(dtAlternativen)[colnames_in_Attribnames], collapse=", "),
+  #                ". Sie benutzen im Moment nicht: ",
+  #                paste(colnames(dtAlternativen)[!colnames_in_Attribnames], collapse=", "),
+  #                ". Nicht zugeordnet ist: ",
+  #                paste(names(Attribnames)[is.na(Attribnames)], collapse=", ")
+  #                ))
   if(!(all(Attribnames %in% colnames(dtAlternativen)|is.na(Attribnames) )) )
     stop (paste(Attribnames[!(Attribnames %in% colnames(dtAlternativen))], collapse=", " ), " nicht in Daten enthalten oder NA")
 
