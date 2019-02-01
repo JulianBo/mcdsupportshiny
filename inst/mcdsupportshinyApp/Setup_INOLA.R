@@ -15,7 +15,7 @@ dtAlternativen <- data.table(Titel= as.factor(c("0) Jetzt-Zustand",
                              Anteil_Energie=c(1,rep_len(100,9))
 
                              )
-summary(dtAlternativen)
+#summary(dtAlternativen)
 
 # Konfiguration aufbauen -----------------
 
@@ -448,7 +448,7 @@ speichersettings= list( #method="GoogleSheets",
 # library(mcdsupportshiny)
 dtBisherige <- loadData("CSV", "inst/mcdsupportshinyApp/MCDA_Beispiel_INOLA")
 
-dput(dtBisherige[1,])
+#dput(dtBisherige[1,])
 
 speicher_template = structure(list(Zeitpunkt = "Fri Jan 18 15:54:28 2019", Sessionstart = "Fri Jan 18 15:52:47 2019",
                                    session_id = 753361L, gruppe = NA, url_search = NA, addBtn = 0L,

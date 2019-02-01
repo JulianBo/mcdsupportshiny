@@ -367,7 +367,7 @@ shinyServer(function(input, output, session) {
 
     future( {
       saveData(daten,speichersettings$method, speichersettings$place )
-      message("saving after input$addBtn DONE")
+     # message("saving after input$addBtn DONE")
       })
     updateSelectInput(session,"ChoiceFinalSlct", selected = input$ChoiceSlct) #TODO BUG doesn't work
     rv$ChoiceFinalSlctCount<-rv$ChoiceFinalSlctCount-1 #account for manual change.
@@ -439,7 +439,7 @@ shinyServer(function(input, output, session) {
 
     future({
       saveData(daten,speichersettings$method, speichersettings$place )
-      message("saving after input$saveBtn DONE")
+      #message("saving after input$saveBtn DONE")
     })
 
     })
@@ -529,9 +529,9 @@ shinyServer(function(input, output, session) {
   #GUI - Bisheriges Abstimmungsverhalten anzeigen ---------
   output$BisherigeTable<-renderTable(value(dtBisherige) )
   output$BisherigeDecsPlot<- renderPlot({
-    message("outside promise . plotting BisherigeDecsPlot")
+    #message("outside promise . plotting BisherigeDecsPlot")
     dtBisherige %...>% {
-      message("inside promise . plotting BisherigeDecsPlot")
+      #message("inside promise . plotting BisherigeDecsPlot")
       ggplot(., mapping = aes(x=ChoiceSlct, fill=ChoiceSlct))+
         geom_bar()
     }
