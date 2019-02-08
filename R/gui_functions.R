@@ -119,8 +119,11 @@ rSliderGuiInput<-function(id, x,
           function(x){
             c(list(
               tags$p(beschreibungs_text),
-              tags$h2(title_text[x+1])),
-              slGui[slGui_attribs[page_nr==x,position]]
+              tags$h2(title_text[x+1]),
+              tags$div(class="sliders",
+               slGui[slGui_attribs[page_nr==x,position]]
+              )
+            )
             )
             })
   )

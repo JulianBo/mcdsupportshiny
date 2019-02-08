@@ -95,7 +95,7 @@ configList <- list (
   'Struktur des Energiesystems' = list (
     class = "elements",
     description = tagList(
-      "Mir ist wichtig, wie das ",em("regionale Energiesystem technisch und sozial gestaltet")," ist."
+      "Mir ist wichtig, wie das ",em("regionale Energiesystem technisch ausgestaltet")," ist."
     ),
     color = "orange",
     'Diversität des Energieerzeugungssystems' = list(
@@ -128,14 +128,16 @@ configList <- list (
         Attribname = NA,
         description = tagList(
           "Ich präferiere ",em("wenige große Anlagen")," zur ",em("Stromerzeugung"),", es ist mir ",em("egal"),", oder ich präferiere ",em("viele kleine Anlagen")," (z.B.: Mehr Verbundkraftwerke anstatt Einzelhausanlagen)."
-        )
+        ),
+        minweight=-100
       ),
       'Anlagengröße Wärmeerzeugung' = list(
         class = "mapping",
         Attribname = NA,
         description = tagList(
           "Ich präferiere ",em("wenige große Anlagen")," zur ",em("Wärmeerzeugung"),", es ist mir ",em("egal"),", oder ich präferiere ",em("viele kleine Anlagen")," (z.B.: Nahwärmenetze mit großem BHKW vs. Wärmespeicher, Solarthermieanlagen, Wärmepumpe)."
-        )
+        ),
+        minweight=-100
       )
     ),
     'Regionale Ausgleichsmechanismen' = list(
