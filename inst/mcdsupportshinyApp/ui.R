@@ -21,7 +21,7 @@ slGui1<-rSliderGuiInput("slGui1",configList,breaking=1,
                         beschreibungs_text=texte$begruessungstext2,
                         title_text=TRUE,
                    cb_title="Ich weiß nicht")
-slGui2<-rSliderGuiInput("slGui2",configList,breaking=0,
+slGui2<-rSliderGuiInput("slGui2",configList,breaking=0, open.maxdepth =1,
                         beschreibungs_text = "Wenn sie jetzt die Einstellungen verändern, können sie verfolgen, wie sich dies auf das Ergebnis auswirkt.",
                         title_text="Gewichtungen",
                         cb_title="Ich weiß nicht")
@@ -82,7 +82,7 @@ shinyUI(fluidPage(theme="mcdsupportshiny.css",
           hidden(numericInput("NUM_PAGES", label=NULL,value=NUM_PAGES_slGUI+3)), #CHANGE to maximum number of Pages
         sidebarLayout(
           sidebarPanel(
-            slGui2,
+            div(id="slGui2",slGui2 ),
 
             textOutput("Aux_to_initialise")
           ),#end of sidebarPanel
@@ -92,11 +92,11 @@ shinyUI(fluidPage(theme="mcdsupportshiny.css",
             tabsetPanel(id="MainTabset",
                         tabPanel("Ergebnis",
                                  h2("Ergebnis"),
-                                 tags$b(
-                                   tags$p("Mit den aktuellen Einstellungen präferieren Sie:",
-                                          textOutput("ErgebnisText")),
-                                   tags$p("Ursprünglich ausgewählt hatten Sie:",
-                                          textOutput("ChoiceText"))
+                                div(class="results",
+                                   tags$div("Mit den aktuellen Einstellungen hat folgende Alternative die höchste Punktzahl:",
+                                          textOutput("ErgebnisText", inline=TRUE)),
+                                   tags$div("Ursprünglich ausgewählt hatten Sie:",
+                                          textOutput("ChoiceText", inline=TRUE))
                                  )
                                  ,
                                  tags$p("Sie können jetzt sowohl die Einstellungen/Gewichtungen als auch die präferierte Alternative verändern, und dabei sehen, wie sich die Ergebnisse anpassen. Beachten sie, dass manche Indikatoren nicht in die Berechnung eingehen, weil sie nicht ohne weiteres quantifizierbar bzw. mit Zahlen abbildbar sind."),
@@ -170,6 +170,13 @@ shinyUI(fluidPage(theme="mcdsupportshiny.css",
   actionButton("prevBtn", "< Zurück"),
   actionButton("nextBtn", "Weiter >"),
   hidden(actionButton("saveBtn", "Speichern und Ergebnis ansehen >" )),
+  #see: https://stackoverflow.com/questions/6345549/right-align-link
+  #see: https://stackoverflow.com/questions/25062422/restart-shiny-session
+  #see: https://stackoverflow.com/questions/2906582/how-to-create-an-html-button-that-acts-like-a-link
+  div( style="float: right;",
+       HTML("<input type=\"button\"
+            class=\"btn btn-default action-button shiny-bound-input\";
+            onclick=\"location.href='javascript:history.go(0)';\" value=\"[Neustart]\" /> ") ),
   br(),
   textOutput("pageNrText")
 

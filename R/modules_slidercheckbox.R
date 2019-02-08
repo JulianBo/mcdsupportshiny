@@ -29,24 +29,28 @@ sliderCheckboxInput <- function(id,description="",
                                 min = 0,
                                 max = 100,
                                 value = 30,
-                                default=30 ,
+                                default=value ,
                                 cb_title = "I don't know",
                                 width = "100%"){
-  ns <- NS(gsub(" ", "", id, fixed = TRUE))
+  ns <- NS(gsub("[^A-Za-z0-9-]", "", id))
 
-  if(!is.na(default)&!is.numeric(default)){
-    warning("default must be numeric or NA; set to NA")
-    default<-NA_real_
-  } else if(is.na(default)) default<-NA_real_
+  if(!is.numeric(default)){
+    warning("default must be numeric; set to min")
+    default<-min
+  }
+
+
+  sl<-sliderInput(ns("sl"),
+                  description,
+                  min = min,
+                  max = max,
+                  value = if(is.na(value) )default else value,
+                  width = width)
+
 
   fluidRow(
     column(width=9,
-           sliderInput(ns("sl"),
-                       description,
-                       min = min,
-                       max = max,
-                       value = ifelse(is.na(value),default,value),
-                       width = width),
+           if(is.na(value)) disabled(sl) else sl,
            hidden(
              numericInput(ns("defaultNumeric"),
                           "If you can see this, you forgot useShinyjs()", default)
@@ -54,7 +58,7 @@ sliderCheckboxInput <- function(id,description="",
 
     ),
     column(width=2,
-           checkboxInput(ns("active"),
+           checkboxInput(ns("disabled"),
                          cb_title, value=is.na(value) )
     )
   )
@@ -68,80 +72,107 @@ sliderCheckboxInput <- function(id,description="",
 #' @export
 sliderCheckbox<- function(input, output, session,
                           oldvalue =NULL) {
-  rv<-reactiveValues(oldvalue=oldvalue)
 
-  observeEvent(input$active,ignoreInit = TRUE, {          #ignoreInit, otherwise creation of Checkbox will set slider to oldvalue.
-    #message(paste(input$active, name, collapse=";") ) #For Development
-    if (input$active){
-      rv$oldvalue<-input$sl
+  #see: https://stackoverflow.com/questions/54560439/shiny-update-input-without-reactives-getting-triggered
+  rv<-reactiveValues(storedvalue=oldvalue,
+                     update=TRUE)
+
+  observeEvent(input$defaultNumeric,ignoreInit = TRUE, {
+    if(input$disabled) updateSliderInput(session, "sl", value=input$defaultNumeric)
+  })
+
+  observeEvent(input$sl, {
+    if (rv$update) rv$storedvalue<-input$sl else rv$update<-TRUE
+  })
+
+  observeEvent(input$disabled,
+               ignoreInit = TRUE, #ignoreInit, otherwise creation of Checkbox will set slider to oldvalue.
+               {
+
+    # message(paste("Event input$disabled", input$disabled,
+    #               "storedvalue:", rv$storedvalue,
+    #               "defaultvalue:",input$defaultNumeric, collapse=";") ) #For Development
+
+    if (input$disabled){
+      if(is.null(rv$storedvalue)) rv$storedvalue<-input$sl
       disable("sl")
-      updateSliderInput(session, "sl", value=input$defaultNumeric)
+      if(!is.null(input$defaultNumeric) &!(input$defaultNumeric==input$sl)) {
+        rv$update<-FALSE
+        updateSliderInput(session, "sl", value=input$defaultNumeric)
+      }
     }else {
-      updateSliderInput(session, "sl", value=rv$oldvalue)
+
+      #see https://github.com/rstudio/shiny/issues/2250
+      if(!is.null(rv$storedvalue) & !(rv$storedvalue==input$sl)) {
+        rv$update<-FALSE
+        updateSliderInput(session, "sl", value=rv$storedvalue)
+      }
       enable("sl")
     }
 
-    #toggleState("sl", !input$active)
   })
 
-  onclick("sl",
-          if(input$active) updateCheckboxInput(session, "active", value=FALSE)
-  )
-
-  setState<-function(value=NULL, checkbox_active=NULL,oldvalue=NULL){
-
-    if(!is.null(checkbox_active)) if (checkbox_active)value<-NA #checkbox_active overrides value, because value is then default-value
-
-    if(!is.null(value)){
-      if (is.na(value)){
-
-        #Updating oldvalue  - so changes are not overriden
-        if(!is.null(oldvalue) & !input$active) updateSliderInput(session, "sl", value=oldvalue)
-            #check for active necessary: if checkbox already==TRUE-> no change->slider remains at oldvalue
-
-        updateCheckboxInput(session, "active", value=TRUE)
-      }else {
-        updateSliderInput(session, "sl", value=value)
+  # onclick("sl",
+  #         if(input$disabled) updateCheckboxInput(session, "disabled", value=FALSE)
+  # )
 
 
+#
+# @param checkbox_active checkbix active? overrides value
+# @param value New value.
+# @param oldvalue
+#
+# @return
+  setState<-function( checkbox_active=NULL,value=NULL,oldvalue=NULL){
+    if(!is.null(checkbox_active)) {
 
-      }
-    }
+      if(!is.null(oldvalue) ) rv$storedvalue<-oldvalue
+      updateCheckboxInput(session, "disabled", value=checkbox_active)
 
 
-    #Updating oldvalue  -last, to override changes before. both necessary
-    if(!is.null(oldvalue)) {
-      rv$oldvalue=oldvalue
-    }
+      }else if(!is.null(value)){
+        if(is.na(value)){
+          updateCheckboxInput(session, "disabled", value=TRUE)
+          if(!is.null(oldvalue) ) rv$storedvalue<-oldvalue
+        }else {
+          if(input$disabled){
+            rv$storedvalue<-value
+            updateCheckboxInput(session, "disabled", value=FALSE)
+          } else updateSliderInput(session, "sl", value=value)
+        }
+
+      } else if(!is.null(oldvalue) ) rv$storedvalue<-oldvalue
 
 
   }
 
   value<-reactive({
-    # message(paste0("GETVALUE. active:",input$active,
-    #                "; sl:", input$sl,"; oldvalue:", rv$oldvalue) )
+    # isolate(message(paste0("GETVALUE. disabled:",input$disabled,
+    #                "; sl:", input$sl,"; oldvalue:", rv$storedvalue,
+    #                "; update:", rv$update) )
+    # )
 
     ##Implement Fallback, if notyet initialised
-    if (is.null(input$active) ){
+    if (is.null(input$disabled) ){
       NULL
-    } else if (input$active){
+    } else if (input$disabled){
       ret<-input$defaultNumeric
     }else {
-      ret<-input$sl
+      ret<-rv$storedvalue
     }
   })
 
   return ( list(
     value= value,
-    checkbox_active=reactive(input$active),
-    oldvalue=reactive(rv$oldvalue),
+    checkbox_active=reactive(input$disabled),
+    oldvalue=reactive(rv$storedvalue),
     setState=setState,
     print=reactive(paste0("VALUE: ", value(),
                           "; sl: ", input$sl,
-                          "; checkbox: ", input$active,
-                          "; oldvalue: ", rv$oldvalue) ),
+                          "; checkbox: ", input$disabled,
+                          "; oldvalue: ", rv$storedvalue) ),
     syncModules=function(oldmodule){
-      setState(oldmodule$value(),oldmodule$checkbox_active(),oldmodule$oldvalue())
+      setState(oldmodule$checkbox_active(),oldmodule$value(),oldmodule$oldvalue())
     }
 
     ))
@@ -161,10 +192,10 @@ updateSliderCheckboxInput<- function( session, id,
   ns<-NS(gsub(" ", "", id, fixed = TRUE))
 
   #Updating Checkbox- without values
-  if(!is.null(cb_title))updateCheckboxInput(session,ns("active"), label=cb_title)
+  if(!is.null(cb_title))updateCheckboxInput(session,ns("disabled"), label=cb_title)
 
   #Updating Slider - without values
-  updateSliderInput(session,ns("sl"), label=description, min=min, max=max)
+  if (!(is.null(description)&is.null(min)&is.null(max)) ) updateSliderInput(session,ns("sl"), label=description, min=min, max=max)
 
   #Updating Default Value
   if(!is.null(default))updateNumericInput(session,ns("defaultNumeric"), value=default)

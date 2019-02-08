@@ -7,7 +7,8 @@
 \title{Module sliderCheckbox: Slider with Checkbox}
 \usage{
 sliderCheckboxInput(id, description = "", min = 0, max = 100,
-  value = 30, default = 30, cb_title = "I don't know", width = "100\%")
+  value = 30, default = value, cb_title = "I don't know",
+  width = "100\%")
 
 sliderCheckbox(input, output, session, oldvalue = NULL)
 

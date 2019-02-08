@@ -4,3 +4,19 @@
     font-style: normal;
 
 }
+.results{font-size: large;}
+.results .shiny-text-output{font-weight: bold;}
+
+#slGui2 .sliders{
+  overflow-y: scroll;
+  max-height: 70vh;
+}
+
+.tab-pane {
+    overflow-y: scroll;
+    max-height: 75vh;
+}
+
+.collapsed {
+    font-size: 14px;
+}

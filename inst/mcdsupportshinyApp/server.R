@@ -28,12 +28,14 @@ validateConfig(configList,dtAlternativen)
 
 # Globale Variablen berechnen ---------------------------------------------
 
-
 dtIndikatorensettings<-getIndikatorensetting(configList)
+
 dtIndikatorensettings[,slname:=paste(name,"sl", sep = ns.sep)] #shiny:ns.sep; NS() not vectorised
 dtIndikatorensettings[,colors:=rColorVector(configList, color="blue")]
+dtIndikatorensettings[, number:=1:length(name)]
 
-setkey(dtIndikatorensettings,name)
+setcolorder(dtIndikatorensettings, "number")
+setkey(dtIndikatorensettings,number)
 
 # columns: bscName bscName.parent - Get each parent-child-combination.Only of collapsePanels.
 # Parent=NA --> Top-level.
@@ -130,8 +132,7 @@ dtNutzen[,dtIndikatorensettings[level==0,first(parent)]  :=NA]
 
 
 important_columns =c( "Titel", "Rahmenszenario","Szenarioergebnis")
-setcolorder(dtNutzen,  c(important_columns,
-                           names(dtNutzen)[!(names(dtNutzen) %in% important_columns)]) )
+setcolorder(dtNutzen,  important_columns )
 
 # Connection to Database --------------------------------------------------
 
@@ -169,8 +170,14 @@ shinyServer(function(input, output, session) {
   #                                )
 
   #copy(dtBscCombinations) to separate Counting. Otherwise call-by-reference, to same data.table.
-  slGui1<-callModule(rSliderGui,"slGui1", dtGewichtungen$name,copy(dtBscCombinations) )
-  slGui2<-callModule(rSliderGui,"slGui2", dtGewichtungen$name,copy(dtBscCombinations) )
+  # time1<- system.time(
+    slGui1<-callModule(rSliderGui,"slGui1", dtGewichtungen$name,copy(dtBscCombinations) )
+  # )
+  # time2<- system.time(
+    slGui2<-callModule(rSliderGui,"slGui2", dtGewichtungen$name,copy(dtBscCombinations) )
+  # )
+
+  #message(time1)
 
 # Reactives berechnen -----------------------------------------------------
 
