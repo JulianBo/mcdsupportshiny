@@ -129,7 +129,8 @@ configList <- list (
         description = tagList(
           "Ich präferiere ",em("wenige große Anlagen")," zur ",em("Stromerzeugung"),", es ist mir ",em("egal"),", oder ich präferiere ",em("viele kleine Anlagen")," (z.B.: Mehr Verbundkraftwerke anstatt Einzelhausanlagen)."
         ),
-        minweight=-100
+        minweight=-100,
+        class="returnLabelsAnlagengroesse"
       ),
       'Anlagengröße Wärmeerzeugung' = list(
         class = "mapping",
@@ -137,7 +138,8 @@ configList <- list (
         description = tagList(
           "Ich präferiere ",em("wenige große Anlagen")," zur ",em("Wärmeerzeugung"),", es ist mir ",em("egal"),", oder ich präferiere ",em("viele kleine Anlagen")," (z.B.: Nahwärmenetze mit großem BHKW vs. Wärmespeicher, Solarthermieanlagen, Wärmepumpe)."
         ),
-        minweight=-100
+        minweight=-100,
+        class="returnLabelsAnlagengroesse"
       )
     ),
     'Regionale Ausgleichsmechanismen' = list(
@@ -175,46 +177,46 @@ configList <- list (
       "Mir ist wichtig, wie das ",em("regionale Energiesystem sich in der Region ökonomisch auswirkt"),"."
     ),
     color = "blue",
-    'Ökonomische Effekte im Bereich EE' = list(
+    'Ökonomische Effekte im Bereich erneuerbare Energien' = list(
       class = "elements",
       description = tagList(
-        "Es ist mir wichtig, dass im Bereich EE-Anlagen und im Energiesystem Wirtschaftskraft in der Region geschaffen wird"
+        "Es ist mir wichtig, dass ",em("im Bereich Erneuerbare-Energie-Anlagen und im Energiesystem Wirtschaftskraft")," in der Region geschaffen wird"
       ),
-      'Regionale Wertschöpfung im Bereich EE' = list(
+      'Regionale Wertschöpfung im Bereich erneuerbare Energien' = list(
         class = "mapping",
         Attribname = NA,
         description = tagList(
-          "Es ist mir wichtig, dass im Bereich EE-Anlagen und im Energiesystem Wertschöpfung in der Region geschaffen wird."
+          "Es ist mir wichtig, dass ",em("im Bereich Erneuerbare-Energie-Anlagen und im Energiesystem Wertschöpfung")," in der Region geschaffen wird."
         )
       ),
-      'Arbeitsplätze im Bereich EE' = list(
+      'Arbeitsplätze im Bereich erneuerbare Energien' = list(
         class = "mapping",
         Attribname = NA,
         description = tagList(
-          "Es ist mir wichtig, dass im Bereich EE-Anlagen und im Energiesystem in der Region neue Arbeitsplätze geschaffen werden."
+          "Es ist mir wichtig, dass ",em("im Bereich Erneuerbare-Energie-Anlagen und im Energiesystem in der Region neue Arbeitsplätze")," geschaffen werden."
         )
       )
     ),
-    'Regionale Wirtschaftsentwicklung durch EE - langfristig und übergreifend' =
+    'Regionale Wirtschaftsentwicklung durch erneuerbare Energien - langfristig und übergreifend' =
       list(
         class = "elements",
         description = tagList(
-          "Es ist mir wichtig, dass sich der Bau von EE-Anlagen und das regionale Energiesystem langfristig positiv auf die gesamte regionale Wirtschaft auswirkt."
+          "Es ist mir wichtig, dass sich der ",em("Bau von Erneuerbare-Energie-Anlagen und das regionale Energiesystem")," langfristig ",em("positiv auf die gesamte regionale Wirtschaft")," auswirkt."
         ),
-        'Regionale Wertschöpfung durch EE- langfristig und übergreifend' =
+        'Regionale Wertschöpfung durch erneuerbare Energien - langfristig und übergreifend' =
           list(
             class = "mapping",
             Attribname = NA,
             description = tagList(
-              "Es ist mir wichtig, dass sich der Bau von EE-Anlagen und das regionale Energiesystem langfristig positiv auf die gesamte regionale Wertschöpfung auswirkt"
+              "Es ist mir wichtig, dass sich der ",em("Bau von Erneuerbare-Energie-Anlagen und das regionale Energiesystem")," langfristig ",em("positiv auf die gesamte regionale Wertschöpfung")," auswirkt"
             )
           ),
-        'Regionale Arbeitsplätze durch EE - langfristig und übergreifend' =
+        'Regionale Arbeitsplätze durch erneuerbare Energien - langfristig und übergreifend' =
           list(
             class = "mapping",
             Attribname = NA,
             description = tagList(
-              "Es ist mir wichtig, dass der Bau von EE-Anlagen und das regionale Energiesystem langfristig für mehr Arbeitsplätze in der gesamten regionalen Wirtschaft sorgt."
+              "Es ist mir wichtig, dass der ",em("Bau von Erneuerbare-Energie-Anlagen und das regionale Energiesystem")," langfristig für ",em("mehr Arbeitsplätze in der gesamten regionalen Wirtschaft")," sorgt."
             )
           )
 
@@ -222,20 +224,20 @@ configList <- list (
     'Energiekosten' = list(
       class = "elements",
       description = tagList(
-        "Es ist mir wichtig, dass die Kosten des regionalen Energiesystems gering sind."
+        "Es ist mir wichtig, dass die ",em("Kosten des regionalen Energiesystems gering")," sind."
       ),
       'Energieerzeugungskosten' = list(
         class = "mapping",
         Attribname = NA,
         description = tagList(
-          "Mir ist wichtig, dass die durchschnittlichen Erzeugungskosten pro KwH (Strom und Wärme) gering sind."
+          "Mir ist wichtig, dass die ",em("durchschnittlichen Erzeugungskosten pro KwH (Strom und Wärme) gering ")," sind."
         )
       ),
-      'Kosten des Baus von EE-Anlagen' = list(
+      'Kosten des Baus von Erneuerbare-Energie-Anlagen' = list(
         class = "mapping",
         Attribname = NA,
         description = tagList(
-          "Es ist mir wichtig, dass die Kosten für den Bau und die Errichtung  von EE-Anlagen in der Region niedrig sind."
+          "Es ist mir wichtig, dass die ",em("Kosten für den Bau und die Errichtung  von EE-Anlagen in der Region niedrig ")," sind."
         )
       )
     )
@@ -250,21 +252,21 @@ configList <- list (
       class = "mapping",
       Attribname = NA,
       description = tagList(
-        "Es ist mir wichtig, dass die Energieversorgung möglichst CO2 frei ist."
+        "Es ist mir wichtig, dass die ",em("Energieversorgung möglichst CO2-frei")," ist."
       )
     ),
     'Ressourcenbeanspruchung' = list(
       class = "mapping",
       Attribname = NA,
       description = tagList(
-        "Es ist mir wichtig, dass der Bau/Rückbau von Energieerzeugungsanlagen möglichst weniger Rohstoffe bedarf/möglichst wenig Müll verursacht."
+        "Es ist mir wichtig, dass der ",em("Bau/Rückbau von Energieerzeugungsanlagen möglichst weniger Rohstoffe bedarf/möglichst wenig Müll")," verursacht."
       )
     ),
     'Rückbaumöglichkeit' = list(
       class = "mapping",
       Attribname = NA,
       description = tagList(
-        "Es ist mir wichtig, dass die gebauten Energieerzeugungsanlagen einfach rückgebaut werden können."
+        "Es ist mir wichtig, dass die ",em("gebauten Energieerzeugungsanlagen einfach rückgebaut")," werden können."
       )
     ),
     'Flächenbeanspruchung' = list(
@@ -277,14 +279,16 @@ configList <- list (
         Attribname = NA,
         description = tagList(
           "Von den ",em("Abstandsflächen für Windkraftanlagen")," soll wie viel Prozent der Fläche einbezogen werden?"
-        )
+        ),
+        class="returnLabelsProzent"
       ),
       'Flächenverbrauch(Fundamente und Gebäude Windkraft)' = list(
         class = "mapping",
         Attribname = NA,
         description = tagList(
           "Von den ",em("Fundamenten und Gebäuden für Windkraftanlagen")," soll wie viel Prozent der Fläche einbezogen werden?"
-        )
+        ),
+        class="returnLabelsProzent"
       ),
       'Flächenverbrauch(Solardachflächenanlagen)' = list(
         class = "mapping",
@@ -292,62 +296,66 @@ configList <- list (
         description =
           list(
             "Von den ",em("Solardachflächenanlagen")," soll wie viel Prozent der Fläche einbezogen werden?"
-          )
+          ),
+        class="returnLabelsProzent"
       ),
       'Flächenverbrauch(Solarfreiflächenanlagen)' = list(
         class = "mapping",
         Attribname = NA,
         description = tagList(
           "Von den ",em("Solarfreiflächenanlagen")," soll wie viel Prozent der Fläche einbezogen werden?"
-        )
+        ),
+        class="returnLabelsProzent"
       ),
       'Flächenverbrauch(tiefe Geothermie)' = list(
         class = "mapping",
         Attribname = NA,
         description = tagList(
           "Von den ",em("Geothermieanlagen")," soll wie viel Prozent der Fläche einbezogen werden?"
-        )
+        ),
+        class="returnLabelsProzent"
       ),
       'Flächenverbrauch(Biomasseanbau)' = list(
         class = "mapping",
         Attribname = NA,
         description = tagList(
           "Vom ",em("landwirtschaftlichen Anbau von Biomasse")," soll wie viel Prozent der Fläche einbezogen werden?"
-        )
+        ),
+        class="returnLabelsProzent"
       )
 
     ),
     'Anteil Energieproduktion an landwirtschaftlicher Produktion' = list(
       class = "elements",
       description = tagList(
-        "Es ist mir wichtig, dass vom gesamten Aufkommen an Mais/Grünland/Gülle/Holz nur ein geringer Anteil zur Energieproduktion verwendet wird."
+        "Es ist mir wichtig, dass vom gesamten ",em("Aufkommen an Mais/Grünland/Gülle/Holz nur ein geringer Anteil "),"zur Energieproduktion verwendet wird."
       ),
       'Anteil Energieproduktion an Mais' = list(
         class = "mapping",
         Attribname = NA,
         description = tagList(
-          "Es ist mir wichtig, dass vom gesamten Aufkommen an Mais nur ein geringer Anteil zur Energieproduktion verwendet wird."
+          "Es ist mir wichtig, dass vom ",em("gesamten Aufkommen an Mais")," nur ein geringer Anteil zur Energieproduktion verwendet wird."
         )
       ),
       'Anteil Energieproduktion an Grünschnitt' = list(
         class = "mapping",
         Attribname = NA,
         description = tagList(
-          "Es ist mir wichtig, dass vom gesamten Grünschnitt nur ein geringer Anteil zur Energieproduktion verwendet wird."
+          "Es ist mir wichtig, dass vom ",em("gesamten Grünschnitt")," nur ein geringer Anteil zur Energieproduktion verwendet wird."
         )
       ),
       'Anteil Energieproduktion an Gülle' = list(
         class = "mapping",
         Attribname = NA,
         description = tagList(
-          "Es ist mir wichtig, dass vom gesamten Gülleaufkommen nur ein geringer Anteil zur Energieproduktion verwendet wird."
+          "Es ist mir wichtig, dass vom ",em("gesamten Gülleaufkommen")," nur ein geringer Anteil zur Energieproduktion verwendet wird."
         )
       ),
       'Anteil Energieproduktion an Holzzuwachs' = list(
         class = "mapping",
         Attribname = NA,
         description = tagList(
-          "Es ist mir wichtig, dass vom gesamten Holzzuwachs nur ein geringer Anteil zur Energieproduktion verwendet wird."
+          "Es ist mir wichtig, dass vom ",em("gesamten Holzzuwachs")," nur ein geringer Anteil zur Energieproduktion verwendet wird."
         )
       )
 
@@ -365,56 +373,56 @@ configList <- list (
       class = "mapping",
       Attribname = NA,
       description = tagList(
-        "Es ist mir wichtig, dass es möglichst geringe regionale Auswirkungen durch Windkraftanlagen gibt."
+        "Es ist mir wichtig, dass es möglichst geringe regionale Auswirkungen durch ",em("Windkraftanlagen")," gibt."
       )
     ),
     'Auswirkungen der PV-Freiflächenanlagen' = list(
       class = "mapping",
       Attribname = NA,
       description = tagList(
-        "Es ist mir wichtig, dass es möglichst geringe regionale Auswirkungen durch Solar-Freiflächenanlagen gibt."
+        "Es ist mir wichtig, dass es möglichst geringe regionale Auswirkungen durch ",em("Solar-Freiflächenanlagen")," gibt."
       )
     ),
     'Auswirkungen der PV-Dachflächenanlagen' = list(
       class = "mapping",
       Attribname = NA,
       description = tagList(
-        "Es ist mir wichtig, dass es möglichst geringe regionale Auswirkungen durch Solar-Dachflächenanlagen gibt."
+        "Es ist mir wichtig, dass es möglichst geringe regionale Auswirkungen durch ",em("Solar-Dachflächenanlagen")," gibt."
       )
     ),
     'Auswirkungen der Wasserkraftanlagen' = list(
       class = "mapping",
       Attribname = NA,
       description = tagList(
-        "Es ist mir wichtig, dass es möglichst geringe regionale Auswirkungen durch Wasserkraftanlagen gibt."
+        "Es ist mir wichtig, dass es möglichst geringe regionale Auswirkungen durch ",em("Wasserkraftanlagen")," gibt."
       )
     ),
     'Auswirkungen der Biogasanlagen' = list(
       class = "mapping",
       Attribname = NA,
       description = tagList(
-        "Es ist mir wichtig, dass es möglichst geringe regionale Auswirkungen durch Biogasanlagen gibt."
+        "Es ist mir wichtig, dass es möglichst geringe regionale Auswirkungen durch ",em("Biogasanlagen")," gibt."
       )
     ),
     'Auswirkungen größerer Biomasseanlagen' = list(
       class = "mapping",
       Attribname = NA,
       description = tagList(
-        "Es ist mir wichtig, dass es möglichst geringe regionale Auswirkungen durch größere Biomasseanlagen gibt."
+        "Es ist mir wichtig, dass es möglichst geringe regionale Auswirkungen durch ",em("größere Biomasseanlagen")," gibt."
       )
     ),
     'Auswirkungen der Einzelhausbiomasseanlagen' = list(
       class = "mapping",
       Attribname = NA,
       description = tagList(
-        "Es ist mir wichtig, dass es möglichst geringe regionale Auswirkungen durch Einzelhausbiomasseanlagen gibt."
+        "Es ist mir wichtig, dass es möglichst geringe regionale Auswirkungen durch ",em("Einzelhausbiomasseanlagen")," gibt."
       )
     ),
     'Auswirkungen der Geothermieanlagen' = list(
       class = "mapping",
       Attribname = NA,
       description = tagList(
-        "Es ist mir wichtig, dass es möglichst geringe regionale Auswirkungen durch Geothermieanlagen gibt."
+        "Es ist mir wichtig, dass es möglichst geringe regionale Auswirkungen durch ",em("Geothermieanlagen")," gibt."
       )
     )
   )

@@ -31,6 +31,7 @@ NUM_PAGES_slGUI <- length(slGui1)
 # Define UI for application
 shinyUI(fluidPage(theme="mcdsupportshiny.css",
       useShinyjs(),
+      includeScript("labels.js"),
       rColorSliders(configList,"slGui1") ,
       rColorSliders(configList,"slGui2") ,
 
@@ -124,9 +125,9 @@ shinyUI(fluidPage(theme="mcdsupportshiny.css",
                                  tableOutput("EntscheidungenTable")
 
                         ),
-                        tabPanel("Endgültige Gewichtungen",
-                                 tableOutput("DirGewichtungenTable")
-                        ),
+                        # tabPanel("Endgültige Gewichtungen",
+                        #          tableOutput("DirGewichtungenTable")
+                        # ),
                         tabPanel("Alternativen",
                                  tableOutput("AlternativenTable")
                         ),
@@ -135,14 +136,15 @@ shinyUI(fluidPage(theme="mcdsupportshiny.css",
                         )
                         ,
                         tabPanel("Bisherige Gewichtungen",
-                                 plotOutput("BisherigeDecsPlot"),
-                                 plotOutput("BisherigeHistsPlot")
-                                 ,
-                                 tableOutput("BisherigeTable")
+                                 plotOutput("BisherigeDecsPlot")
+                                 # ,
+                                 # plotOutput("BisherigeHistsPlot")
+                                 # ,
+                                 # tableOutput("BisherigeTable")
                         ),
-                        tabPanel("Einstellungen für die Indikatoren",
-                                 tableOutput("Indikatorensettings")
-                        ),
+                        # tabPanel("Einstellungen für die Indikatoren",
+                        #          tableOutput("Indikatorensettings")
+                        # ),
                         tabPanel("Über dieses Programm",
                                  tags$div(tags$p("Dieses Programm wurde im Rahmen des Projektes INOLA erstellt.
                                                  Weitere Informationen unter: ", tags$a(href="http://inola-region.de", "inola-region.de") ),
