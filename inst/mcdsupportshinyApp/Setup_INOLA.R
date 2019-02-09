@@ -27,6 +27,7 @@ configList <- list (
   maxweight = 100,
   standardweight = 20,
   util_func = "prop",
+  sliderclass="returnLabelsNormal",
   #Standardeinstellungen der utilityfunction, zum weiterreichen
   util_mean = "mean",
   util_offset = 0,
@@ -130,7 +131,7 @@ configList <- list (
           "Ich präferiere ",em("wenige große Anlagen")," zur ",em("Stromerzeugung"),", es ist mir ",em("egal"),", oder ich präferiere ",em("viele kleine Anlagen")," (z.B.: Mehr Verbundkraftwerke anstatt Einzelhausanlagen)."
         ),
         minweight=-100,
-        class="returnLabelsAnlagengroesse"
+        sliderclass="returnLabelsAnlagengroesse"
       ),
       'Anlagengröße Wärmeerzeugung' = list(
         class = "mapping",
@@ -139,7 +140,7 @@ configList <- list (
           "Ich präferiere ",em("wenige große Anlagen")," zur ",em("Wärmeerzeugung"),", es ist mir ",em("egal"),", oder ich präferiere ",em("viele kleine Anlagen")," (z.B.: Nahwärmenetze mit großem BHKW vs. Wärmespeicher, Solarthermieanlagen, Wärmepumpe)."
         ),
         minweight=-100,
-        class="returnLabelsAnlagengroesse"
+        sliderclass="returnLabelsAnlagengroesse"
       )
     ),
     'Regionale Ausgleichsmechanismen' = list(
@@ -280,7 +281,7 @@ configList <- list (
         description = tagList(
           "Von den ",em("Abstandsflächen für Windkraftanlagen")," soll wie viel Prozent der Fläche einbezogen werden?"
         ),
-        class="returnLabelsProzent"
+        sliderclass="returnLabelsProzent"
       ),
       'Flächenverbrauch(Fundamente und Gebäude Windkraft)' = list(
         class = "mapping",
@@ -288,7 +289,7 @@ configList <- list (
         description = tagList(
           "Von den ",em("Fundamenten und Gebäuden für Windkraftanlagen")," soll wie viel Prozent der Fläche einbezogen werden?"
         ),
-        class="returnLabelsProzent"
+        sliderclass="returnLabelsProzent"
       ),
       'Flächenverbrauch(Solardachflächenanlagen)' = list(
         class = "mapping",
@@ -297,7 +298,7 @@ configList <- list (
           list(
             "Von den ",em("Solardachflächenanlagen")," soll wie viel Prozent der Fläche einbezogen werden?"
           ),
-        class="returnLabelsProzent"
+        sliderclass="returnLabelsProzent"
       ),
       'Flächenverbrauch(Solarfreiflächenanlagen)' = list(
         class = "mapping",
@@ -305,7 +306,7 @@ configList <- list (
         description = tagList(
           "Von den ",em("Solarfreiflächenanlagen")," soll wie viel Prozent der Fläche einbezogen werden?"
         ),
-        class="returnLabelsProzent"
+        sliderclass="returnLabelsProzent"
       ),
       'Flächenverbrauch(tiefe Geothermie)' = list(
         class = "mapping",
@@ -313,7 +314,7 @@ configList <- list (
         description = tagList(
           "Von den ",em("Geothermieanlagen")," soll wie viel Prozent der Fläche einbezogen werden?"
         ),
-        class="returnLabelsProzent"
+        sliderclass="returnLabelsProzent"
       ),
       'Flächenverbrauch(Biomasseanbau)' = list(
         class = "mapping",
@@ -321,7 +322,7 @@ configList <- list (
         description = tagList(
           "Vom ",em("landwirtschaftlichen Anbau von Biomasse")," soll wie viel Prozent der Fläche einbezogen werden?"
         ),
-        class="returnLabelsProzent"
+        sliderclass="returnLabelsProzent"
       )
 
     ),

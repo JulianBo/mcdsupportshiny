@@ -6,12 +6,13 @@
 \usage{
 recSliderGuiInput(id, x, depth = 0, breaking = 0,
   parents_name = "genauer", minweight = 0, maxweight = 100,
-  standardweight = 30, open.maxdepth = Inf, cb_title = "I don't know")
+  standardweight = 30, open.maxdepth = Inf, cb_title = "I don't know",
+  sliderclass = "")
 }
 \arguments{
 \item{depth}{actual depth - root is 0}
 
-\item{cb_title}{}
+\item{sliderclass}{}
 }
 \value{
 a list of rows as UIoutput - Sliders and collapsebars

@@ -14,7 +14,7 @@
 
 .tab-pane {
     overflow-y: scroll;
-    max-height: 75vh;
+    max-height: 80vh;
 }
 
 .collapsed {

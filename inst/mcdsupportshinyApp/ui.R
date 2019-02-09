@@ -82,14 +82,14 @@ shinyUI(fluidPage(theme="mcdsupportshiny.css",
       div(class = "page", id = paste0("page", NUM_PAGES_slGUI+3), #change according to paging
           hidden(numericInput("NUM_PAGES", label=NULL,value=NUM_PAGES_slGUI+3)), #CHANGE to maximum number of Pages
         sidebarLayout(
-          sidebarPanel(
+          sidebarPanel( width = 5,
             div(id="slGui2",slGui2 ),
 
             textOutput("Aux_to_initialise")
           ),#end of sidebarPanel
 
           # Show Results, Description, ...
-          mainPanel(
+          mainPanel(width = 7,
             tabsetPanel(id="MainTabset",
                         tabPanel("Ergebnis",
                                  h2("Ergebnis"),
@@ -105,7 +105,8 @@ shinyUI(fluidPage(theme="mcdsupportshiny.css",
                                  div(id="abstimmungsDiv",
                                    tags$p("Wenn Sie mit den Einstellungen zufrieden sind, können Sie diese abspeichern. Damit gehen diese Werte in das Ergebnis ein."),
                                    selectInput("ChoiceFinalSlct","Welche Alternative präferieren Sie, nachdem Sie diese Ergebnisse gesehen haben?" ,
-                                               choices=levels(dtAlternativen$Titel)
+                                               choices=levels(dtAlternativen$Titel),
+                                               width = "100%"
                                                #TODO: Add changecount!
                                    ),
                                    actionButton("addBtn", "Zufrieden? Dann aktuelle Einstellungen speichern und damit abstimmen!")

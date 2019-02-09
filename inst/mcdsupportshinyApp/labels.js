@@ -39,10 +39,23 @@ $(document).ready(function() {
     }
 
 
-    var someID = $(".js-range-slider").ionRangeSlider({ // enter your shiny slider ID here (CSS-Selector?): .js-range-slider #bins
+    var someID = $("[sliderclass~=returnLabelsNormal] .js-range-slider").ionRangeSlider({ // enter your shiny slider ID here (CSS-Selector?): .js-range-slider #bins
           prettify: returnLabelsNormal
           // ,
           // force_edges: true,
           // grid: false
         });
+
+
+    var someID2 = $("[sliderclass~=returnLabelsAnlagengroesse] .js-range-slider").ionRangeSlider({ // enter your shiny slider ID here (CSS-Selector?): .js-range-slider #bins
+          prettify: returnLabelsAnlagengroesse
+        });
+
+    var someID3 = $("[sliderclass~=returnLabelsProzent] .js-range-slider").ionRangeSlider({ // enter your shiny slider ID here (CSS-Selector?): .js-range-slider #bins
+          prettify: returnLabelsProzent
+        });
+
     });
+
+
+

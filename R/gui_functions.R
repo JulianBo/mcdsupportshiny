@@ -29,6 +29,8 @@
 #' @param open.maxdepth From which depth on to create fold-out-panels, if not declared otherwise in x.
 #'                      Maximum:12 (see \code{\link{shiny:column}}).Must be larger than breaking (if provided).
 #' @param cb_title Default description label for checkbox.
+#' @param sliderclass Default class of sliderceckboxes, to use with \href{https://stackoverflow.com/a/42887905}{custom
+#' prettify-function to have individual labels}.
 #'
 #' @return Slidergui: List of Sliders (breaking== NULL or breaking==FALSE)
 #'                    or list of SliderGui-pages (breaking==TRUE or Breaking>0).
@@ -43,7 +45,8 @@ rSliderGuiInput<-function(id, x,
                      parents_name="Hauptkategorien",
                      minweight=0,maxweight=100, standardweight=30,
                      open.maxdepth=Inf,
-                     cb_title= "I don't know"
+                     cb_title= "I don't know",
+                     sliderclass=""
                      ){
 
   ##Tests
@@ -64,7 +67,8 @@ rSliderGuiInput<-function(id, x,
                         breaking=breaking,
                         parents_name = parents_name, minweight = minweight,
                         maxweight = maxweight, standardweight = standardweight,
-                        open.maxdepth = open.maxdepth, cb_title=cb_title)
+                        open.maxdepth = open.maxdepth, cb_title=cb_title,
+                        sliderclass = sliderclass)
 
 
   slGui_attribs<-data.table(element_name =sapply(slGui, function (x) attr(x,"element_name")),
@@ -143,6 +147,7 @@ rSliderGuiInput<-function(id, x,
 #' @param standardweight
 #' @param open.maxdepth
 #' @param cb_title
+#' @param sliderclass
 #'
 #'
 #' @return a list of rows as UIoutput - Sliders and collapsebars
@@ -156,7 +161,8 @@ recSliderGuiInput<-function(id, x, depth=0,
                        breaking=0,
                        parents_name="genauer",
                      minweight=0,maxweight=100, standardweight=30,
-                     open.maxdepth=Inf, cb_title= "I don't know"
+                     open.maxdepth=Inf, cb_title= "I don't know",
+                     sliderclass=""
 ){
   # Ziel: Elemente für innerhalb sidebarPanel bzw. für ganze Seite zurückliefern.
 
@@ -177,6 +183,9 @@ recSliderGuiInput<-function(id, x, depth=0,
   stopifnot(depth>=0)
   stopifnot(open.maxdepth>=breaking)
 
+  if("sliderclass" %in% names(x) ) sliderclass <- x$sliderclass
+
+
 
 
   ret <- list()
@@ -186,12 +195,15 @@ recSliderGuiInput<-function(id, x, depth=0,
     list.elem <- x[[i]]
     elem.name <- names(x)[i]
 
+
+    ##TODO Funktioniert wahrscheinlich nicht bei root!!!
     ##TODO: ifelse auf Performance und ggf. Vektorisierung prüfen, ersetzen
     #Attribute parsen
-    this.minweight <- ifelse("minweight" %in% names(list.elem), list.elem$minweight, minweight)
-    this.maxweight <- ifelse("maxweight" %in% names(list.elem),  list.elem$maxweight, maxweight)
-    this.standardweight <- ifelse("standardweight" %in% names(list.elem),
-                                  list.elem$standardweight, standardweight)
+    this.sliderclass <- if("sliderclass" %in% names(list.elem) ) list.elem$sliderclass else sliderclass
+    message(paste0("inside recslidergui. elem.name=", elem.name, " this.sliderclass=", this.sliderclass))
+    this.minweight <- if("minweight" %in% names(list.elem) ) list.elem$minweight else minweight
+    this.maxweight <- if("maxweight" %in% names(list.elem) )  list.elem$maxweight else maxweight
+    this.standardweight <- if("standardweight" %in% names(list.elem))list.elem$standardweight else  standardweight
     if("description" %in% names(list.elem)){
       this.description<-list.elem$description
       }else this.description <-elem.name
@@ -206,7 +218,8 @@ recSliderGuiInput<-function(id, x, depth=0,
                                                   min = this.minweight,
                                                   max = this.maxweight,
                                                   value = this.standardweight,
-                                                  cb_title = cb_title)
+                                                  cb_title = cb_title,
+                                                sliderclass=this.sliderclass)
                             )
 
 
@@ -260,7 +273,8 @@ recSliderGuiInput<-function(id, x, depth=0,
                                      minweight = this.minweight, maxweight=this.maxweight,
                                      standardweight = this.standardweight,
                                      open.maxdepth = open.maxdepth,
-                                     cb_title = cb_title)
+                                     cb_title = cb_title,
+                                     sliderclass = this.sliderclass)
                  #)
         )
 

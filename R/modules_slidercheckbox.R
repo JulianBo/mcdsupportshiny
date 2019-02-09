@@ -31,8 +31,10 @@ sliderCheckboxInput <- function(id,description="",
                                 value = 30,
                                 default=value ,
                                 cb_title = "I don't know",
+                                sliderclass="",
                                 width = "100%"){
-  ns <- NS(gsub("[^A-Za-z0-9-]", "", id))
+  id_replaced<-gsub("[^A-Za-z0-9-]", "", id)
+  ns <- NS(id_replaced)
 
   if(!is.numeric(default)){
     warning("default must be numeric; set to min")
@@ -48,7 +50,8 @@ sliderCheckboxInput <- function(id,description="",
                   width = width)
 
 
-  fluidRow(
+  message(paste0("inside sliderCheckboxInput. id=", id, " siderclass=", sliderclass))
+  fluidRow(id=id_replaced, sliderclass=sliderclass,
     column(width=9,
            if(is.na(value)) disabled(sl) else sl,
            hidden(

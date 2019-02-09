@@ -9,7 +9,8 @@ rSliderGuiInput(id, x, breaking = NULL, beschreibungs_text = NULL,
   title_text = "Please adjust the sliders according to your preferences.",
   mainpageposition = c("first", "last", "none"),
   parents_name = "Hauptkategorien", minweight = 0, maxweight = 100,
-  standardweight = 30, open.maxdepth = Inf, cb_title = "I don't know")
+  standardweight = 30, open.maxdepth = Inf, cb_title = "I don't know",
+  sliderclass = "")
 
 rSliderGui(input, output, session, slCbNames, dtBscCombinations)
 }
@@ -46,6 +47,9 @@ Should main page be first or last or be omitted?}
 Maximum:12 (see \code{\link{shiny:column}}).Must be larger than breaking (if provided).}
 
 \item{cb_title}{Default description label for checkbox.}
+
+\item{sliderclass}{Default class of sliderceckboxes, to use with \href{https://stackoverflow.com/a/42887905}{custom
+prettify-function to have individual labels}.}
 }
 \value{
 Slidergui: List of Sliders (breaking== NULL or breaking==FALSE)
