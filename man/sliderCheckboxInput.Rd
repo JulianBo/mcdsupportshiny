@@ -10,7 +10,8 @@ sliderCheckboxInput(id, description = "", min = 0, max = 100,
   value = 30, default = value, cb_title = "I don't know",
   sliderclass = "", width = "100\%")
 
-sliderCheckbox(input, output, session, oldvalue = NULL)
+sliderCheckbox(input, output, session, oldvalue = NULL,
+  check_changeDefaultNumeric = FALSE, check_enableOnClick = FALSE)
 
 updateSliderCheckboxInput(session, id, description = NULL, min = NULL,
   max = NULL, default = NULL, cb_title = NULL)
@@ -36,6 +37,11 @@ updateSliderCheckboxInput(session, id, description = NULL, min = NULL,
 
 \item{oldvalue}{Value to be stored if value is NA. SLider will be set to oldvalue after Checkbox is
 deactivated.}
+
+\item{check_changeDefaultNumeric}{Should defaultNumeric be observed for changes? Enables updating DefaultNumeric
+when slider is disabled, but is time-consuming}
+
+\item{check_enableOnClick}{Should disabled slider be activated when clicked on? Time-consuming.}
 }
 \value{
 fluidrow with slider and checkbox for Input, values as described below.

@@ -72,18 +72,30 @@ sliderCheckboxInput <- function(id,description="",
 #'                                 #TODO: Documentation.
 #'                                 Slidervalue if checkbox is FALSE, else default.
 #'                                 Value which sider had when checkbox was last checked will be returned in attribute "oldvalue".
+#' @param check_changeDefaultNumeric Should defaultNumeric be observed for changes? Enables updating DefaultNumeric
+#'                                   when slider is disabled, but is time-consuming
+#' @param check_enableOnClick   Should disabled slider be activated when clicked on? Time-consuming.
+#'
 #' @export
 sliderCheckbox<- function(input, output, session,
-                          oldvalue =NULL) {
+                          oldvalue =NULL,
+                          check_changeDefaultNumeric=FALSE,
+                          check_enableOnClick=FALSE) {
 
   #see: https://stackoverflow.com/questions/54560439/shiny-update-input-without-reactives-getting-triggered
   rv<-reactiveValues(storedvalue=oldvalue,
                      update=TRUE)
 
-  observeEvent(input$defaultNumeric,ignoreInit = TRUE, {
+  if(check_changeDefaultNumeric) observeEvent(input$defaultNumeric,ignoreInit = TRUE, {
     if(input$disabled) updateSliderInput(session, "sl", value=input$defaultNumeric)
   })
 
+  if(check_enableOnClick)   onclick("sl",
+            if(input$disabled) updateCheckboxInput(session, "disabled", value=FALSE)
+            )
+
+
+  #To isolate update and reactivity. See https://stackoverflow.com/a/54560830/4177265
   observeEvent(input$sl, {
     if (rv$update) rv$storedvalue<-input$sl else rv$update<-TRUE
   })
@@ -115,9 +127,6 @@ sliderCheckbox<- function(input, output, session,
 
   })
 
-  # onclick("sl",
-  #         if(input$disabled) updateCheckboxInput(session, "disabled", value=FALSE)
-  # )
 
 
 #
