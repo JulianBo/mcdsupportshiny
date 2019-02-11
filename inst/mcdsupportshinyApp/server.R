@@ -6,7 +6,7 @@ library(shiny)
 library(shinyjs)
 
 library (data.table)
-library(ggplot2)
+library(plotly)
 library(googlesheets)
 
 

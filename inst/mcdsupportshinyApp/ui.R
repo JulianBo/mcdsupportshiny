@@ -11,6 +11,8 @@ library(shiny)
 library(shinyBS)
 library(shinyjs)
 
+library(plotly)
+
 
 library(mcdsupportshiny)
 

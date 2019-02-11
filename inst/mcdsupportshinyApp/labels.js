@@ -31,9 +31,9 @@ $(document).ready(function() {
   function returnLabelsProzent(value) {
 
       if (value == 100){// enter your highest slider value here
-        return "100% (alles einbeziehen)";
+        return "100% (alles)";
       } if (value === 0){// enter your highest slider value here
-        return "0% (nicht einbeziehen)";
+        return "0% (nichts)";
       } else
       return value;
     }
