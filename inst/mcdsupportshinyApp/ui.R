@@ -140,6 +140,7 @@ shinyUI(fluidPage(theme="mcdsupportshiny.css",
 
 
                         ),
+
                     tabPanel("Bisherige Gewichtungen",
                                  plotOutput("BisherigeDecsPlot")
                                  # ,
