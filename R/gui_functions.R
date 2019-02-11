@@ -29,8 +29,10 @@
 #' @param open.maxdepth From which depth on to create fold-out-panels, if not declared otherwise in x.
 #'                      Maximum:12 (see \code{\link{shiny:column}}).Must be larger than breaking (if provided).
 #' @param cb_title Default description label for checkbox.
-#' @param sliderclass Default class of sliderceckboxes, to use with \href{https://stackoverflow.com/a/42887905}{custom
+#' @param sliderlabel Default class of slidercheckboxes, to use with \href{https://stackoverflow.com/a/42887905}{custom
 #' prettify-function to have individual labels}.
+#' @param id
+#' @param beschreibungs_text
 #'
 #' @return Slidergui: List of Sliders (breaking== NULL or breaking==FALSE)
 #'                    or list of SliderGui-pages (breaking==TRUE or Breaking>0).
@@ -46,7 +48,7 @@ rSliderGuiInput<-function(id, x,
                      minweight=0,maxweight=100, standardweight=30,
                      open.maxdepth=Inf,
                      cb_title= "I don't know",
-                     sliderclass=""
+                     sliderlabel=""
                      ){
 
   ##Tests
@@ -68,7 +70,7 @@ rSliderGuiInput<-function(id, x,
                         parents_name = parents_name, minweight = minweight,
                         maxweight = maxweight, standardweight = standardweight,
                         open.maxdepth = open.maxdepth, cb_title=cb_title,
-                        sliderclass = sliderclass)
+                        sliderlabel = sliderlabel)$result
 
 
   slGui_attribs<-data.table(element_name =sapply(slGui, function (x) attr(x,"element_name")),
@@ -140,15 +142,16 @@ rSliderGuiInput<-function(id, x,
 #' @param x
 #' @param depth actual depth - root is 0
 #' @param breaking
-#' @param mainpageposition
 #' @param parents_name
 #' @param minweight
 #' @param maxweight
 #' @param standardweight
 #' @param open.maxdepth
 #' @param cb_title
-#' @param sliderclass
+#' @param sliderlabel
 #'
+#' @param id
+#' @param sliderstate Default class of slider.
 #'
 #' @return a list of rows as UIoutput - Sliders and collapsebars
 #'         with attributes "depth" and "element_name". See code{\link{setNameDepth}}
@@ -162,7 +165,7 @@ recSliderGuiInput<-function(id, x, depth=0,
                        parents_name="genauer",
                      minweight=0,maxweight=100, standardweight=30,
                      open.maxdepth=Inf, cb_title= "I don't know",
-                     sliderclass=""
+                     sliderlabel="", sliderstate=""
 ){
   # Ziel: Elemente für innerhalb sidebarPanel bzw. für ganze Seite zurückliefern.
 
@@ -183,24 +186,22 @@ recSliderGuiInput<-function(id, x, depth=0,
   stopifnot(depth>=0)
   stopifnot(open.maxdepth>=breaking)
 
-  if("sliderclass" %in% names(x) ) sliderclass <- x$sliderclass
-
-
-
+  if("sliderlabel" %in% names(x) ) sliderlabel <- x$sliderlabel
+  #TODO: Element werden bei Root nicht geparsed..
 
   ret <- list()
+  children_qualitative<-vector(mode = "logical")
 
   ##Durch Elemente des aktuellen Knotens iterieren
   for(i in 1:length(x) ){
     list.elem <- x[[i]]
     elem.name <- names(x)[i]
 
-
     ##TODO Funktioniert wahrscheinlich nicht bei root!!!
     ##TODO: ifelse auf Performance und ggf. Vektorisierung prüfen, ersetzen
     #Attribute parsen
-    this.sliderclass <- if("sliderclass" %in% names(list.elem) ) list.elem$sliderclass else sliderclass
-    message(paste0("inside recslidergui. elem.name=", elem.name, " this.sliderclass=", this.sliderclass))
+    this.sliderlabel <- if("sliderlabel" %in% names(list.elem) ) list.elem$sliderlabel else sliderlabel
+    #message(paste0("inside recslidergui. elem.name=", elem.name, " this.sliderlabel=", this.sliderlabel))
     this.minweight <- if("minweight" %in% names(list.elem) ) list.elem$minweight else minweight
     this.maxweight <- if("maxweight" %in% names(list.elem) )  list.elem$maxweight else maxweight
     this.standardweight <- if("standardweight" %in% names(list.elem))list.elem$standardweight else  standardweight
@@ -212,15 +213,44 @@ recSliderGuiInput<-function(id, x, depth=0,
     #Falls Element. GGf. Child-Elemente parsen
     if("class" %in% names(list.elem)){
 
+      ##First let's determine the status of the children --> see if slider must be "qualitative"
+      if(list.elem$class=="mapping" |list.elem$class=="submapping" |list.elem$class=="mappingelements"){
+       # message(paste0("mapping ", elem.name))
+        this.isQualitative <- if("Attribname" %in% names(list.elem)
+        ) is.na(list.elem$Attribname) else TRUE #if missing->qualitative
+      }
+
+
+      ##Ggf. REKURSION
+      ##Slider (Element selbst) mit evtl. Child-Knoten zusammensetzen.
+      #mit c(); ohne extra list(), damit Liste der einzelnen Zeilen nicht geschachtelt wird.
+      if(list.elem$class=="elements" |list.elem$class=="mappingelements"){
+        #message(paste0("elements ", elem.name))
+        this.subtree<- recSliderGuiInput(id,list.elem,depth+1,
+                                         breaking = breaking,
+                                         elem.name,
+                                         minweight = this.minweight, maxweight=this.maxweight,
+                                         standardweight = this.standardweight,
+                                         open.maxdepth = open.maxdepth,
+                                         cb_title = cb_title,
+                                         sliderlabel = this.sliderlabel)
+
+        this.isQualitative<-this.subtree$qualitative
+      }
+
       ## Hier Slider selbst - Taglist!
       returnvalue <-tagList(sliderCheckboxInput(ns(elem.name),
-                                                  description = this.description,
-                                                  min = this.minweight,
-                                                  max = this.maxweight,
-                                                  value = this.standardweight,
-                                                  cb_title = cb_title,
-                                                sliderclass=this.sliderclass)
-                            )
+                                                description = this.description,
+                                                min = this.minweight,
+                                                max = this.maxweight,
+                                                value = this.standardweight,
+                                                cb_title = cb_title,
+                                                sliderlabel=this.sliderlabel,
+                                                sliderstate=if(this.isQualitative)"qualitative" else "",
+                                                sliderclass=list.elem$class
+                                                )
+
+      )
 
 
       ##Je nach Tiefe zusammenfügen
@@ -235,8 +265,7 @@ recSliderGuiInput<-function(id, x, depth=0,
           ret<- c(ret,
                   list(
                     setSliderGuiAttribs(
-                      indentedRow(indention = depth,
-                                                 returnvalue)
+                      indentedRow(indention = depth, returnvalue)
                       ,elem.name, depth,parents_name )
                   )
           )
@@ -247,9 +276,8 @@ recSliderGuiInput<-function(id, x, depth=0,
           ret<- c(ret,
                   list(
                     setSliderGuiAttribs(
-                      indentedRow(indention = depth -breaking,
-                                                returnvalue)
-                                    ,elem.name, depth,parents_name )
+                      indentedRow(indention = depth -breaking,returnvalue)
+                      ,elem.name, depth,parents_name )
                   )
           )
 
@@ -261,27 +289,24 @@ recSliderGuiInput<-function(id, x, depth=0,
       }#  if (depth>= open.maxdepth)
 
 
-      ##Ggf. REKURSION
-      ##Slider (Element selbst) mit evtl. Child-Knoten zusammensetzen.
-      #mit c(); ohne extra list(), damit Liste der einzelnen Zeilen nicht geschachtelt wird.
-      if(list.elem$class=="elements")
+      #If subelements, now there is the time to put it together
+      if(list.elem$class=="elements" |list.elem$class=="mappingelements"){
+        # message(paste0("put together: ", list.elem$class, " ", elem.name ))
         ret <-c(ret,
                 #list(  #If one uses list() here, there will be a nested list in the end.
-                  recSliderGuiInput(id,list.elem,depth+1,
-                                     breaking = breaking,
-                                     elem.name,
-                                     minweight = this.minweight, maxweight=this.maxweight,
-                                     standardweight = this.standardweight,
-                                     open.maxdepth = open.maxdepth,
-                                     cb_title = cb_title,
-                                     sliderclass = this.sliderclass)
+                this.subtree$result
                  #)
-        )
+                )
 
+        # message("this.subtree$ret ---" )
+        # message(this.subtree$ret )
 
+      }
 
-
+      children_qualitative<- c(children_qualitative, this.isQualitative)
     } # if "class" in names
+
+
 
   }#for
 
@@ -309,7 +334,11 @@ recSliderGuiInput<-function(id, x, depth=0,
 
   } else result <- ret
 
-  return(result)
+  return(
+    list(result=result,
+         qualitative=all(children_qualitative)
+    )
+  )
 
 
 
@@ -357,16 +386,11 @@ rSliderGui<- function(input, output, session, slCbNames,dtBscCombinations) {
     observeEvent(input[[gsub("[^A-Za-z0-9-]", "", x)]],
                  ignoreNULL = FALSE, ignoreInit = TRUE,{
 
-                   #print(paste0("catching event, ",x,"=",first(paste0(input[[x]],collapse="") )  )) #first because of BUG
-
-
                    rv$bscValues[bscName==x,':='(timesClicked=timesClicked+1,
                                                 opened= !opened,
                                                 lastState=first(paste0(input[[x]],collapse=""))#Aufgrund BUG in bsCollapse;
                                                 )
                                 ]
-
-                   #print("Anpassen")
 
                    ##TODO
                    #Falls vorhanden, Eltern-Knoten anpassen, um die folgende -fehlerhafte-
@@ -382,10 +406,6 @@ rSliderGui<- function(input, output, session, slCbNames,dtBscCombinations) {
                    #Um Reaktivität trotz data.table zu triggern.
                    #https://stackoverflow.com/questions/32536940/shiny-reactivity-fails-with-data-tables
                    rv$bscValues_triggerupdate<-rv$bscValues_triggerupdate+1
-
-                   # print(x)
-                   # print( rv$bscValues)
-
 
                   })
 

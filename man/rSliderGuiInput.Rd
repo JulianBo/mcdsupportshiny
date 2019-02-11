@@ -10,7 +10,7 @@ rSliderGuiInput(id, x, breaking = NULL, beschreibungs_text = NULL,
   mainpageposition = c("first", "last", "none"),
   parents_name = "Hauptkategorien", minweight = 0, maxweight = 100,
   standardweight = 30, open.maxdepth = Inf, cb_title = "I don't know",
-  sliderclass = "")
+  sliderlabel = "")
 
 rSliderGui(input, output, session, slCbNames, dtBscCombinations)
 }
@@ -30,6 +30,8 @@ one single list of sliders?
 Maybe in future versions possibilities for putting special Elements on
 extra pages by name will be added, right now this is not possible.}
 
+\item{beschreibungs_text}{}
+
 \item{title_text}{Which paragraph should be added as first element of each page?}
 
 \item{mainpageposition}{One of "first", "last", "none".
@@ -48,7 +50,7 @@ Maximum:12 (see \code{\link{shiny:column}}).Must be larger than breaking (if pro
 
 \item{cb_title}{Default description label for checkbox.}
 
-\item{sliderclass}{Default class of sliderceckboxes, to use with \href{https://stackoverflow.com/a/42887905}{custom
+\item{sliderlabel}{Default class of slidercheckboxes, to use with \href{https://stackoverflow.com/a/42887905}{custom
 prettify-function to have individual labels}.}
 }
 \value{

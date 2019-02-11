@@ -8,7 +8,7 @@
 \usage{
 sliderCheckboxInput(id, description = "", min = 0, max = 100,
   value = 30, default = value, cb_title = "I don't know",
-  sliderclass = "", width = "100\%")
+  sliderlabel = "", sliderstate = "", sliderclass = "", width = "100\%")
 
 sliderCheckbox(input, output, session, oldvalue = NULL,
   check_changeDefaultNumeric = FALSE, check_enableOnClick = FALSE)
@@ -31,12 +31,14 @@ updateSliderCheckboxInput(session, id, description = NULL, min = NULL,
 
 \item{cb_title}{Description Label for Checkbox.}
 
+\item{sliderlabel}{Default class of slidercheckboxes, to use with \href{https://stackoverflow.com/a/42887905}{custom
+prettify-function to have individual labels}.}
+
+\item{sliderstate}{Default state of slider,see \code{\link{rSliderGuiInput}}.}
+
+\item{sliderclass}{Default class of slider, see \code{\link{rSliderGuiInput}}.}
+
 \item{width}{The width of the \code{\link[shiny]{sliderInput}}, e.g. '400px', or '100\%'; see \code{\link[shiny]{validateCssUnit}}.}
-
-\item{session}{Passing the \code{session} object to function which was given to \code{shinyServer}.}
-
-\item{oldvalue}{Value to be stored if value is NA. SLider will be set to oldvalue after Checkbox is
-deactivated.}
 
 \item{check_changeDefaultNumeric}{Should defaultNumeric be observed for changes? Enables updating DefaultNumeric
 when slider is disabled, but is time-consuming}

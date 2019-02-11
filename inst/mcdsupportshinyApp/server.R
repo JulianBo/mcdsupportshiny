@@ -453,24 +453,35 @@ shinyServer(function(input, output, session) {
 
   ####GUI Updaten ---Entscheidungen ####
 
-  output$ErgebnisPlot<- renderPlot({
-    ggplot(rv_dtErgebnis(),aes(x=Titel,y=Gesamtergebnis, fill=Titel))+
-      geom_col()
-  })
-
   #Entscheidungen als Text
 
   output$ErgebnisText<- renderText({
-        paste(rv_BestesErgebnis(),collapse=", ")
+    paste(rv_BestesErgebnis(),collapse=", ")
   })
 
   output$ChoiceText <- renderText({
     input$ChoiceSlct
   })
 
+  output$ErgebnisPlot<- renderPlot({
+    ggplot(rv_dtErgebnis(),aes(x=Titel,y=Gesamtergebnis, fill=Titel))+
+      geom_col()
+  })
 
 
   output$ErgebnisTable <- renderTable(rv_dtErgebnis() )
+
+  output$SzenarioPlot<- renderPlot({
+    ggplot(rv_dtSzenarioergebnis(), aes(y=Szenarioergebnis,fill=Titel,x=Titel,  shape=Rahmenszenario))+
+      geom_col(position="dodge" )+
+      scale_shape_manual(values=21:24)+
+      geom_point(colour="Black", position=position_dodge(width=1))
+
+  }  )
+
+
+
+
 
   #Entscheidungen visualisieren
 
@@ -486,6 +497,10 @@ shinyServer(function(input, output, session) {
       geom_point(colour="Black", position=position_dodge(width=1))
 
   })
+
+
+
+
 
   #Entscheidungen als Tabelle ausgeben
   output$EntscheidungenTable<- renderTable({rv_dtSzenarioergebnis()})

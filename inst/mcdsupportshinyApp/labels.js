@@ -39,7 +39,7 @@ $(document).ready(function() {
     }
 
 
-    var someID = $("[sliderclass~=returnLabelsNormal] .js-range-slider").ionRangeSlider({ // enter your shiny slider ID here (CSS-Selector?): .js-range-slider #bins
+    var someID = $("[sliderlabel~=returnLabelsNormal] .js-range-slider").ionRangeSlider({ // enter your shiny slider ID here (CSS-Selector?): .js-range-slider #bins
           prettify: returnLabelsNormal
           // ,
           // force_edges: true,
@@ -47,11 +47,11 @@ $(document).ready(function() {
         });
 
 
-    var someID2 = $("[sliderclass~=returnLabelsAnlagengroesse] .js-range-slider").ionRangeSlider({ // enter your shiny slider ID here (CSS-Selector?): .js-range-slider #bins
+    var someID2 = $("[sliderlabel~=returnLabelsAnlagengroesse] .js-range-slider").ionRangeSlider({ // enter your shiny slider ID here (CSS-Selector?): .js-range-slider #bins
           prettify: returnLabelsAnlagengroesse
         });
 
-    var someID3 = $("[sliderclass~=returnLabelsProzent] .js-range-slider").ionRangeSlider({ // enter your shiny slider ID here (CSS-Selector?): .js-range-slider #bins
+    var someID3 = $("[sliderlabel~=returnLabelsProzent] .js-range-slider").ionRangeSlider({ // enter your shiny slider ID here (CSS-Selector?): .js-range-slider #bins
           prettify: returnLabelsProzent
         });
 

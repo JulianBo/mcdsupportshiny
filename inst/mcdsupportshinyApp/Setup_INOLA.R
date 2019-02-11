@@ -178,38 +178,18 @@ configList <- list (
       "Mir ist wichtig, wie das ",em("regionale Energiesystem sich in der Region ökonomisch auswirkt"),"."
     ),
     color = "blue",
-    'Ökonomische Effekte im Bereich erneuerbare Energien' = list(
-      class = "elements",
-      description = tagList(
-        "Es ist mir wichtig, dass ",em("im Bereich Erneuerbare-Energie-Anlagen und im Energiesystem Wirtschaftskraft")," in der Region geschaffen wird"
-      ),
-      'Regionale Wertschöpfung im Bereich erneuerbare Energien' = list(
-        class = "mapping",
-        Attribname = NA,
-        description = tagList(
-          "Es ist mir wichtig, dass ",em("im Bereich Erneuerbare-Energie-Anlagen und im Energiesystem Wertschöpfung")," in der Region geschaffen wird."
-        )
-      ),
-      'Arbeitsplätze im Bereich erneuerbare Energien' = list(
-        class = "mapping",
-        Attribname = NA,
-        description = tagList(
-          "Es ist mir wichtig, dass ",em("im Bereich Erneuerbare-Energie-Anlagen und im Energiesystem in der Region neue Arbeitsplätze")," geschaffen werden."
-        )
-      )
-    ),
-    'Regionale Wirtschaftsentwicklung durch erneuerbare Energien - langfristig und übergreifend' =
+    'Regionale Wirtschaftsentwicklung durch erneuerbare Energien' =
       list(
         class = "elements",
         description = tagList(
-          "Es ist mir wichtig, dass sich der ",em("Bau von Erneuerbare-Energie-Anlagen und das regionale Energiesystem")," langfristig ",em("positiv auf die gesamte regionale Wirtschaft")," auswirkt."
+          "Es ist mir wichtig, dass sich der ",em("Ausbau erneuerbarer Energien")," langfristig ",em("positiv auf die gesamte regionale Wirtschaft")," auswirkt."
         ),
         'Regionale Wertschöpfung durch erneuerbare Energien - langfristig und übergreifend' =
           list(
             class = "mapping",
             Attribname = NA,
             description = tagList(
-              "Es ist mir wichtig, dass sich der ",em("Bau von Erneuerbare-Energie-Anlagen und das regionale Energiesystem")," langfristig ",em("positiv auf die gesamte regionale Wertschöpfung")," auswirkt"
+              "Es ist mir wichtig, dass sich der ",em("Ausbau erneuerbarer Energien")," langfristig ",em("positiv auf die gesamte regionale Wertschöpfung")," auswirkt"
             )
           ),
         'Regionale Arbeitsplätze durch erneuerbare Energien - langfristig und übergreifend' =
@@ -217,16 +197,31 @@ configList <- list (
             class = "mapping",
             Attribname = NA,
             description = tagList(
-              "Es ist mir wichtig, dass der ",em("Bau von Erneuerbare-Energie-Anlagen und das regionale Energiesystem")," langfristig für ",em("mehr Arbeitsplätze in der gesamten regionalen Wirtschaft")," sorgt."
+              "Es ist mir wichtig, dass der ",em("Ausbau erneuerbarer Energien")," langfristig für ",em("mehr Arbeitsplätze in der gesamten regionalen Wirtschaft")," sorgt."
             )
           )
 
       ),
-    'Energiekosten' = list(
+    'Ökonomische Effekte im Bereich erneuerbare Energien' = list(
       class = "elements",
       description = tagList(
-        "Es ist mir wichtig, dass die ",em("Kosten des regionalen Energiesystems gering")," sind."
+        "Es ist mir wichtig, dass ",em(" regionale Wirtschaftskraft in den Energiesektor verlagert ")," wird"
       ),
+      'Regionale Wertschöpfung im Bereich erneuerbare Energien' = list(
+        class = "mapping",
+        Attribname = NA,
+        description = tagList(
+          "Es ist mir wichtig, dass ",em(" regionale Wertschöpfung in den Energiesektor verlagert ")," wird."
+        )
+      ),
+      'Arbeitsplätze im Bereich erneuerbare Energien' = list(
+        class = "mapping",
+        Attribname = NA,
+        description = tagList(
+          "Es ist mir wichtig, dass es ",em("viele Arbeitsplätze im Energiesektor in der Region")," gibt."
+        )
+      )
+    ),
       'Energieerzeugungskosten' = list(
         class = "mapping",
         Attribname = NA,
@@ -234,12 +229,31 @@ configList <- list (
           "Mir ist wichtig, dass die ",em("durchschnittlichen Erzeugungskosten pro KwH (Strom und Wärme) gering ")," sind."
         )
       ),
-      'Kosten des Baus von Erneuerbare-Energie-Anlagen' = list(
+    'Kosten für Energieimporte' = list(
+      class = "elements",
+      description = tagList(
+        "Es ist mir wichtig, dass es ",em(" Kosten für Energieimporte in die Region möglichst gering")," sind."
+      ),
+      'Stromimportkosten' = list(
         class = "mapping",
         Attribname = NA,
         description = tagList(
-          "Es ist mir wichtig, dass die ",em("Kosten für den Bau und die Errichtung  von EE-Anlagen in der Region niedrig ")," sind."
+          "Mir ist wichtig, dass die ",em(" Kosten für Stromimporte bzw. für den Import von Rohstoffen zur Stromerzeugung")," möglichst niedrig sind."
         )
+      ),
+      'Wärmeimportkosten' = list(
+        class = "mapping",
+        Attribname = NA,
+        description = tagList(
+          "Mir ist wichtig, dass die ",em("Kosten für Wärmeimporte bzw. für den Import von Rohstoffen zur Wärmeerzeugung")," möglichst niedrig sind."
+        )
+      )
+    ),
+    'Stromexporterlöse' = list(
+      class = "mapping",
+      Attribname = NA,
+      description = tagList(
+        "Mir ist wichtig, dass die ",em("regionalen Erlöse aus Stromexporten möglichst hoch")," sind."
       )
     )
   ),
@@ -430,16 +444,27 @@ configList <- list (
 
 )
 
+# pfadbeschreibungen ------------------------------------------------------
+
+pfadbeschreibungen<-tagList(
+  p(strong("0)Jetzt-Zustand"),": Der Zustand zu Beginn der Modellierung (2015)."),
+  p(strong("1) Fotschreibung"),": Fortschreibung der aktuellen Ausbauraten: Erneuerbare Energieanlagen werden gebaut, falls sie rentabel sind. Die Region Oberland setzt auf Energieeffizienzmaßnahmen und wirtschaftliches Wachstum und ist grundsätzlich technologieoffen. "),
+  p(strong("2) Kleinere Anlagen"),": Es werden „kleine“ Lösungen fokussiert, zum Beispiel bei gebäudegebundenen Anlagen und Speichern. Haushalte und Firmen sind die primären Investoren. "),
+  p(strong("3) Größere Anlagen"),": Bei erneuerbaren Energien und Energieeinsparung werden „größere“ Lösungen bevorzugt. Als Investoren treten vor allem Kommunen, Stadtwerke und Genossenschaften als Investoren z.B. für Kombienergiezentralen und Nachwärmenetze sowie (Quartier-)Speicher auf. ")
+)
+
 
 
 # Texte --------------------------------------------------------
 
 texte <- list (
 
-  begruessungstext="Dieses Programm ist eine Entscheidungshilfe. Auf den nächsten Seiten können sie gewichten, wie wichtig ihnen verschiedene Eigenschaften sind. Auf welches Attribut legen Sie wie viel Wert? Das Programm berechnet dann, welches der verschiedenen Alternativen am meisten Ihren Präferenzen entspricht.",
+  begruessungstext="Dieses Programm ist eine Entscheidungshilfe. Auf den nächsten Seiten können sie gewichten, wie wichtig ihnen verschiedene Eigenschaften eines regionalen Energiesystems sind. Auf was legen Sie wie viel Wert? Das Programm berechnet dann, welches der verschiedenen Alternativen am meisten Ihren Präferenzen entspricht.",
   auswahlaufforderungstext="Bitte wählen sie jedoch zuerst aus, welche Alternative Ihnen spontan am besten gefällt.Die einzelnen Alternativen sind unten beschrieben",
 
   begruessungstext2= "Bitte stellen sie ein, wie wichtig Ihnen die einzelnen Indikatoren im Verhältnis zu den anderen Indikatoren sind.",
+
+  choiceSlctText="Welcher Pfad gefällt ihnen spontan am Besten?",
 
   ortstext="Wohnen Sie im bayerischen Oberland?",
   ortslist=list("Ja, Landkreis Bad Tölz-Wolfratshausen",

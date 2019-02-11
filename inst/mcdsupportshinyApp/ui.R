@@ -38,12 +38,16 @@ shinyUI(fluidPage(theme="mcdsupportshiny.css",
       rColorSliders(configList,"slGui2") ,
 
   ## Application title ----
+  a(href="http://www.inola-region.de",
+     img(src="Inola_Logo-rgb_web_transparent.png", style="height: 4em; float:right"),
+     style="text-align: right"),
   titlePanel("Multikriterieller Pfadvergleich"),
+
 
   ## List of pages - Main Part    ----
 
 
-  hidden(
+
     list( #list, weil diverse "divs" in einer Liste kombiniert werden - obwohl rSliderGuiInput schon Liste von Pages liefert.
 
       #### SliderGuis
@@ -53,15 +57,17 @@ shinyUI(fluidPage(theme="mcdsupportshiny.css",
           tags$p(texte$begruessungstext),
 
           tags$p(texte$auswahlaufforderungstext),
-          selectInput("ChoiceSlct","Welche Alternative gefällt ihnen spontan am Besten?" ,
+          selectInput("ChoiceSlct", texte$choiceSlctText ,
                       choices=levels(dtAlternativen$Titel) ),
 
           h3("Informationen zu den Alternativen"),
-          textOutput("InformationenText")
+          textOutput("InformationenText"),
+          pfadbeschreibungen
       ),
 
 
       ##SliderGui1 - several pages
+      hidden(
       lapply(seq(NUM_PAGES_slGUI),
              function(i)div(class = "page",
                             id = paste0("page", i+1),slGui1[[i]])),#change according to paging
@@ -93,7 +99,8 @@ shinyUI(fluidPage(theme="mcdsupportshiny.css",
           # Show Results, Description, ...
           mainPanel(width = 7,
             tabsetPanel(id="MainTabset",
-                        tabPanel("Ergebnis",
+                          tabPanel("Hauptergebnisse",
+
                                  h2("Ergebnis"),
                                 div(class="results",
                                    tags$div("Mit den aktuellen Einstellungen hat folgende Alternative die höchste Punktzahl:",
@@ -123,10 +130,22 @@ shinyUI(fluidPage(theme="mcdsupportshiny.css",
                                    column(width=6, plotOutput("ErgebnisPlot")),
                                    column(width=6,tableOutput("ErgebnisTable"))
                                    ),
-                                 h3("Ergebnisse im Einzelnen und nach Szenario"),
+                                 h3("Ergebnisse nach Rahmenszenario"),
+                                 plotOutput("SzenarioPlot")
+
+                                 ),
+                    tabPanel("Detailergebnisse",
                                  plotOutput("EntscheidungenPlot"),
                                  tableOutput("EntscheidungenTable")
 
+
+                        ),
+                    tabPanel("Bisherige Gewichtungen",
+                                 plotOutput("BisherigeDecsPlot")
+                                 # ,
+                                 # plotOutput("BisherigeHistsPlot")
+                                 # ,
+                                 # tableOutput("BisherigeTable")
                         ),
                         # tabPanel("Endgültige Gewichtungen",
                         #          tableOutput("DirGewichtungenTable")
@@ -138,13 +157,7 @@ shinyUI(fluidPage(theme="mcdsupportshiny.css",
                                  plotOutput("NutzenPlot")
                         )
                         ,
-                        tabPanel("Bisherige Gewichtungen",
-                                 plotOutput("BisherigeDecsPlot")
-                                 # ,
-                                 # plotOutput("BisherigeHistsPlot")
-                                 # ,
-                                 # tableOutput("BisherigeTable")
-                        ),
+
                         # tabPanel("Einstellungen für die Indikatoren",
                         #          tableOutput("Indikatorensettings")
                         # ),

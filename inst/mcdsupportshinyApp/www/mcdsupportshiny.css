@@ -7,6 +7,9 @@
 .results{font-size: large;}
 .results .shiny-text-output{font-weight: bold;}
 
+[sliderstate=qualitative] .control-label{font-style: italic;;}
+
+
 #slGui2 .sliders{
   overflow-y: scroll;
   max-height: 70vh;

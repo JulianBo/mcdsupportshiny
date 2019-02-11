@@ -11,11 +11,12 @@
 #' @param max Slider maximum value.
 #' @param value Slider initial value. If NA, Checkbox will be activated and default returned.
 #' @param default Value to be returned if Checkbox is active.
-#' @param oldvalue Value to be stored if value is NA. SLider will be set to oldvalue after Checkbox is
-#'                 deactivated.
 #' @param cb_title Description Label for Checkbox.
+#' @param sliderlabel Default class of slidercheckboxes, to use with \href{https://stackoverflow.com/a/42887905}{custom
+#' prettify-function to have individual labels}.
+#' @param sliderstate Default state of slider,see \code{\link{rSliderGuiInput}}.
 #' @param width The width of the \code{\link[shiny]{sliderInput}}, e.g. '400px', or '100\%'; see \code{\link[shiny]{validateCssUnit}}.
-#' @param session Passing the \code{session} object to function which was given to \code{shinyServer}.
+#' @param sliderclass Default class of slider, see \code{\link{rSliderGuiInput}}.
 #'
 #' @return fluidrow with slider and checkbox for Input, values as described below.
 #' @export
@@ -31,7 +32,7 @@ sliderCheckboxInput <- function(id,description="",
                                 value = 30,
                                 default=value ,
                                 cb_title = "I don't know",
-                                sliderclass="",
+                                sliderlabel="",sliderstate="",sliderclass="",
                                 width = "100%"){
   id_replaced<-gsub("[^A-Za-z0-9-]", "", id)
   ns <- NS(id_replaced)
@@ -50,8 +51,8 @@ sliderCheckboxInput <- function(id,description="",
                   width = width)
 
 
-  message(paste0("inside sliderCheckboxInput. id=", id, " siderclass=", sliderclass))
-  fluidRow(id=id_replaced, sliderclass=sliderclass,
+  #message(paste0("inside sliderCheckboxInput. id=", id, " siderlabel=", sliderlabel))
+  fluidRow(id=id_replaced, sliderlabel=sliderlabel,sliderstate=sliderstate,
     column(width=9,
            if(is.na(value)) disabled(sl) else sl,
            hidden(

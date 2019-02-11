@@ -1,6 +1,9 @@
 
 # Allgemeine Funktionen ---------------------------------------------------
 
+
+
+
 #' Get minimum of open.maxdepth and x$open.maxdepth
 #'
 #' Compares open.maxdepth and x$open.maxdepth and returns lower one, if present.
