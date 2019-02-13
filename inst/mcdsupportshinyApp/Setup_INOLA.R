@@ -175,7 +175,7 @@ configList <- list (
   'Ökonomische Effekte' = list (
     class = "elements",
     description = tagList(
-      "Mir ist wichtig, wie das ",em("regionale Energiesystem sich in der Region ökonomisch auswirkt"),"."
+      "Mir ist wichtig, wie das ",em("regionale Energiesystem sich in der Region ökonomisch")," auswirkt."
     ),
     color = "blue",
     'Regionale Wirtschaftsentwicklung durch erneuerbare Energien' =

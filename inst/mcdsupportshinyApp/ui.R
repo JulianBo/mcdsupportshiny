@@ -89,7 +89,7 @@ shinyUI(fluidPage(theme="mcdsupportshiny.css",
       ### Sidebar with a slider inputs
       div(class = "page", id = paste0("page", NUM_PAGES_slGUI+3), #change according to paging
           hidden(numericInput("NUM_PAGES", label=NULL,value=NUM_PAGES_slGUI+3)), #CHANGE to maximum number of Pages
-        sidebarLayout(
+        sidebarLayout(position="left",
           sidebarPanel( width = 5,
             div(id="slGui2",slGui2 ),
 
@@ -186,8 +186,8 @@ shinyUI(fluidPage(theme="mcdsupportshiny.css",
 
   ## Bottom Part ----
   br(),
-  actionButton("prevBtn", "< Zurück"),
-  actionButton("nextBtn", "Weiter >"),
+  disabled(actionButton("prevBtn", "< Zurück")),
+  disabled(actionButton("nextBtn", "Weiter >") ),
   hidden(actionButton("saveBtn", "Speichern und Ergebnis ansehen >" )),
   #see: https://stackoverflow.com/questions/6345549/right-align-link
   #see: https://stackoverflow.com/questions/25062422/restart-shiny-session

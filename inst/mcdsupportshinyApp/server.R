@@ -409,6 +409,7 @@ shinyServer(function(input, output, session) {
     if (rv$page  > 0 & rv$page  <= NUM_PAGES){
       hide(selector = ".page") #To hide other pages.
       show(paste0("page", rv$page))
+      shinyjs::runjs("window.scrollTo(0, 0)")
 
       ##Next nur bis vorletzte Seite
       toggleState(id = "nextBtn", condition = rv$page <= NUM_PAGES -2)
@@ -420,6 +421,9 @@ shinyServer(function(input, output, session) {
       toggleState(id = "prevBtn", condition = rv$page > 1 )
       ## PRevBtn am Ende nicht mehr sichtbar  Am Ende geht es nicht mehr zurück
       toggle(id = "prevBtn", condition = rv$page < NUM_PAGES)
+
+      ##am Ende scroll to Result
+      if (rv$page == NUM_PAGES)shinyjs::runjs("document.getElementById('MainTabset').scrollIntoView();")
     }
 
   })
