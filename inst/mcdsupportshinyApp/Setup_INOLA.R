@@ -447,10 +447,10 @@ configList <- list (
 # pfadbeschreibungen ------------------------------------------------------
 
 pfadbeschreibungen<-tagList(
-  p(strong("0)Jetzt-Zustand"),": Der Zustand zu Beginn der Modellierung (2015)."),
-  p(strong("1) Fotschreibung"),": Fortschreibung der aktuellen Ausbauraten: Erneuerbare Energieanlagen werden gebaut, falls sie rentabel sind. Die Region Oberland setzt auf Energieeffizienzmaßnahmen und wirtschaftliches Wachstum und ist grundsätzlich technologieoffen. "),
-  p(strong("2) Kleinere Anlagen"),": Es werden „kleine“ Lösungen fokussiert, zum Beispiel bei gebäudegebundenen Anlagen und Speichern. Haushalte und Firmen sind die primären Investoren. "),
-  p(strong("3) Größere Anlagen"),": Bei erneuerbaren Energien und Energieeinsparung werden „größere“ Lösungen bevorzugt. Als Investoren treten vor allem Kommunen, Stadtwerke und Genossenschaften als Investoren z.B. für Kombienergiezentralen und Nachwärmenetze sowie (Quartier-)Speicher auf. ")
+  p(strong("0) Jetzt-Zustand:"),"Der Zustand zu Beginn der Modellierung (2015)."),
+  p(strong("1) Fortschreibung:"),"Fortschreibung der aktuellen Ausbauraten: Erneuerbare Energieanlagen werden gebaut, falls sie rentabel sind. Die Region Oberland setzt auf Energieeffizienzmaßnahmen und wirtschaftliches Wachstum und ist grundsätzlich technologieoffen. "),
+  p(strong("2) Kleinere Anlagen:"),"Es werden „kleine“ Lösungen fokussiert, zum Beispiel bei gebäudegebundenen Anlagen und Speichern. Haushalte und Firmen sind die primären Investoren. "),
+  p(strong("3) Größere Anlagen:"),"Bei erneuerbaren Energien und Energieeinsparung werden „größere“ Lösungen bevorzugt. Als Investoren treten vor allem Kommunen, Stadtwerke und Genossenschaften als Investoren z.B. für Kombienergiezentralen und Nachwärmenetze sowie (Quartier-)Speicher auf. ")
 )
 
 
