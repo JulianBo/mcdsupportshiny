@@ -469,7 +469,8 @@ shinyServer(function(input, output, session) {
 
   output$ErgebnisPlot<- renderPlot({
     ggplot(rv_dtErgebnis(),aes(x=Titel,y=Gesamtergebnis, fill=Titel))+
-      geom_col()
+      geom_col()+
+      ylab("Punktzahl")
   })
 
 
@@ -479,7 +480,9 @@ shinyServer(function(input, output, session) {
     ggplot(rv_dtSzenarioergebnis(), aes(y=Szenarioergebnis,fill=Titel,x=Titel,  shape=Rahmenszenario))+
       geom_col(position="dodge" )+
       scale_shape_manual(values=21:24)+
-      geom_point(colour="Black", position=position_dodge(width=1))
+      geom_point(colour="Black", position=position_dodge(width=1))+
+      ylab("Punktzahl")
+
 
   }  )
 
@@ -498,7 +501,8 @@ shinyServer(function(input, output, session) {
       facet_wrap(~variable)+
       geom_col(position="dodge" )+
       scale_shape_manual(values=21:24)+
-      geom_point(colour="Black", position=position_dodge(width=1))
+      geom_point(colour="Black", position=position_dodge(width=1))+
+      ylab("Punktzahl")
 
   })
 
