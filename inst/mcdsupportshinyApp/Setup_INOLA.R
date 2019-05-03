@@ -12,8 +12,10 @@ dtAlternativen <- data.table(Titel= as.factor(c("0) Jetzt-Zustand",
                                                         "Nachhaltigkeit schafft Werte", "Das Wachstum geht weiter", "Kein Land in Sicht")),
                              Energieverbrauch_Strom=1,
                              Energieverbrauch_Wärme=1:10,
-                             Anteil_Energie=c(1,rep_len(100,9))
-
+                             Anteil_Energie=c(1,rep_len(100,9)),
+                             Anlagengröße_Strom=c(1,1:9*10),
+                             Anlagengröße_Wärme=c(1,10,14,13, 10,10,10, 50, 60, 55),
+                             Anlagengröße_Wärme_negative=c(1,10,14,13, 10,10,10, 50, 60, 55)*100
                              )
 #summary(dtAlternativen)
 
@@ -126,7 +128,7 @@ configList <- list (
       ),
       'Anlagengröße Stromerzeugung' = list(
         class = "mapping",
-        Attribname = NA,
+        Attribname = "Anlagengröße_Strom",
         description = tagList(
           "Ich präferiere ",em("wenige große Anlagen")," zur ",em("Stromerzeugung"),", es ist mir ",em("egal"),", oder ich präferiere ",em("viele kleine Anlagen")," (z.B.: Mehr Verbundkraftwerke anstatt Einzelhausanlagen)."
         ),
@@ -135,7 +137,8 @@ configList <- list (
       ),
       'Anlagengröße Wärmeerzeugung' = list(
         class = "mapping",
-        Attribname = NA,
+        Attribname = "Anlagengröße_Wärme",
+        negative_Attribname = "Anlagengröße_Wärme_negative",
         description = tagList(
           "Ich präferiere ",em("wenige große Anlagen")," zur ",em("Wärmeerzeugung"),", es ist mir ",em("egal"),", oder ich präferiere ",em("viele kleine Anlagen")," (z.B.: Nahwärmenetze mit großem BHKW vs. Wärmespeicher, Solarthermieanlagen, Wärmepumpe)."
         ),

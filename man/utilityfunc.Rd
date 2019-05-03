@@ -5,12 +5,12 @@
 \title{Convert Values of Indicators to utility-values.}
 \usage{
 utilityfunc(x, type, offset = ifelse(type == "antiprop", 50, 0),
-  centervalue = calculatecenterfunc(centervalue, x, offset), scale = 100)
+  centervalue = calculatecenterfunc("mean", x, offset), scale = 100)
 }
 \arguments{
 \item{x}{Numeric. Value to be converted.}
 
-\item{type}{One of c("prop","antiprop", "identity")}
+\item{type}{One of c("prop", "negprop", antiprop", "identity")}
 
 \item{offset}{Offst to be added to x.}
 
@@ -21,6 +21,7 @@ utilityfunc(x, type, offset = ifelse(type == "antiprop", 50, 0),
 \value{
 switch(as.character(type),
                  prop = scale* (x+offset)/centervalue ,
+                 negprop = 2*scale - scale*(x +offset)/centervalue ,
                  antiprop=scale* centervalue/(x+offset),
                  identity= x)
 }

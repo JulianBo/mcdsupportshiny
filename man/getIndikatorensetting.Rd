@@ -4,27 +4,25 @@
 \alias{getIndikatorensetting}
 \title{Get Settings of Indicators}
 \usage{
-getIndikatorensetting(x, util_func = "prop", util_mean = "mean",
-  util_offset = ifelse(util_func == "antiprop", 10, 0), util_scale = 100,
+getIndikatorensetting(x, positive_utility_settings = utility_settings(),
+  negative_utility_settings = utility_settings(util_func = "negprop"),
   agg_func = "weighted.sum", include_parent = TRUE, open.maxdepth = Inf,
   standardweight = 30)
 }
 \arguments{
 \item{x}{Configuration list, see \code{\link{validateConfig}}.}
 
-\item{util_func}{standard utitily function.}
+\item{positive_utility_settings}{standard utitily function settings, \code{\link{utility_settings}()}.}
 
-\item{util_mean}{standard utility mean.}
-
-\item{util_offset}{standard utility offset.}
-
-\item{util_scale}{standard utility scale.}
+\item{negative_utility_settings}{standard utitily function settings for negative weights, \code{\link{utility_settings}(util_func="negprop")}.}
 
 \item{agg_func}{standard aggregation function.}
 
 \item{include_parent}{Should new settings apply also to parent itself, or only to children?}
 
 \item{open.maxdepth}{}
+
+\item{minweight}{only to determine, if negative settings should be included}
 }
 \description{
 Get Settings of Indicators

@@ -5,13 +5,19 @@
 \title{Internal version of getIndikatorensetting}
 \usage{
 rgetIndikatorensetting(x, depth = 0, parent = "Szenarioergebnis",
-  util_func = "prop", util_mean = "mean", util_offset = ifelse(util_func
-  == "antiprop", 10, 0), util_scale = 100, agg_func = "weighted.sum",
-  include_parent = TRUE, open.maxdepth = Inf, color = NA,
-  standardweight = 30)
+  positive_utility_settings = utility_settings(),
+  negative_utility_settings = utility_settings(util_func = "negprop"),
+  agg_func = "weighted.sum", include_parent = TRUE, open.maxdepth = Inf,
+  color = NA, minweight = 0, standardweight = 30)
 }
 \arguments{
+\item{positive_utility_settings}{standard utitily function settings, \code{\link{utility_settings}()}.}
+
+\item{negative_utility_settings}{standard utitily function settings for negative weights, \code{\link{utility_settings}(util_func="negprop")} .}
+
 \item{color}{}
+
+\item{minweight}{only to determine, if negative settings should be included, see \code{\link{rSliderGuiInput}}.}
 }
 \value{
 

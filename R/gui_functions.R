@@ -99,21 +99,7 @@ rSliderGuiInput<-function(id, x,
                                                     ##Other Titles
                                                     sprintf("Worauf legen sie im Bereich '%s' wie viel wert?",
                                                             first(parent_name))
-    )
-
-                                                   # paste(ifelse(first(depth)<first(breaking),
-                                                   #        switch(first(mainpageposition), #only first argument used
-                                                   #               first="Zuerst ",
-                                                   #               last="Zum Schluss ",
-                                                   #               none="NA" ) ,
-                                                   #
-                                                   #
-                                                   #        switch(first(mainpageposition),
-                                                   #               first="Bitte jetzt Faktor ",
-                                                   #               last="Bitte zuerst Faktor ",
-                                                   #               none="NA" )
-                                                   #        ),
-                                                   # first(parent_name), " einstellen", sep="")
+                                                    )
                                  ),
                              by=page_nr]$title_text
   }
@@ -198,7 +184,6 @@ recSliderGuiInput<-function(id, x, depth=0,
     elem.name <- names(x)[i]
 
     ##TODO Funktioniert wahrscheinlich nicht bei root!!!
-    ##TODO: ifelse auf Performance und ggf. Vektorisierung prüfen, ersetzen
     #Attribute parsen
     this.sliderlabel <- if("sliderlabel" %in% names(list.elem) ) list.elem$sliderlabel else sliderlabel
     #message(paste0("inside recslidergui. elem.name=", elem.name, " this.sliderlabel=", this.sliderlabel))

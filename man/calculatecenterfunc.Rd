@@ -10,7 +10,7 @@ calculatecenterfunc(centervalue, x, offset, trim = 0, na.rm = FALSE)
 \item{na.rm}{}
 }
 \value{
-
+defaults to mean
 }
 \description{
 Title

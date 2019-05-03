@@ -38,16 +38,40 @@ validateConfig <- function (configList, dtAlternativen){
   #TODO: mindestens ein Mapping muss vorhanden sein.
 }
 
+#' Helper function. Standard configuration of utility function
+#'
+#' @param util_func
+#' @param util_mean
+#' @param util_offset
+#' @param util_scale
+#'
+#' @return list of four:
+#'            list(util_func=util_func,
+#'                 util_mean=util_mean,
+#'                 util_offset=util_offset,
+#'                util_scale=util_scale)
+#'
+#'
+#' @export
+#'
+#' @examples
+utility_settings<-function( util_func="prop",util_mean="mean",
+                            util_offset=ifelse(util_func=="antiprop", 10,0),
+                            util_scale=100){
+  list(util_func=util_func,
+       util_mean=util_mean,
+       util_offset=util_offset,
+       util_scale=util_scale)
+}
 
 #' Get Settings of Indicators
 #'
 #' @param x  Configuration list, see \code{\link{validateConfig}}.
-#' @param util_func standard utitily function.
-#' @param util_mean standard utility mean.
-#' @param util_offset standard utility offset.
-#' @param util_scale standard utility scale.
+#' @param positive_utility_settings standard utitily function settings, \code{\link{utility_settings}()}.
+#' @param negative_utility_settings standard utitily function settings for negative weights, \code{\link{utility_settings}(util_func="negprop")}.
 #' @param agg_func standard aggregation function.
 #' @param include_parent Should new settings apply also to parent itself, or only to children?
+#' @param minweight only to determine, if negative settings should be included
 #' @param open.maxdepth
 #'
 #' @return
@@ -55,9 +79,8 @@ validateConfig <- function (configList, dtAlternativen){
 #'
 #' @examples
 getIndikatorensetting<- function(x,
-                                 util_func="prop",util_mean="mean",
-                                 util_offset=ifelse(util_func=="antiprop", 10,0),
-                                 util_scale=100,
+                                 positive_utility_settings= utility_settings(),
+                                 negative_utility_settings= utility_settings(util_func="negprop"),
                                  agg_func="weighted.sum", #alternative: weighted.mean
                                  include_parent=TRUE,
                                  open.maxdepth=Inf,
@@ -67,11 +90,12 @@ getIndikatorensetting<- function(x,
 
 
   dtIndikatorensetting <- rgetIndikatorensetting (x,depth=0, parent="Szenarioergebnis",
-                                                  util_func=util_func, util_mean = util_mean,
-                                                  util_offset = util_offset, util_scale = util_scale,
+                                                  positive_utility_settings=positive_utility_settings,
+                                                  negative_utility_settings= negative_utility_settings,
                                                   agg_func=agg_func,
                                                   include_parent=include_parent                                                  ,
                                                   open.maxdepth=open.maxdepth ,
+                                                  minweight=0, #corresponding to rSliderGuiInput
                                                   standardweight = standardweight)
 
   return(dtIndikatorensetting)
@@ -83,26 +107,25 @@ getIndikatorensetting<- function(x,
 #' @param x
 #' @param depth
 #' @param parent
-#' @param util_func
-#' @param util_mean
-#' @param util_offset
-#' @param util_scale
+#' @param positive_utility_settings standard utitily function settings, \code{\link{utility_settings}()}.
+#' @param negative_utility_settings standard utitily function settings for negative weights, \code{\link{utility_settings}(util_func="negprop")} .
 #' @param agg_func
 #' @param include_parent
 #' @param open.maxdepth
+#' @param minweight only to determine, if negative settings should be included, see \code{\link{rSliderGuiInput}}.
 #' @param color
 #'
 #' @return
 #'
 #' @examples
 rgetIndikatorensetting<- function(x, depth=0, parent="Szenarioergebnis",
-                                  util_func="prop",util_mean="mean",
-                                  util_offset=ifelse(util_func=="antiprop", 10,0),
-                                  util_scale=100,
+                                  positive_utility_settings= utility_settings(),
+                                  negative_utility_settings= utility_settings(util_func="negprop"),
                                   agg_func="weighted.sum", #alternative: weighted.mean
                                   include_parent=TRUE,
                                   open.maxdepth=Inf,
                                   color=NA,
+                                  minweight=0,
                                   standardweight=30){
 
   stopifnot(depth>=0)
@@ -117,46 +140,76 @@ rgetIndikatorensetting<- function(x, depth=0, parent="Szenarioergebnis",
     list.elem <- x[[i]]
     elem.name<- names(x)[i]
 
-    #Attribute parsen
-    this.util_func <- ifelse("util_func" %in% names(list.elem), list.elem$util_func, util_func)
-    this.util_mean <- ifelse("util_mean" %in% names(list.elem), list.elem$util_mean, util_mean)
-    this.util_offset <- ifelse("util_offset" %in% names(list.elem), list.elem$util_offset, util_offset)
-    this.util_scale <- ifelse("util_scale" %in% names(list.elem), list.elem$util_scale, util_scale)
-    this.agg_func <- ifelse("agg_func" %in% names(list.elem),  list.elem$agg_func, agg_func)
-    this.include_parent <- ifelse("include_parent" %in% names(list.elem),
-                                  list.elem$include_parent, include_parent)
-    this.standardweight <- ifelse("standardweight" %in% names(list.elem),
-                                  list.elem$standardweight, standardweight)
+    ##Attribute parsen
+    #Positive Settings
+    this.positive_utility_settings<-positive_utility_settings
+    if("util_func" %in% names(list.elem)) this.positive_utility_settings$util_func<-list.elem$util_func
+    if("util_mean" %in% names(list.elem)) this.positive_utility_settings$util_mean<-list.elem$util_mean
+    if("util_offset" %in% names(list.elem)) this.positive_utility_settings$util_offset<-list.elem$util_offset
+    if("util_scale" %in% names(list.elem)) this.positive_utility_settings$util_scale<-list.elem$util_scale
+    #Negative Settings
+    this.negative_utility_settings<-negative_utility_settings
+    if("negative_util_func" %in% names(list.elem)) this.negative_utility_settings$util_func<-list.elem$negative_util_func
+    if("negative_util_mean" %in% names(list.elem)) this.negative_utility_settings$util_mean<-list.elem$negative_util_mean
+    if("negative_util_offset" %in% names(list.elem)) this.negative_utility_settings$util_offset<-list.elem$negative_util_offset
+    if("negative_util_scale" %in% names(list.elem)) this.negative_utility_settings$util_scale<-list.elem$negative_util_scale
+    #Further Settings
+    this.agg_func <-if("agg_func" %in% names(list.elem))list.elem$agg_func else agg_func
+    this.include_parent <- if("include_parent" %in% names(list.elem) ) list.elem$include_parent else include_parent
+    this.minweight <- if("minweight" %in% names(list.elem) ) list.elem$minweight else minweight
+    this.standardweight <- if("standardweight" %in% names(list.elem) ) list.elem$standardweight else standardweight
 
 
     #Falls Element. GGf. Child-Elemente parsen
     if("class" %in% names(list.elem)){
       retvalue <- data.table(name=elem.name,
                              is_mapping = list.elem$class=="mapping",
-                             Attribname=ifelse(list.elem$class=="mapping",list.elem$Attribname, NA),
+                             negative=FALSE,
+                             Attribname=if(list.elem$class=="mapping") list.elem$Attribname else NA,
                              level=depth,
-                             util_func=ifelse(this.include_parent, this.util_func, util_func),
-                             util_mean=ifelse(this.include_parent, this.util_mean, util_mean),
-                             util_offset=ifelse(this.include_parent, this.util_offset, util_offset),
-                             util_scale=ifelse(this.include_parent, this.util_scale, util_scale),
-                             agg_func=ifelse(this.include_parent,this.agg_func, agg_func),
+                             util_func=if(this.include_parent)this.positive_utility_settings$util_func else positive_utility_settings$util_func,
+                             util_mean=if(this.include_parent) this.positive_utility_settings$util_mean else positive_utility_settings$util_mean,
+                             util_offset=if(this.include_parent) this.positive_utility_settings$util_offset else positive_utility_settings$util_offset,
+                             util_scale=if(this.include_parent) this.positive_utility_settings$util_scale else positive_utility_settings$util_scale,
+                             agg_func=if(this.include_parent) this.agg_func else agg_func,
                              parent=parent,
-                             bscName=ifelse(depth>= open.maxdepth,
-                                            NS(parent)("bsc") ,
-                                            NA),
+                             bscName=if(depth>= open.maxdepth )NS(parent)("bsc") else NA,
                              standardweight = ifelse(this.include_parent,this.standardweight, standardweight)
       )
+
+      #Falls negativ nötig
+      if ( this.minweight<0)  {
+        retvalue<-rbind(
+          retvalue,
+          data.table(name=elem.name,
+                     is_mapping = list.elem$class=="mapping",
+                     negative=TRUE,
+                     Attribname=if(list.elem$class=="mapping") {
+                       ##Falls anderes Attribut für negative Einstellungen.
+                       if("negative_Attribname" %in% names(list.elem) ) list.elem$negative_Attribname else list.elem$Attribname
+                       } else NA,
+                     level=depth,
+                     util_func=if(this.include_parent)this.negative_utility_settings$util_func else negative_utility_settings$util_func,
+                     util_mean=if(this.include_parent) this.negative_utility_settings$util_mean else negative_utility_settings$util_mean,
+                     util_offset=if(this.include_parent) this.negative_utility_settings$util_offset else negative_utility_settings$util_offset,
+                     util_scale=if(this.include_parent) this.negative_utility_settings$util_scale else negative_utility_settings$util_scale,
+                     agg_func=if(this.include_parent) this.agg_func else agg_func,
+                     parent=parent,
+                     bscName=if(depth>= open.maxdepth )NS(parent)("bsc") else NA,
+                     standardweight = ifelse(this.include_parent,this.standardweight, standardweight)
+          )
+        )
+      }
 
       #Rekursion
       if(list.elem$class=="elements")
         retvalue <-rbind(retvalue, rgetIndikatorensetting (list.elem,depth=depth+1, parent=elem.name,
-                                                           util_func=this.util_func,
-                                                           util_mean = this.util_mean,
-                                                           util_offset = this.util_offset,
-                                                           util_scale = this.util_scale,
+                                                           positive_utility_settings= this.positive_utility_settings,
+                                                           negative_utility_settings= this.negative_utility_settings,
                                                            agg_func=this.agg_func,
                                                            include_parent=this.include_parent,
                                                            open.maxdepth = open.maxdepth,
+                                                           minweight = this.minweight,
                                                            standardweight = this.standardweight)
         )
 

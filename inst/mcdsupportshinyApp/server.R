@@ -29,9 +29,10 @@ validateConfig(configList,dtAlternativen)
 # Globale Variablen berechnen ---------------------------------------------
 
 dtIndikatorensettings<-getIndikatorensetting(configList)
+vColors<-rColorVector(configList, color="blue")
+dtIndikatorensettings<-dtIndikatorensettings[data.table(name=names(vColors),colors=vColors), on="name"]
 
-dtIndikatorensettings[,slname:=paste(name,"sl", sep = ns.sep)] #shiny:ns.sep; NS() not vectorised
-dtIndikatorensettings[,colors:=rColorVector(configList, color="blue")]
+dtIndikatorensettings[,slname:=paste("slGui2", gsub("[^A-Za-z0-9-]", "", name),"sl", sep = ns.sep)] #shiny:ns.sep; NS() not vectorised
 dtIndikatorensettings[, number:=1:length(name)]
 
 setcolorder(dtIndikatorensettings, "number")
@@ -57,7 +58,7 @@ dtAlternativen_long <- merge(melt(dtAlternativen, id.vars=c("Titel", "Rahmenszen
 dtAlternativen_long[,
                     centervar:=calculatecenterfunc(first(util_mean),value, first(util_offset)
                                                    ),
-                    by=variable]
+                    by=.(variable, negative)]
 
 #Berechne Nutzen. Gruppiert, weil utilityfunc  einen single character vector für type erwartet (liegt am switch)
 # TODO: utilityfunc vektorisieren???
@@ -66,8 +67,8 @@ dtAlternativen_long[,nutzen:=utilityfunc(x=value,
                                         type=first(util_func),
                                         offset = util_offset,
                                         centervalue = centervar,
-                                        scale=util_scale),
-                    by=variable]
+                                        scale=util_scale ),
+                    by=.(variable, negative)]
 
 #Füge Minimum und MAximum hinzu
 #nötig um Nutzenfunktionen zu plotten; inkl. 5% außerhalb
@@ -76,7 +77,7 @@ dtAlternativen_long[,`:=`(   value_min=min(value)*0.95,
                              nutzen_min=min(nutzen)*0.95,
                              nutzen_max=max(nutzen)*1.05
                              ),
-                    by=.(variable,util_func, util_offset,util_offset, util_scale, centervar)]
+                    by=.(variable,negative,util_func, util_offset,util_offset, util_scale, centervar)]
 
 #FÜge width hinzu, um es beim Plotten benutzen zu können (position_dodge)
 #Siehe: https://stackoverflow.com/questions/48946222/ggplot-with-facets-provide-different-width-to-dodge-with-each-facet
@@ -88,11 +89,11 @@ dtAlternativen_long[,`:=`( I_group=1:.N,
                  group=.GRP,
                  #Here the actual dodging is done
                  value_dodgedx = value - ( (1:.N-0.5) - .N/2) *width_dodge ),
-          , by=.(variable, value, nutzen)]
+          , by=.(variable, negative, value, nutzen)]
 
 ## Nutzenfunktionen, zum Plotten
 dtNutzenFuncs <-  copy(dtAlternativen_long)[,.N,
-                                            by=.(variable,util_func, util_offset,util_offset, util_scale, centervar,value_min,value_max)]
+                                            by=.(variable,negative, util_func, util_offset,util_offset, util_scale, centervar,value_min,value_max)]
 dtNutzenFuncsList <- crossjoinFunc(dtNutzenFuncs,data.table(n=seq_len(101)-1))
 dtNutzenFuncsList[,`:=`(
   x= value_min  +(value_max-value_min  )*n*1./100,
@@ -104,14 +105,17 @@ dtNutzenFuncsList[,`:=`(
                centervalue = centervar,
                scale=util_scale)
 
-), by=.(variable,util_func, util_offset, centervar)]
+), by=.(variable,negative )]
 
 
 
 # Reactive data.tables vorbereiten ----------------------------------------
 
 
-dtGewichtungen <- copy(dtIndikatorensettings)
+dtGewichtungen <- copy(dtIndikatorensettings[,.(colors=first(colors),
+                                                number=first(number)
+                                                ),
+                                             by=.(name, is_mapping, level, parent, bscName, slname)])
 setkey(dtGewichtungen, name)
 
 
@@ -119,20 +123,25 @@ setkey(dtGewichtungen, name)
 
 # benutze "name" anstatt "variable", um auf Indikatoren(Mappings)
 # anstatt auf Attribute(Alternativen) zu kommen
-dtNutzen <- dcast(dtAlternativen_long,Titel +Rahmenszenario~name,  value.var = "nutzen")
+# dtNutzen <- dcast(dtAlternativen_long,Titel +Rahmenszenario~name,  value.var = "nutzen",
+#                   fun.aggregate=max) ##muss später nochmal gefüllt werden, wegen negativen Zellen
+
+dtNutzen<-copy(dtAlternativen[,.(Titel,Rahmenszenario)])
+#Spalte für Szenarioergebnis
+dtNutzen[,dtIndikatorensettings[level==0,first(parent)]  :=NA_real_]
 
 ##Füge weitere Spalten hinzu, um sie später zu füllen
-# Alle Spalten von Gruppierungen
-if (any(!dtIndikatorensettings$is_mapping) )dtNutzen[,dtIndikatorensettings[!(is_mapping),name]  :=NA]
+# Alle Indikatoren
+dtNutzen[,unique(dtIndikatorensettings[,name])  :=NA_real_]
 # Alle Spalten von Gruppierungen von nicht zugeordneten Attributen
 #NA= Nicht gewusst; 0 = Ausschließen
 dtNutzen[,dtIndikatorensettings[is_mapping& is.na(Attribname),name]  :=0]
-#Spalte für Szenarioergebnis
-dtNutzen[,dtIndikatorensettings[level==0,first(parent)]  :=NA]
 
+NutzenWerte<- as.matrix(dtNutzen[,.SD,
+                                 .SDcols = names(dtNutzen)[-(1:2)] #!(names(dtNutzen) %in% c( "Titel", "Rahmenszenario"))]
+                                 ]
+)
 
-important_columns =c( "Titel", "Rahmenszenario","Szenarioergebnis")
-setcolorder(dtNutzen,  important_columns )
 
 # Connection to Database --------------------------------------------------
 
@@ -184,19 +193,19 @@ shinyServer(function(input, output, session) {
   rv_dtGewichtungen <- reactive({
 
     #Zum Testen:
-   # dtGewichtungen[,originalweights:= c(0:10*10, 10,10)]
+    #dtGewichtungen[,originalweights:= c(-10,10,1:10*10, 10,10)]
 
     dtGewichtungen[,originalweights:=slGui2$sliderCheckBoxValues()]
 
     ##HIER EIGENTLICHE LOGIK
     #getrennt nach allen leveln aufaggregieren
     #Summe aller Einstellungen pro Level
-    dtGewichtungen[ ,sum_in_level:=sum(originalweights, na.rm = TRUE) ,
+    dtGewichtungen[ ,sum_in_level:=sum(abs(originalweights), na.rm = TRUE) ,
                     by=.(parent, level)]
 
     dtGewichtungen[,finalweight_in_level :=
                      #alle 0 ausschließen
-                     ifelse(sum_in_level==0, 0, originalweights/sum_in_level) ]
+                     ifelse(sum_in_level==0, 0, abs(originalweights)/sum_in_level) ]
 
     ## Korrigierte Gewichtungen, wo nicht zugeordnete Variablen und Äste,
     ## in denen alle Gewichtungen auf 0 gesetzt werden, nicht berücksichtigt werden
@@ -209,8 +218,8 @@ shinyServer(function(input, output, session) {
 
       ##TODO: Childssumcorrected anpassen!!!
 
-      dtGewichtungen[!(is_mapping &is.na(Attribname) )&level==i,
-                     sum_in_level_corrected := sum(originalweights, na.rm = TRUE) ,
+      dtGewichtungen[!(is_mapping )&level==i,
+                     sum_in_level_corrected := sum(abs(originalweights), na.rm = TRUE) ,
                      by=.(parent, level)]
 
 
@@ -225,23 +234,15 @@ shinyServer(function(input, output, session) {
                        #alle 0 und NA ausschließen
                        ifelse(is.na(sum_in_level_corrected) | sum_in_level_corrected==0,
                               0,
-                              originalweights/sum_in_level_corrected) ]
+                              abs(originalweights)/sum_in_level_corrected) ]
 
     }
 
 
 
-    # print(
-    #   dtGewichtungen[,
-    #                  .(name,slname, is_mapping,Attribname,level,
-    #                    parent,
-    #                    originalweights,
-    #                    sum_in_level, finalweight_in_level, sum_in_level_corrected,
-    #                    finalweight_in_level_corrected)]
-    # )
     #Nur relevanten Spalten zurückliefern
     dtGewichtungen[,
-                   .(name,slname, is_mapping,Attribname,level,
+                   .(name,slname, is_mapping,level,
                      parent,
                      originalweights,
                      sum_in_level, finalweight_in_level, sum_in_level_corrected,
@@ -250,25 +251,34 @@ shinyServer(function(input, output, session) {
 
     }) #end of rv_dtGewichtungen
 
+
+
+
+
   rv_dtSzenarioergebnis <- reactive({
 
-    NutzenWerte<- as.matrix(dtNutzen[,.SD,
-                                     .SDcols = names(dtNutzen)
-                                     [!(names(dtNutzen) %in% c( "Titel", "Rahmenszenario"))]
-                                     ]
-                            )
 
-    #Eigentliche Logik.
+    ## Blätter in Abhängigkeit von NEgativität füllen
+    for (x in dtIndikatorensettings[is_mapping&!is.na(Attribname),unique(name)] ){
+      # print(x)
+      # print(rv_dtGewichtungen()[name==x])
+      # print(dtAlternativen_long[name==x & negative==(rv_dtGewichtungen()[name==x]$originalweight<0)])
+      NutzenWerte[,x]<-dtAlternativen_long[name==x & negative==(rv_dtGewichtungen()[name==x]$originalweight<0)]$nutzen
+    }
+
+
+
+    ## #Eigentliche Logik.
    for( i in max(  dtIndikatorensettings$level):0)
      for (x in dtIndikatorensettings[level==i,.N, by=parent]$parent){
       # print(paste0("---- i=",i,";x= ",x, " ---"))
-      # print(NutzenWerte)
-      # print(rv_dtGewichtungen())
+      # print(NutzenWerte[,dtIndikatorensettings[parent==x &level==i,unique(name)] ])
+      # print(rv_dtGewichtungen()[parent==x &level==i])
+
         NutzenWerte[,x]<-
-          NutzenWerte[,dtIndikatorensettings[parent==x &level==i,name] ] %*%
+          NutzenWerte[,dtIndikatorensettings[parent==x &level==i,unique(name)] ] %*%
           as.matrix(rv_dtGewichtungen()[parent==x &level==i, finalweight_in_level])
         # Added as.matrix for 1x1 matrices, else treated as scalar (with error)
-
            #dtGewichtungen[parent==x &level==i,finalweight_in_level]## Zum Testen
 
      }
@@ -539,17 +549,22 @@ shinyServer(function(input, output, session) {
 
     # add width to position dodge, different for each facet.
     #See: https://stackoverflow.com/questions/48946222/ggplot-with-facets-provide-different-width-to-dodge-with-each-facet
-    ggplot(dtAlternativen_long,aes(x=value_dodgedx, y=nutzen, shape=Rahmenszenario, fill=Titel))+
+    ggplot(dtAlternativen_long,aes(x=value_dodgedx, y=nutzen, shape=Rahmenszenario, fill=Titel, alpha=as.numeric(negative) ))+
       #geom_col(aes(fill=Titel),position = "dodge")+
       geom_rect(aes(xmin=value_dodgedx-width_dodge/2,
                     xmax=value_dodgedx+width_dodge/2,
-                    ymax=nutzen , fill=Titel),
-                ymin=0 )+
+                    ymax=nutzen , fill=Titel,
+                    linetype=negative),
+                colour="black", ymin=0 )+
       scale_shape_manual(values=21:24)+
+      scale_alpha_continuous(range=c(1,0.8),guide = 'none')+
+      scale_linetype_discrete( name="Bewertungsbereich",labels=c("positiv", "negativ"))+
+      scale_fill_discrete(name="Ausbaupfad")+
       geom_point(colour="Black")+
+      labs(x="Wert",y="Punktzahl")+
       facet_wrap(~variable, scales = "free_x")+ # facet_wrap nach Slidernamen wäre "name", funktioniert nicht
-      geom_path(data =dtNutzenFuncsList , mapping=aes(x=x,y=y), inherit.aes = FALSE )
-  })
+      geom_path(data =dtNutzenFuncsList , mapping=aes(x=x,y=y, linetype=negative), inherit.aes = FALSE )
+   })
 
   #Indikatorensettings
   output$Indikatorensettings<- renderTable({dtIndikatorensettings})
