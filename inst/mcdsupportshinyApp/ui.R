@@ -11,6 +11,8 @@ library(shiny)
 library(shinyBS)
 library(shinyjs)
 
+library(DT)
+
 library(plotly)
 
 
@@ -135,12 +137,36 @@ shinyUI(fluidPage(theme="mcdsupportshiny.css",
 
                                  ),
                     tabPanel("Detailergebnisse",
+                             h3("Endgültige Punktzahlen der Bereiche"),
+                             ##TODO
+                             # selectInput(
+                             #   "EntscheidungenPlot",
+                             #   "Bitte Indikatoren zur Ansicht auswählen",
+                             #   choices= names(dtAlternativen)[-(1:2)],
+                             #   selected=names(dtAlternativen)[-(1:2)],
+                             #   multiple=TRUE
+                             #
+                             # ),
                                  plotOutput("EntscheidungenPlot"),
-                                 tableOutput("EntscheidungenTable")
+                             h3("Punktzahlen der Bereiche"),
+                              DT::dataTableOutput("EntscheidungenTable")
 
 
                         ),
+                    tabPanel("Alternativen",
+                             h3("Benutzte Punktzahlen der Indikatoren"),
+                             selectInput(
+                               "NutzenPlotOptions",
+                               "Bitte Variablen zur Ansicht auswählen",
+                               choices= names(dtAlternativen)[-(1:2)],
+                               selected=names(dtAlternativen)[-(1:2)],
+                               multiple=TRUE
 
+                             ),
+                             plotOutput("NutzenPlot"),
+                             h3("Tabelle der Alternativen"),
+                             DT::dataTableOutput("AlternativenTable")
+                    ),
                     tabPanel("Bisherige Gewichtungen",
                                  plotOutput("BisherigeDecsPlot")
                                  # ,
@@ -151,13 +177,7 @@ shinyUI(fluidPage(theme="mcdsupportshiny.css",
                         # tabPanel("Endgültige Gewichtungen",
                         #          tableOutput("DirGewichtungenTable")
                         # ),
-                        tabPanel("Alternativen",
-                                 tableOutput("AlternativenTable")
-                        ),
-                        tabPanel("Nutzen-Funktionen",
-                                 plotOutput("NutzenPlot")
-                        )
-                        ,
+
 
                         # tabPanel("Einstellungen für die Indikatoren",
                         #          tableOutput("Indikatorensettings")

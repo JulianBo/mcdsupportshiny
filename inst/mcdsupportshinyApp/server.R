@@ -521,7 +521,17 @@ shinyServer(function(input, output, session) {
 
 
   #Entscheidungen als Tabelle ausgeben
-  output$EntscheidungenTable<- renderTable({rv_dtSzenarioergebnis()})
+  output$EntscheidungenTable<-DT::renderDataTable({
+    rv_dtSzenarioergebnis() %>%
+    DT::datatable(
+      selection = 'none', rownames = '', filter = 'none',
+      extensions = "FixedColumns",
+      options = list(
+        paging = FALSE, searching = FALSE, info = FALSE,
+        sort = TRUE, scrollX = TRUE, fixedColumns = list(leftColumns = 3)
+      )
+    )
+    })
 
   ####GUI Updaten ---Rest ####
 
@@ -541,15 +551,28 @@ shinyServer(function(input, output, session) {
   output$DirGewichtungenTable<-renderTable( rv_dtGewichtungen())
 
   #Alternativen anzeigen
-  output$AlternativenTable<- renderTable({dtAlternativen})
+  output$AlternativenTable<- DT::renderDataTable({
+    dtAlternativen %>%
+      DT::datatable(
+        selection = 'none', rownames = '', filter = 'none',
+        extensions = "FixedColumns",
+        options = list(
+          paging = FALSE, searching = FALSE, info = FALSE,
+          sort = TRUE, scrollX = TRUE, fixedColumns = list(leftColumns = 3)
+        )
+      )
+    })
 
 
   #Nutzenfunktionen anzeigen
   output$NutzenPlot <- renderPlot({
 
+
     # add width to position dodge, different for each facet.
     #See: https://stackoverflow.com/questions/48946222/ggplot-with-facets-provide-different-width-to-dodge-with-each-facet
-    ggplot(dtAlternativen_long,aes(x=value_dodgedx, y=nutzen, shape=Rahmenszenario, fill=Titel, alpha=as.numeric(negative) ))+
+    ggplot(dtAlternativen_long[ variable %in% input$NutzenPlotOptions],
+           aes(x=value_dodgedx, y=nutzen, shape=Rahmenszenario, fill=Titel, alpha=as.numeric(negative) )
+           )+
       #geom_col(aes(fill=Titel),position = "dodge")+
       geom_rect(aes(xmin=value_dodgedx-width_dodge/2,
                     xmax=value_dodgedx+width_dodge/2,
@@ -563,7 +586,8 @@ shinyServer(function(input, output, session) {
       geom_point(colour="Black")+
       labs(x="Wert",y="Punktzahl")+
       facet_wrap(~variable, scales = "free_x")+ # facet_wrap nach Slidernamen wäre "name", funktioniert nicht
-      geom_path(data =dtNutzenFuncsList , mapping=aes(x=x,y=y, linetype=negative), inherit.aes = FALSE )
+      geom_path(data =dtNutzenFuncsList[variable %in% input$NutzenPlotOptions],
+                mapping=aes(x=x,y=y, linetype=negative), inherit.aes = FALSE )
    })
 
   #Indikatorensettings
