@@ -34,7 +34,7 @@ dtIndikatorensettings<-dtIndikatorensettings[data.table(name=names(vColors),colo
 
 dtIndikatorensettings[,slname:=paste("slGui2", gsub("[^A-Za-z0-9-]", "", name),"sl", sep = ns.sep)] #shiny:ns.sep; NS() not vectorised
 dtIndikatorensettings[, number:=1:length(name)]
-dtIndikatorensettings[,is_qualitative:=is_mapping&is.na(Attribname)]
+dtIndikatorensettings[is_mapping==TRUE,is_qualitative:=any(is.na(Attribname)), by=name]##If only negative or positive is qualitative, then both!
 
 setcolorder(dtIndikatorensettings, "number")
 setkey(dtIndikatorensettings,number)
@@ -105,6 +105,16 @@ dtIndikatorensettings[ Attribname==dtAlternativen_long[,
                                        [all_missing==TRUE]$variable,
                        is_qualitative:=TRUE]
 
+##Recursively set qualitative== TRUE, if all children are qualitative
+for( i in max(  dtIndikatorensettings$level):1){
+  dtIndikatorensettings[is.na(is_qualitative)&level==i-1,
+                        is_qualitative:=dtIndikatorensettings[level==i,
+                                                              .(all_qualitative=all(is_qualitative)),
+                                                              by=.(level,parent)]$all_qualitative
+                        ]
+
+}
+
 
 ## Nutzenfunktionen, zum Plotten
 dtNutzenFuncs <-  copy(dtAlternativen_long)[,.N,
@@ -130,7 +140,7 @@ dtNutzenFuncsList[,`:=`(
 dtGewichtungen <- copy(dtIndikatorensettings[,.(colors=first(colors),
                                                 number=first(number)
                                                 ),
-                                             by=.(name, is_mapping, level, parent, bscName, slname)])
+                                             by=.(name, is_mapping, level, parent, bscName, slname, is_qualitative)])
 setkey(dtGewichtungen, number)
 
 # print(dtIndikatorensettings)
@@ -215,6 +225,22 @@ shinyServer(function(input, output, session) {
 
     dtGewichtungen[,originalweights:=slGui2$sliderCheckBoxValues()]
 
+    ## Korrigierte Gewichtungen, wo nicht zugeordnete Variablen und Äste,
+    ## in denen alle Gewichtungen auf 0 gesetzt werden, nicht berücksichtigt werden
+    ## Muss absteigend geschehen, weil sich 0-Werte von den Blättern propagieren könnten,
+    ## falls dort auch nicht zugeordnete Variablen wären.
+
+    ##If all children are  qualitative or all Sliders of children are 0,
+    ##  set value itself to 0 (do not take it into account) and
+    ##  and mark indicator as "qualitative" (all qualitative) or "not calculable" (children 0, or mixed)
+    ##Indicators with all values missing are set to "qualitative" (preparation of global variables)
+
+    for( i in max(  dtIndikatorensettings$level):0){
+
+
+    }
+
+
     ##HIER EIGENTLICHE LOGIK
     #getrennt nach allen leveln aufaggregieren
     #Summe aller Einstellungen pro Level
@@ -225,15 +251,6 @@ shinyServer(function(input, output, session) {
                      #alle 0 ausschließen
                      ifelse(sum_in_level==0, 0, abs(originalweights)/sum_in_level) ]
 
-    ## Korrigierte Gewichtungen, wo nicht zugeordnete Variablen und Äste,
-    ## in denen alle Gewichtungen auf 0 gesetzt werden, nicht berücksichtigt werden
-    ## Muss absteigend geschehen, weil sich 0-Werte von den Blättern propagieren könnten,
-    ## falls dort auch nicht zugeordnete Variablen wären.
-
-    ##If all children are  qualitative or all Sliders of children are 0,
-    ##  set value itself to 0 (do not take it into account) and
-    ##  and mark indicator as "qualitative" (all qualitative) or "not calculable" (children 0, or mixed)
-    ##Indicators with all values missing are set to "qualitative" (preparation of global variables)
 
     dtGewichtungen[,finalweight_in_level_corrected:=0]
 
