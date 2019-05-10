@@ -15,7 +15,9 @@ dtAlternativen <- data.table(Titel= as.factor(c("0) Jetzt-Zustand",
                              Anteil_Energie=c(1,rep_len(100,9)),
                              Anlagengröße_Strom=c(1,1:9*10),
                              Anlagengröße_Wärme=c(1,10,14,13, 10,10,10, 50, 60, 55),
-                             Anlagengröße_Wärme_negative=c(1,10,14,13, 10,10,10, 50, 60, 55)*100
+                             Anlagengröße_Wärme_negative=c(1,10,14,13, 10,10,10, 50, 60, 55),
+                             Energieerzeugungskosten=c (1, 3,3,5, 0.5, 1, NA, 0.5, 0.5, NA),
+                             Stromimportkosten=NA
                              )
 #summary(dtAlternativen)
 
@@ -227,7 +229,7 @@ configList <- list (
     ),
       'Energieerzeugungskosten' = list(
         class = "mapping",
-        Attribname = NA,
+        Attribname = "Energieerzeugungskosten",
         description = tagList(
           "Mir ist wichtig, dass die ",em("durchschnittlichen Erzeugungskosten pro KwH (Strom und Wärme) gering ")," sind."
         )
@@ -239,7 +241,7 @@ configList <- list (
       ),
       'Stromimportkosten' = list(
         class = "mapping",
-        Attribname = NA,
+        Attribname = "Stromimportkosten",
         description = tagList(
           "Mir ist wichtig, dass die ",em(" Kosten für Stromimporte bzw. für den Import von Rohstoffen zur Stromerzeugung")," möglichst niedrig sind."
         )

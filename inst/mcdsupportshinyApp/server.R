@@ -34,6 +34,7 @@ dtIndikatorensettings<-dtIndikatorensettings[data.table(name=names(vColors),colo
 
 dtIndikatorensettings[,slname:=paste("slGui2", gsub("[^A-Za-z0-9-]", "", name),"sl", sep = ns.sep)] #shiny:ns.sep; NS() not vectorised
 dtIndikatorensettings[, number:=1:length(name)]
+dtIndikatorensettings[,is_qualitative:=is_mapping&is.na(Attribname)]
 
 setcolorder(dtIndikatorensettings, "number")
 setkey(dtIndikatorensettings,number)
@@ -70,12 +71,13 @@ dtAlternativen_long[,nutzen:=utilityfunc(x=value,
                                         scale=util_scale ),
                     by=.(variable, negative)]
 
+
 #Füge Minimum und MAximum hinzu
 #nötig um Nutzenfunktionen zu plotten; inkl. 5% außerhalb
-dtAlternativen_long[,`:=`(   value_min=min(value)*0.95,
-                             value_max=max(value)*1.05,
-                             nutzen_min=min(nutzen)*0.95,
-                             nutzen_max=max(nutzen)*1.05
+dtAlternativen_long[,`:=`(   value_min=min(value, na.rm=TRUE)*0.95,
+                             value_max=max(value, na.rm=TRUE)*1.05,
+                             nutzen_min=min(nutzen, na.rm=TRUE)*0.95,
+                             nutzen_max=max(nutzen, na.rm=TRUE)*1.05
                              ),
                     by=.(variable,negative,util_func, util_offset,util_offset, util_scale, centervar)]
 
@@ -90,6 +92,19 @@ dtAlternativen_long[,`:=`( I_group=1:.N,
                  #Here the actual dodging is done
                  value_dodgedx = value - ( (1:.N-0.5) - .N/2) *width_dodge ),
           , by=.(variable, negative, value, nutzen)]
+
+
+#Set NA to  and mark them as missing- only after calculating min and max!
+dtAlternativen_long[,`:=`(nutzen_correct=ifelse(is.na(value),0, nutzen),
+                         missing=is.na(value)
+                         )]
+
+##If all of a variable is missing, it is marked as qualitative
+dtIndikatorensettings[ Attribname==dtAlternativen_long[,
+                                                       .(all_missing=all(missing)), by=variable]
+                                       [all_missing==TRUE]$variable,
+                       is_qualitative:=TRUE]
+
 
 ## Nutzenfunktionen, zum Plotten
 dtNutzenFuncs <-  copy(dtAlternativen_long)[,.N,
@@ -215,11 +230,18 @@ shinyServer(function(input, output, session) {
     ## Muss absteigend geschehen, weil sich 0-Werte von den Blättern propagieren könnten,
     ## falls dort auch nicht zugeordnete Variablen wären.
 
+    ##If all children are  qualitative or all Sliders of children are 0,
+    ##  set value itself to 0 (do not take it into account) and
+    ##  and mark indicator as "qualitative" (all qualitative) or "not calculable" (children 0, or mixed)
+    ##Indicators with all values missing are set to "qualitative" (preparation of global variables)
+
     dtGewichtungen[,finalweight_in_level_corrected:=0]
 
     for( i in max(  dtIndikatorensettings$level):0){
 
       ##TODO: Childssumcorrected anpassen!!!
+
+
 
       dtGewichtungen[!(is_mapping )&level==i,
                      sum_in_level_corrected := sum(abs(originalweights), na.rm = TRUE) ,
@@ -248,8 +270,9 @@ shinyServer(function(input, output, session) {
                    .(name,slname, is_mapping,level,
                      parent,
                      originalweights,
-                     sum_in_level, finalweight_in_level, sum_in_level_corrected,
-                     finalweight_in_level_corrected)]
+                     sum_in_level, finalweight_in_level,
+                     sum_in_level_corrected,finalweight_in_level_corrected)
+                   ]
 
 
     }) #end of rv_dtGewichtungen
@@ -266,7 +289,7 @@ shinyServer(function(input, output, session) {
       # print(x)
       # print(rv_dtGewichtungen()[name==x])
       # print(dtAlternativen_long[name==x & negative==(rv_dtGewichtungen()[name==x]$originalweight<0)])
-      NutzenWerte[,x]<-dtAlternativen_long[name==x & negative==(rv_dtGewichtungen()[name==x]$originalweight<0)]$nutzen
+      NutzenWerte[,x]<-dtAlternativen_long[name==x & negative==(rv_dtGewichtungen()[name==x]$originalweight<0)]$nutzen_correct
     }
 
 
