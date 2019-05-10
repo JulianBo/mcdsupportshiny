@@ -116,7 +116,10 @@ dtGewichtungen <- copy(dtIndikatorensettings[,.(colors=first(colors),
                                                 number=first(number)
                                                 ),
                                              by=.(name, is_mapping, level, parent, bscName, slname)])
-setkey(dtGewichtungen, name)
+setkey(dtGewichtungen, number)
+
+# print(dtIndikatorensettings)
+# print(dtGewichtungen)
 
 
 ##Nutzenwerte, um sie später reactive füllen zu können
@@ -225,7 +228,7 @@ shinyServer(function(input, output, session) {
 
       dtGewichtungen[dtGewichtungen[level==i,
                                     .(name=first(parent),childs_sum_corrected=first(sum_in_level_corrected) ),
-                                    by=.(name)] ,
+                                    by=.(number)] ,
                      childs_sum_corrected:=childs_sum_corrected
                       ]
       #print(dtGewichtungen[level==i])
