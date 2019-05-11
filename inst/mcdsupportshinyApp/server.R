@@ -278,14 +278,14 @@ shinyServer(function(input, output, session) {
 
 
 
-    #Nur relevanten Spalten zurückliefern
-    dtGewichtungen[,
-                   .(name,slname, is_mapping,level,
-                     parent,
-                     originalweights,
-                     sum_in_level, finalweight_in_level,
-                     sum_in_level_corrected,finalweight_in_level_corrected)
-                   ]
+    ##Nur relevanten Spalten zurückliefern
+    # dtGewichtungen[,
+    #                .(name,slname, is_mapping,level,
+    #                  parent,
+    #                  originalweights,
+    #                  sum_in_level, finalweight_in_level,
+    #                  sum_in_level_corrected,finalweight_in_level_corrected)
+    #                ]
 
 
     }) #end of rv_dtGewichtungen
@@ -544,15 +544,27 @@ shinyServer(function(input, output, session) {
 
   output$EntscheidungenPlot<-renderPlot({
 
-    dtErgebnislong <- melt(rv_dtSzenarioergebnis(), id.vars=c("Titel", "Rahmenszenario"))
+    dtErgebnislong <- melt(rv_dtSzenarioergebnis(), 
+                           id.vars=c("Titel", "Rahmenszenario"), 
+                           variable.name = "name")
+    
+    print(rv_dtGewichtungen()[,.(name,is_qualitative, is_calculable)])
 
 
     ggplot(dtErgebnislong, aes(y=value,fill=Titel,x=Titel,  shape=Rahmenszenario))+
-      facet_wrap(~variable)+
+      facet_wrap(~name)+
       geom_col(position="dodge" )+
       scale_shape_manual(values=21:24)+
       geom_point(colour="Black", position=position_dodge(width=1))+
-      ylab("Punktzahl")
+      ylab("Punktzahl")+
+      geom_text(data = rv_dtGewichtungen(),
+                 mapping=aes(label =ifelse(is_qualitative, "Qualitative",
+                                                 ifelse(is_calculable,"","Nicht berechenbar" )
+                                                 ),
+                             shape=NULL,x = NULL, y = NULL, fill=NULL
+                                   ),
+                x = 0, y = 0, fill="red",  color = "red",size=3,
+                vjust=0,  hjust=0, angle = 40)
 
   })
 
