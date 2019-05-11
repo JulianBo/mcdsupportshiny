@@ -141,6 +141,7 @@ dtGewichtungen <- copy(dtIndikatorensettings[,.(colors=first(colors),
                                                 number=first(number)
                                                 ),
                                              by=.(name, is_mapping, level, parent, bscName, slname, is_qualitative)])
+dtGewichtungen[, is_calculable:=NA]
 setkey(dtGewichtungen, number)
 
 # print(dtIndikatorensettings)
@@ -220,8 +221,10 @@ shinyServer(function(input, output, session) {
 
   rv_dtGewichtungen <- reactive({
 
-    #Zum Testen:
-    #dtGewichtungen[,originalweights:= c(-10,10,1:10*10, 10,10)]
+    ##Zum Testen:
+    #dtGewichtungen[,originalweights:= c(20,10,1:10*10,rep(0, times=10), 20,10,
+    #                                    20,10,1:10*10,rep(0, times=10), 20,10,
+    #                                    10, 10, rep(0, times=5))]
 
     dtGewichtungen[,originalweights:=slGui2$sliderCheckBoxValues()]
 
@@ -231,14 +234,25 @@ shinyServer(function(input, output, session) {
     ## falls dort auch nicht zugeordnete Variablen wären.
 
     ##If all children are  qualitative or all Sliders of children are 0,
-    ##  set value itself to 0 (do not take it into account) and
-    ##  and mark indicator as "qualitative" (all qualitative) or "not calculable" (children 0, or mixed)
+    ##  set value itself to 0 (do not take it into account) and "not calculable" (children 0, or mixed)
     ##Indicators with all values missing are set to "qualitative" (preparation of global variables)
 
     for( i in max(  dtIndikatorensettings$level):0){
 
-
+      dtGewichtungen[level==i,
+                     sum_in_level_corrected := sum(abs( (!(is_qualitative ))*originalweights),
+                                                   na.rm = TRUE) ,
+                     by=.(parent, level)]
     }
+
+
+    dtGewichtungen[,is_calculable:=TRUE]
+    dtGewichtungen[
+      dtGewichtungen[,.(V=first(sum_in_level_corrected) ),by=parent ],
+      is_calculable:= (V>0),
+      on=c(name="parent")
+      ]
+
 
 
     ##HIER EIGENTLICHE LOGIK
@@ -253,32 +267,14 @@ shinyServer(function(input, output, session) {
 
 
     dtGewichtungen[,finalweight_in_level_corrected:=0]
-
-    for( i in max(  dtIndikatorensettings$level):0){
-
-      ##TODO: Childssumcorrected anpassen!!!
-
-
-
-      dtGewichtungen[!(is_mapping )&level==i,
-                     sum_in_level_corrected := sum(abs(originalweights), na.rm = TRUE) ,
-                     by=.(parent, level)]
+    dtGewichtungen[,finalweight_in_level_corrected :=
+                     #alle 0 und NA ausschließen
+                     ifelse(is.na(sum_in_level_corrected) | sum_in_level_corrected==0 |
+                                is_qualitative|(!is_calculable),
+                            0,
+                            abs(originalweights)/sum_in_level_corrected) ]
 
 
-      dtGewichtungen[dtGewichtungen[level==i,
-                                    .(name=first(parent),childs_sum_corrected=first(sum_in_level_corrected) ),
-                                    by=.(number)] ,
-                     childs_sum_corrected:=childs_sum_corrected
-                      ]
-      #print(dtGewichtungen[level==i])
-
-      dtGewichtungen[,finalweight_in_level_corrected :=
-                       #alle 0 und NA ausschließen
-                       ifelse(is.na(sum_in_level_corrected) | sum_in_level_corrected==0,
-                              0,
-                              abs(originalweights)/sum_in_level_corrected) ]
-
-    }
 
 
 
@@ -320,7 +316,8 @@ shinyServer(function(input, output, session) {
 
         NutzenWerte[,x]<-
           NutzenWerte[,dtIndikatorensettings[parent==x &level==i,unique(name)] ] %*%
-          as.matrix(rv_dtGewichtungen()[parent==x &level==i, finalweight_in_level])
+          as.matrix(rv_dtGewichtungen()[parent==x &level==i, finalweight_in_level_corrected ])
+        ## Use corrected Values here
         # Added as.matrix for 1x1 matrices, else treated as scalar (with error)
            #dtGewichtungen[parent==x &level==i,finalweight_in_level]## Zum Testen
 
