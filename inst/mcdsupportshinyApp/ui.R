@@ -137,18 +137,19 @@ shinyUI(fluidPage(theme="mcdsupportshiny.css",
 
                                  ),
                     tabPanel("Detailergebnisse",
-                             h3("Endgültige Punktzahlen der Bereiche"),
-                             ##TODO
-                             # selectInput(
-                             #   "EntscheidungenPlot",
-                             #   "Bitte Indikatoren zur Ansicht auswählen",
-                             #   choices= names(dtAlternativen)[-(1:2)],
-                             #   selected=names(dtAlternativen)[-(1:2)],
-                             #   multiple=TRUE
-                             #
-                             # ),
-                                 plotOutput("EntscheidungenPlot"),
-                             h3("Punktzahlen der Bereiche"),
+                             ##dtGewichtungen[,.N, by=.(parent, level)][order(level)]
+                             h3("Punktwerte der Kategorien"),
+                             h4("Bereiche"),
+                             plotOutput("BereichPlot"),
+
+
+                             h4("Einzelne Bereiche genauer erkunden"),
+                             selectInput("BereichDetailPlotSelect",
+                                         "Bitte Bereich auswählen",
+                                         choices=unique(dtGewichtungen[level>0,parent])),
+
+                             plotOutput("BereichDetailPlot"),
+                             h3("Punktwerte als Tabelle"),
                               DT::dataTableOutput("EntscheidungenTable")
 
 

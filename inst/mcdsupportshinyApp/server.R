@@ -520,7 +520,15 @@ shinyServer(function(input, output, session) {
   output$ErgebnisPlot<- renderPlot({
     ggplot(rv_dtErgebnis(),aes(x=Titel,y=Gesamtergebnis, fill=Titel))+
       geom_col()+
-      ylab("Punktzahl")
+      ylab("Punktzahl")+
+      annotate("text",
+               label =ifelse(sum(rv_dtGewichtungen()[level==0,
+                                                     finalweight_in_level_corrected])==0,
+                             "Nicht berechenbar",
+                             "" ) ,
+               x = 0, y = 0, color = "red",size=5,
+               vjust=0,  hjust=0, angle = 0)+
+      theme(axis.text.x = element_blank(), axis.ticks = element_blank())
   })
 
 
@@ -531,7 +539,14 @@ shinyServer(function(input, output, session) {
       geom_col(position="dodge" )+
       scale_shape_manual(values=21:24)+
       geom_point(colour="Black", position=position_dodge(width=1))+
-      ylab("Punktzahl")
+      ylab("Punktzahl")+
+      annotate("text",
+                label =ifelse(sum(rv_dtGewichtungen()[level==0,
+                                                      finalweight_in_level_corrected])==0,
+                                          "Nicht berechenbar",
+                                          "" ) ,
+                x = 0, y = 0, color = "red",size=5,
+                vjust=0,  hjust=0, angle = 0)
 
 
   }  )
@@ -542,13 +557,16 @@ shinyServer(function(input, output, session) {
 
   #Entscheidungen visualisieren
 
-  output$EntscheidungenPlot<-renderPlot({
+  output$BereichPlot<-renderPlot({
 
-    dtErgebnislong <- melt(rv_dtSzenarioergebnis(), 
-                           id.vars=c("Titel", "Rahmenszenario"), 
-                           variable.name = "name")
-    
-    print(rv_dtGewichtungen()[,.(name,is_qualitative, is_calculable)])
+    ##TODO: This is all very inefficient
+    dtErgebnislong <- melt(rv_dtSzenarioergebnis()[],
+                           id.vars=c("Titel", "Rahmenszenario"),
+                           measure.vars=rv_dtGewichtungen()[level==0,name],
+                           variable.name = "name",
+                           variable_factor=TRUE)
+
+    #print(rv_dtGewichtungen()[,.(name,is_qualitative, is_calculable)])
 
 
     ggplot(dtErgebnislong, aes(y=value,fill=Titel,x=Titel,  shape=Rahmenszenario))+
@@ -557,14 +575,47 @@ shinyServer(function(input, output, session) {
       scale_shape_manual(values=21:24)+
       geom_point(colour="Black", position=position_dodge(width=1))+
       ylab("Punktzahl")+
-      geom_text(data = rv_dtGewichtungen(),
-                 mapping=aes(label =ifelse(is_qualitative, "Qualitative",
+      geom_text(data = rv_dtGewichtungen()[level==0,],
+                mapping=aes(label =ifelse(is_qualitative, "Nicht mit Daten hinterlegt",
+                                          ifelse(is_calculable,"","Nicht berechenbar" )
+                ),
+                shape=NULL,x = NULL, y = NULL, fill=NULL
+                ),
+                x = 0.5, y = 0, color = "red",size=5,
+                vjust=0,  hjust=0, angle = 0)+
+    theme(axis.text.x = element_blank(), axis.ticks = element_blank())
+
+  })
+
+  output$BereichDetailPlot<-renderPlot({
+
+
+    ##TODO: This is all very inefficient
+    dtErgebnislong <- melt(rv_dtSzenarioergebnis()[],
+                           id.vars=c("Titel", "Rahmenszenario"),
+                           measure.vars=rv_dtGewichtungen()[parent==input$BereichDetailPlotSelect,name],
+                           variable.name = "name")
+
+    #levels(dtErgebnislong$name)<-rv_dtGewichtungen()[parent==input$BereichDetailPlotSelect,name]
+
+    print(rv_dtGewichtungen()[parent==input$BereichDetailPlotSelect,.(name, parent,is_qualitative, is_calculable)])
+
+
+    ggplot(dtErgebnislong, aes(y=value,fill=Titel,x=Titel,  shape=Rahmenszenario))+
+      facet_wrap(~name)+
+      geom_col(position="dodge" )+
+      scale_shape_manual(values=21:24)+
+      geom_point(colour="Black", position=position_dodge(width=1))+
+      ylab("Punktzahl")+
+      geom_text(data = rv_dtGewichtungen()[parent==input$BereichDetailPlotSelect,],
+                 mapping=aes(label =ifelse(is_qualitative, "Nicht mit Daten hinterlegt",
                                                  ifelse(is_calculable,"","Nicht berechenbar" )
                                                  ),
                              shape=NULL,x = NULL, y = NULL, fill=NULL
                                    ),
-                x = 0, y = 0, fill="red",  color = "red",size=3,
-                vjust=0,  hjust=0, angle = 40)
+                x = 0.5, y = 0, color = "red",size=5,
+                vjust=0,  hjust=0, angle = 0)+
+   theme(axis.text.x = element_blank(), axis.ticks = element_blank())
 
   })
 
