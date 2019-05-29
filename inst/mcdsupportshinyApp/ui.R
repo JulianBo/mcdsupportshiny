@@ -21,7 +21,7 @@ library(mcdsupportshiny)
 #source("Setup.R", encoding="UTF-8") #local=FALSE, auch in ui.R sichtbar
 source("Setup_INOLA.R", encoding="UTF-8") #local=FALSE, auch in ui.R sichtbar
 
-slGui1<-rSliderGuiInput("slGui1",configList,breaking=1,
+slGui1<-rSliderGuiInput("slGui1",configList,breaking=0,
                         beschreibungs_text=texte$begruessungstext2,
                         title_text=TRUE,
                    cb_title="Ich weiß nicht")
@@ -169,9 +169,11 @@ shinyUI(fluidPage(theme="mcdsupportshiny.css",
                              DT::dataTableOutput("AlternativenTable")
                     ),
                     tabPanel("Bisherige Gewichtungen",
+                                actionButton("renewBisherige",
+                                             "Bisherige Abstimmungen neu laden"),
                                  plotOutput("BisherigeDecsPlot")
-                                 # ,
-                                 # plotOutput("BisherigeHistsPlot")
+                                  ,
+                                  plotOutput("BisherigeHistsPlot")
                                  # ,
                                  # tableOutput("BisherigeTable")
                         ),

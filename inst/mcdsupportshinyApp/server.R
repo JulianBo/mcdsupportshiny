@@ -445,6 +445,11 @@ shinyServer(function(input, output, session) {
                ignoreInit = TRUE
                )
 
+  observeEvent(input$renewBisherige,
+               dtBisherige <- future({ loadData(speichersettings$method, speichersettings$place ) }),
+               ignoreInit = TRUE
+  )
+
 
 
 
@@ -714,7 +719,7 @@ shinyServer(function(input, output, session) {
       ggplot(data=melt( . ,
                         id.vars=c("Sessionstart", "session_id"),
                         measure.vars=
-                          grep("^sl.*originalweights$", names(.), fixed=FALSE, value=TRUE)
+                          grep("sl.*originalweights$", names(.), fixed=FALSE, value=TRUE)
       ),
       mapping = aes(x=value))+
         geom_density()+

@@ -481,8 +481,8 @@ texte <- list (
 )
 
 #Speicherkonfiguration --------------------------------------------------------
-speichersettings= list( method="GoogleSheets",
-                        #method="CSV",
+speichersettings= list( #method="GoogleSheets",
+                        method="CSV",
                         place="MCDA_Beispiel_INOLA")
 # Speichertemplate --------------------------------------------------------
 
