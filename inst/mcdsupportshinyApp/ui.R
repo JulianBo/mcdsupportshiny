@@ -19,9 +19,10 @@ library(plotly)
 library(mcdsupportshiny)
 
 #source("Setup.R", encoding="UTF-8") #local=FALSE, auch in ui.R sichtbar
-source("Setup_INOLA.R", encoding="UTF-8") #local=FALSE, auch in ui.R sichtbar
+source("Setup_INOLA.R",local=FALSE, encoding="UTF-8") #local=FALSE, auch in ui.R sichtbar
+dtIndikatorensettings<-getIndikatorensetting(configList)
 
-slGui1<-rSliderGuiInput("slGui1",configList,breaking=1,
+slGui1<-rSliderGuiInput("slGui1",configList,breaking=0,
                         beschreibungs_text=texte$begruessungstext2,
                         title_text=TRUE,
                    cb_title="Ich weiß nicht")
@@ -146,7 +147,7 @@ shinyUI(fluidPage(theme="mcdsupportshiny.css",
                              h4("Einzelne Bereiche genauer erkunden"),
                              selectInput("BereichDetailPlotSelect",
                                          "Bitte Bereich auswählen",
-                                         choices=unique(dtGewichtungen[level>0,parent])),
+                                         choices=unique(dtIndikatorensettings[level>0,parent])),
 
                              plotOutput("BereichDetailPlot"),
                              h3("Punktwerte als Tabelle"),
@@ -168,12 +169,12 @@ shinyUI(fluidPage(theme="mcdsupportshiny.css",
                              h3("Tabelle der Alternativen"),
                              DT::dataTableOutput("AlternativenTable")
                     ),
-                    tabPanel("Bisherige Gewichtungen",
-                                 plotOutput("BisherigeDecsPlot")
-                                 # ,
-                                 # plotOutput("BisherigeHistsPlot")
-                                 # ,
-                                 # tableOutput("BisherigeTable")
+                    tabPanel("Bisherige Abstimmungen",
+                             AnalysisPreviousUI("AnalysisPrevious",dtIndikatorensettings),
+                             actionButton("renewBisherige",
+                                          "Bisherige Abstimmungen neu laden")
+
+
                         ),
                         # tabPanel("Endgültige Gewichtungen",
                         #          tableOutput("DirGewichtungenTable")
