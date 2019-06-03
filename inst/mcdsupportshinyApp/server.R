@@ -709,7 +709,7 @@ shinyServer(function(input, output, session) {
     #message("outside promise . plotting BisherigeDecsPlot")
     dtBisherige %...>% {
       #message("inside promise . plotting BisherigeDecsPlot")
-      ggplot(., mapping = aes(x=ChoiceSlct, fill=ChoiceSlct))+
+      ggplot(., mapping = aes(x=ChoiceSlct, fill=ChoiceSlct))+ #Aus Daten: ChoiceSlct
         geom_bar()
     }
   })
