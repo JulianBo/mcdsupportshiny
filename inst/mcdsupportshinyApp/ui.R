@@ -19,7 +19,7 @@ library(plotly)
 library(mcdsupportshiny)
 
 #source("Setup.R", encoding="UTF-8") #local=FALSE, auch in ui.R sichtbar
-source("Setup_INOLA.R", encoding="UTF-8") #local=FALSE, auch in ui.R sichtbar
+source("Setup_INOLA.R",local=FALSE, encoding="UTF-8") #local=FALSE, auch in ui.R sichtbar
 dtIndikatorensettings<-getIndikatorensetting(configList)
 
 slGui1<-rSliderGuiInput("slGui1",configList,breaking=0,
@@ -169,14 +169,12 @@ shinyUI(fluidPage(theme="mcdsupportshiny.css",
                              h3("Tabelle der Alternativen"),
                              DT::dataTableOutput("AlternativenTable")
                     ),
-                    tabPanel("Bisherige Gewichtungen",
-                                actionButton("renewBisherige",
-                                             "Bisherige Abstimmungen neu laden"),
-                                 plotOutput("BisherigeDecsPlot")
-                                  ,
-                                  plotOutput("BisherigeHistsPlot")
-                                 # ,
-                                 # tableOutput("BisherigeTable")
+                    tabPanel("Bisherige Abstimmungen",
+                             AnalysisPreviousUI("AnalysisPrevious",dtIndikatorensettings),
+                             actionButton("renewBisherige",
+                                          "Bisherige Abstimmungen neu laden")
+
+
                         ),
                         # tabPanel("Endgültige Gewichtungen",
                         #          tableOutput("DirGewichtungenTable")

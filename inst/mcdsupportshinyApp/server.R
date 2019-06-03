@@ -197,7 +197,15 @@ shinyServer(function(input, output, session) {
   session_start= date()
   session_id = as.integer(runif(n=1, max=1000000) )
 
-  dtBisherige <- future({ loadData(speichersettings$method, speichersettings$place ) })
+  dtBisherige <- reactive({
+      input$renewBisherige
+
+      #print("loading Bisherige")
+
+      future({ as.data.table(loadData(speichersettings$method, speichersettings$place ) ) })
+
+  }
+  )
 
   ##Bisherige Daten laden.
 
@@ -214,6 +222,14 @@ shinyServer(function(input, output, session) {
   # time2<- system.time(
     slGui2<-callModule(rSliderGui,"slGui2", dtGewichtungen$name,copy(dtBscCombinations) )
   # )
+
+    AnalysisPrevious1<- callModule(AnalysisPrevious,"AnalysisPrevious",
+                                   dtBisherige,
+                                   copy(dtIndikatorensettings)[,name_new:=paste0("slGui2.",
+                                                                                 gsub("[^A-Za-z0-9-]", "", name),
+                                                                                 ".sl.originalweights")
+                                                               ]
+                                   )
 
   #message(time1)
 
@@ -445,11 +461,6 @@ shinyServer(function(input, output, session) {
                ignoreInit = TRUE
                )
 
-  observeEvent(input$renewBisherige,
-               dtBisherige <- future({ loadData(speichersettings$method, speichersettings$place ) }),
-               ignoreInit = TRUE
-  )
-
 
 
 
@@ -652,6 +663,9 @@ shinyServer(function(input, output, session) {
     ## selbst wenn einige noch in CollapsePanel sind.
     rv_dtGewichtungen()[,sum(originalweights)]
 
+    #
+    dtBisherige()
+
     return("")
   })
 
@@ -704,28 +718,6 @@ shinyServer(function(input, output, session) {
 
 
   #GUI - Bisheriges Abstimmungsverhalten anzeigen ---------
-  output$BisherigeTable<-renderTable(value(dtBisherige) )
-  output$BisherigeDecsPlot<- renderPlot({
-    #message("outside promise . plotting BisherigeDecsPlot")
-    dtBisherige %...>% {
-      #message("inside promise . plotting BisherigeDecsPlot")
-      ggplot(., mapping = aes(x=ChoiceSlct, fill=ChoiceSlct))+ #Aus Daten: ChoiceSlct
-        geom_bar()
-    }
-  })
-
-  output$BisherigeHistsPlot<- renderPlot({
-    dtBisherige %...>% {
-      ggplot(data=melt( . ,
-                        id.vars=c("Sessionstart", "session_id"),
-                        measure.vars=
-                          grep("sl.*originalweights$", names(.), fixed=FALSE, value=TRUE)
-      ),
-      mapping = aes(x=value))+
-        geom_density()+
-        facet_grid(variable~.)
-    }
-  })
 
   ####GUI Updaten ---R Helferfunktionen ####
 
