@@ -6,8 +6,8 @@
 \usage{
 getIndikatorensetting(x, positive_utility_settings = utility_settings(),
   negative_utility_settings = utility_settings(util_func = "negprop"),
-  agg_func = "weighted.sum", include_parent = TRUE, open.maxdepth = Inf,
-  standardweight = 30)
+  agg_func = "weighted.sum", include_parent = TRUE,
+  open.maxdepth = Inf, standardweight = 30)
 }
 \arguments{
 \item{x}{Configuration list, see \code{\link{validateConfig}}.}

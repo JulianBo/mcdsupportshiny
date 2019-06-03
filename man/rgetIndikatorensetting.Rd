@@ -7,8 +7,9 @@
 rgetIndikatorensetting(x, depth = 0, parent = "Szenarioergebnis",
   positive_utility_settings = utility_settings(),
   negative_utility_settings = utility_settings(util_func = "negprop"),
-  agg_func = "weighted.sum", include_parent = TRUE, open.maxdepth = Inf,
-  color = NA, minweight = 0, standardweight = 30)
+  agg_func = "weighted.sum", include_parent = TRUE,
+  open.maxdepth = Inf, color = NA, minweight = 0,
+  standardweight = 30)
 }
 \arguments{
 \item{positive_utility_settings}{standard utitily function settings, \code{\link{utility_settings}()}.}

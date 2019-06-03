@@ -9,8 +9,8 @@ rSliderGuiInput(id, x, breaking = NULL, beschreibungs_text = NULL,
   title_text = "Please adjust the sliders according to your preferences.",
   mainpageposition = c("first", "last", "none"),
   parents_name = "Hauptkategorien", minweight = 0, maxweight = 100,
-  standardweight = 30, open.maxdepth = Inf, cb_title = "I don't know",
-  sliderlabel = "")
+  standardweight = 30, open.maxdepth = Inf,
+  cb_title = "I don't know", sliderlabel = "")
 
 rSliderGui(input, output, session, slCbNames, dtBscCombinations)
 }

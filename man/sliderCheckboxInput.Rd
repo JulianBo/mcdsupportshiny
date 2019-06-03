@@ -8,7 +8,8 @@
 \usage{
 sliderCheckboxInput(id, description = "", min = 0, max = 100,
   value = 30, default = value, cb_title = "I don't know",
-  sliderlabel = "", sliderstate = "", sliderclass = "", width = "100\%")
+  sliderlabel = "", sliderstate = "", sliderclass = "",
+  width = "100\%")
 
 sliderCheckbox(input, output, session, oldvalue = NULL,
   check_changeDefaultNumeric = FALSE, check_enableOnClick = FALSE)

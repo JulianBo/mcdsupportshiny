@@ -5,7 +5,8 @@
 \title{Helper function. Standard configuration of utility function}
 \usage{
 utility_settings(util_func = "prop", util_mean = "mean",
-  util_offset = ifelse(util_func == "antiprop", 10, 0), util_scale = 100)
+  util_offset = ifelse(util_func == "antiprop", 10, 0),
+  util_scale = 100)
 }
 \arguments{
 \item{util_scale}{}
