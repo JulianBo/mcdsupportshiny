@@ -319,6 +319,7 @@ shinyServer(function(input, output, session) {
       # print(rv_dtGewichtungen()[name==x])
       # print(dtAlternativen_long[name==x & negative==(rv_dtGewichtungen()[name==x]$originalweight<0)])
       NutzenWerte[,x]<-dtAlternativen_long[name==x & negative==(rv_dtGewichtungen()[name==x]$originalweight<0)]$nutzen_correct
+      NutzenWerte[is.na(NutzenWerte[,x]),x]<-0 ##Account for missing values in raw data
     }
 
 
@@ -614,7 +615,7 @@ shinyServer(function(input, output, session) {
 
     #levels(dtErgebnislong$name)<-rv_dtGewichtungen()[parent==input$BereichDetailPlotSelect,name]
 
-    print(rv_dtGewichtungen()[parent==input$BereichDetailPlotSelect,.(name, parent,is_qualitative, is_calculable)])
+    #print(rv_dtGewichtungen()[parent==input$BereichDetailPlotSelect,.(name, parent,is_qualitative, is_calculable)])
 
 
     ggplot(dtErgebnislong, aes(y=value,fill=Titel,x=Titel,  shape=Rahmenszenario))+
