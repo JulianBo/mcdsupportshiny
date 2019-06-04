@@ -1,24 +1,13 @@
 #Daten aufbauen --------------
 
 library (data.table)
+#library(bit64)
 
-dtAlternativen <- data.table(Titel= as.factor(c("0) Jetzt-Zustand",
-                                                "1)Fortschreibung","1)Fortschreibung","1)Fortschreibung",
-                                                "2)Kleinere Anlagen","2)Kleinere Anlagen","2)Kleinere Anlagen",
-                                                "3)Größere Anlagen","3)Größere Anlagen","3)Größere Anlagen") ),
-                             Rahmenszenario=as.factor(c("Jetzt-Zustand",
-                                                        "Das Wachstum geht weiter", "Nachhaltigkeit schafft Werte", "Kein Land in Sicht",
-                                                        "Das Wachstum geht weiter", "Nachhaltigkeit schafft Werte", "Kein Land in Sicht",
-                                                        "Nachhaltigkeit schafft Werte", "Das Wachstum geht weiter", "Kein Land in Sicht")),
-                             Energieverbrauch_Strom=1,
-                             Energieverbrauch_Wärme=1:10,
-                             Anteil_Energie=c(1,rep_len(100,9)),
-                             Anlagengröße_Strom=c(1,1:9*10),
-                             Anlagengröße_Wärme=c(1,10,14,13, 10,10,10, 50, 60, 55),
-                             Anlagengröße_Wärme_negative=c(1,10,14,13, 10,10,10, 50, 60, 55),
-                             Energieerzeugungskosten=c (1, 3,3,5, 0.5, 1, NA, 0.5, 0.5, NA),
-                             Stromimportkosten=NA
-                             )
+dtAlternativen <- fread(file="Alternativen.csv",
+                        na.strings="",
+                        dec=",",
+                        stringsAsFactors=TRUE,
+                        integer64="double")
 #summary(dtAlternativen)
 
 # Konfiguration aufbauen -----------------
@@ -38,53 +27,64 @@ configList <- list (
   util_scale = 100,
 
   #Kindelemente
-  # Energiewendeziel = list (
-  #   class = "elements",
-  #   description = tagList("Energiewendeziel: Wie wichtig ist es Ihnen, wie sehr sich die Region durch ",em("regionale erneuerbare Energien versorgt?"),""),
-  #   color = "darkred",
-  #   util_func = "prop",
-  #   include_parent = TRUE,
-  #   Energieverbrauch = list(
-  #     class = "elements",
-  #     description = tagList(
-  #       "Wie wichtig ist Ihnen ein ein generell ", em("niedriger Energieverbrauch")," in der Region Oberland?"
-  #     ),
-  #     'Energieverbrauch (Strom)' = list(
-  #       class = "mapping",
-  #       Attribname = "Energieverbrauch_Strom",
-  #       util_func = "antiprop",
-  #       util_offset = 10,
-  #       include_parent = TRUE,
-  #       description = tagList(
-  #         "Wie wichtig ist Ihnen ein ",em("niedriger Stromverbrauch"),"  in der Region Oberland?"
-  #       )
-  #     ),
-  #     'Energieverbrauch (Wärme)' = list(
-  #       class = "mapping",
-  #       Attribname = "Energieverbrauch_Wärme",
-  #       util_func = "antiprop",
-  #       util_offset = 10,
-  #       include_parent = TRUE,
-  #       description = tagList(
-  #         "Wie wichtig ist Ihnen ein ",em("niedriger Wärmeverbrauch")," in der Region Oberland?"
-  #       )
-  #     )
-  #   ),
-  #   'Gesamtanteil erneuerbarer Energien' = list(
-  #     class = "mapping",
-  #     Attribname = "Anteil_Energie",
-  #     description = tagList(
-  #       "Wie wichtig ist es Ihnen, dass  ",em("bilanziell ein hoher Anteil des regionalen Energieverbrauchs durch regionale erneuerbare Energien")," erzeugt wird?"
-  #     )
-  #   ),
-  #   'Exportmöglichkeit' = list(
-  #     class = "mapping",
-  #     Attribname = NA,
-  #     description = tagList(
-  #       "Wie wichtig ist es Ihnen, dass in der Region so viel ",em(" Stromerzeugungsanlagen gebaut werden, dass potentiell auch Strom exportiert werden könnte?")," (z.B. um Städte wie München mitzuversorgen)"
-  #     )
-  #   )
-  # ),
+  Energiewendeziel = list (
+    class = "elements",
+    description = tagList("Energiewendeziel: Wie wichtig ist es Ihnen, wie sehr sich die Region durch ",em("regionale erneuerbare Energien versorgt?"),""),
+    color = "darkred",
+    util_func = "prop",
+    include_parent = TRUE,
+    Energieverbrauch = list(
+      class = "elements",
+      description = tagList(
+        "Wie wichtig ist Ihnen ein ein generell ", em("niedriger Energieverbrauch")," in der Region Oberland?"
+      ),
+      'Energieverbrauch (Strom)' = list(
+        class = "mapping",
+        Attribname = "Energieverbrauch_Strom",
+        util_func = "antiprop",
+        util_offset = 10,
+        include_parent = TRUE,
+        description = tagList(
+          "Wie wichtig ist Ihnen ein ",em("niedriger Stromverbrauch"),"  in der Region Oberland?"
+        )
+      ),
+      'Energieverbrauch (Wärme)' = list(
+        class = "mapping",
+        Attribname = "Energieverbrauch_Wärme",
+        util_func = "antiprop",
+        util_offset = 10,
+        include_parent = TRUE,
+        description = tagList(
+          "Wie wichtig ist Ihnen ein ",em("niedriger Wärmeverbrauch")," in der Region Oberland?"
+        )
+      )
+      # ,
+      # 'Energieverbrauch (Gas)' = list(
+      #   class = "mapping",
+      #   Attribname = "Energieverbrauch_Gas",
+      #   util_func = "antiprop",
+      #   util_offset = 10,
+      #   include_parent = TRUE,
+      #   description = tagList(
+      #     "Wie wichtig ist Ihnen ein ",em("niedriger Gasverbrauch")," in der Region Oberland?"
+      #   )
+      # )
+    ),
+    'Gesamtanteil erneuerbarer Energien' = list(
+      class = "mapping",
+      Attribname = "Anteil_Erneuerbar",
+      description = tagList(
+        "Wie wichtig ist es Ihnen, dass  ",em("bilanziell ein hoher Anteil des regionalen Energieverbrauchs durch regionale erneuerbare Energien")," erzeugt wird?"
+      )
+    ),
+    'Exportmöglichkeit' = list(
+      class = "mapping",
+      Attribname = "Export",
+      description = tagList(
+        "Wie wichtig ist es Ihnen, dass in der Region so viele ",em(" Stromerzeugungsanlagen gebaut werden, dass potentiell auch Strom exportiert werden könnte?")," (z.B. um Städte wie München mitzuversorgen)"
+      )
+    )
+  ),
 
   'Struktur des Energiesystems' = list (
     class = "elements",
@@ -94,6 +94,7 @@ configList <- list (
     color = "orange",
     'Diversität des Energieerzeugungssystems' = list(
       class = "mapping",
+      Attribname="Diversität",
       description = tagList(
         "Wie wichtig ist es Ihnen, dass das ",em("regionale Energieerzeugungssystem")," aus einem ",em("breiten Mix unterschiedlicher erneuerbarer Energieerzeugungsanlagen")," besteht? (d.h. eine Mischung aus PV, Windkraft, Biomasse, Wasserkraft, Geothermie)"
         )
@@ -119,7 +120,7 @@ configList <- list (
       'Anlagengröße Wärmeerzeugung' = list(
         class = "mapping",
         Attribname = "Anlagengröße_Wärme",
-        negative_Attribname = "Anlagengröße_Wärme_negative",
+        #negative_Attribname = "Anlagengröße_Wärme_negative",
         description = tagList(
           "Ich präferiere ",em("wenige große Anlagen")," zur ",em("Wärmeerzeugung"),", es ist mir ",em("egal"),", oder ich präferiere ",em("viele kleine Anlagen")," (z.B.: Nahwärmenetze mit großem BHKW vs. Wärmespeicher, Solarthermieanlagen, Wärmepumpe)."
         ),
@@ -130,284 +131,192 @@ configList <- list (
     ,
   'Regionale Ausgleichsmechanismen' = list(
     class = "mapping",
-    Attribname = NA,
+    Attribname = "Stromdelta_Summe",
+    util_func = "antiprop",
+    util_offset = 10,
+    include_parent = TRUE,
     description = tagList(
       "Die Erzeugung von Strom mit EE-Anlagen unterliegt zeitlichen Schwankungen, die von den Witterungsverhältnissen und vom Technologiemix abhängen.",
       tags$br(),"Wie wichtig ist es Ihnen, dass  ",em("innerhalb der Region Schwankungen zwischen EE-Stromproduktion und –verbrauch ausgeglichen ")," werden?"
       )
     )
+  ),
+
+  'Ökonomische Effekte' = list (
+    class = "elements",
+    description = tagList(
+      "Wirtschaftliche Effekte: Wie wichtig ist Ihnen, wie sich das ",em("regionale Energiesystem sich in der Region ökonomisch "),"auswirkt? (z.B. Wirkungen auf Arbeitsplätze und Wertschöpfung, Kosten)"
+    ),
+    color = "blue",
+    'Wirtschaftsentwicklung' =
+      list(
+        class = "elements",
+
+        description = tagList(
+          "Es ist mir wichtig, dass sich der ",em("Ausbau erneuerbarer Energien")," langfristig ",em("positiv auf die gesamte regionale Wirtschaft")," auswirkt."
+        ),
+        'Wertschöpfung' =
+          list(
+            class = "mapping",
+            Attribname="Wertschöpfung",
+            description = tagList(
+              "Wie wichtig ist es Ihnen, dass sich der ",em(" Ausbau erneuerbarer Energien")," langfristig ",
+              em(" positiv auf die gesamte regionale Wertschöpfung")," auswirkt?")
+          ),
+        'Arbeitsplätze' =
+          list(
+            class = "mapping",
+            Attribname = "Arbeitsplätze",
+            escription =tagList(
+              "Wie wichtig ist es Ihnen, dass der ",em(" Ausbau erneuerbarer Energien")," langfristig für ",
+              em("mehr Arbeitsplätze in der gesamten regionalen Wirtschaft "),"sorgt?")
+            )
+        ),
+      'Energieerzeugungskosten' = list(
+        class = "mapping",
+        Attribname = "Energieerzeugungskosten",
+        description = tagList(
+          "Wie wichtig ist es Ihnen, dass die  ",em("durchschnittlichen Erzeugungskosten pro KwH (Strom und Wärme) gering ")," sind?"
+        )
+      ),
+    'Förderkosten' = list(
+      class = "mapping",
+      Attribname = "Förderkosten",
+      description = tagList(
+        "Wie wichtig ist es Ihnen, dass nur ",em("wenig regionale Fördermittel")," benötigt werden?"
+      )
+    ),
+    'Gewinnbeteiligung' = list(
+      class = "mapping",
+      Attribname = NA,
+      description = tagList(
+        "Wie wichtig ist es Ihnen, dass ",em("BürgerInnen finanziell an den Gewinnen beteiligt"),
+        " werden? (z.B. über Genossenschaften oder andere Beteiligungsmodelle)"
+      )
+
+    ),
+    'Planungsbeteiligung' = list(
+      class = "mapping",
+      Attribname = NA,
+      description = tagList(
+        "Wie wichtig ist es Ihnen, dass ",em("BürgerInnen an planerischen Entscheidungen"),
+        "  beim Bau von Erneuerbare-Energien-Anlagen beteiligt werden?"
+      )
+    )
+  ),
+  'Umwelteffekte' = list (
+    class = "elements",
+    description = tagList(
+      "Umweltauswirkungen: Wie wichtig ist Ihnen, wie sich das",em("regionale Energiesystem auf die Umwelt")," auswirkt? (z.B. Flächenbeanspruchung; Nutzung von Biomasse)"
+    ),
+    color = "green",
+    'Flächenbeanspruchung' = list(
+      class = "mapping",
+      Attribname = "Flächenbeanspruchung",
+      description = tagList(
+        "Wie wichtig ist es Ihnen, dass bei der Energieerzeugung möglichst ",em("wenig Freiflächen versiegelt oder überbaut"),
+        " werden? (Es werden Windkraft, PV-Freiflächenanlagen, Biogasanlagen und Kraftwerke berücksichtigt)"
+      )
+    ),
+    'Biomassenverwendung' = list(
+      class = "elements",
+      description = tagList(
+        "Wie wichtig ist es Ihnen, dass von ",em("Nahrungs- und Futtermitteln (v. a. Mais) und Holz nur ein geringer Anteil zur Energieproduktion"),
+        " verwendet wird? (im Modell wird von der aktuellen Flächennutzung ausgegangen)"
+      ),
+      'Maisverwendung' = list(
+        class = "mapping",
+        Attribname = "Maisanteil",
+        description = tagList(
+          "Wie wichtig ist es Ihnen, dass vom ",em("gesamten Aufkommen an Mais")," nur ein geringer Anteil zur Energieproduktion verwendet wird?"
+        )
+      ),
+      'Holzverwendung' = list(
+        class = "mapping",
+        Attribname = "Holzanteil",
+        description = tagList(
+          "Wie wichtig ist es Ihnen, dass vom ",em("gesamten Holzzuwachs")," nur ein geringer Anteil zur Energieproduktion verwendet wird?"
+        )
+      )
+
+    ),
+    'Regionale Auswirkungen' = list (
+      class = "elements",
+      description = tagList(
+        "Wie wichtig ist es Ihnen, dass ",em("sonstige regionalen und lokalen Auswirkungen durch Energieerzeugungsanlagen"),
+        " möglichst gering sind?",
+        explanation_for_childs=tagList("Welche Anlagen präferieren Sie im Verhältnis zueinander wie stark?",
+                                       em("von 0 = eher nicht, bis 100 = große Zustimmung"))
+      ),
+      'PV-Dachflächenanlagen' = list(
+        class = "mapping",
+        Attribname = "PV_Dach_Kapazität",
+        description = tagList(
+          "Auf der Skala von 0 bis 100 bewerte ich ",em("Dach- und Fassadenanlagen für PV und Solarthermie")," mit:"
+        )
+      ),
+      'PV-Freiflächenanlagen' = list(
+        class = "mapping",
+        Attribname = "PV_Frei_Kapazität",
+        description = tagList(
+          "Auf der Skala von 0 bis 100 bewerte ich ",em("Freiflächenanlagen für PV und Solarthermie")," mit:"
+        )
+      ),
+      'Windkraft' = list(
+        class = "mapping",
+        Attribname = "Windkraft_Anzahl",
+        description = tagList(
+          "Auf der Skala von 0 bis 100 bewerte ich ",em("Windkraftanlagen")," mit:"
+        )
+      ),
+
+      'Wasserkraftanlagen' = list(
+        class = "mapping",
+        Attribname = "Wasserkraft_Anzahl",
+        description = tagList(
+          "Auf der Skala von 0 bis 100 bewerte ich ",em("Wasserkraftanlagen")," mit:"
+        )
+      ),
+      'Biogasanlagen' = list(
+        class = "mapping",
+        Attribname = "Biogas_Anzahl",
+        description = tagList(
+          "Auf der Skala von 0 bis 100 bewerte ich ",em("Biogasanlagen")," mit:"
+        )
+      ),
+      'Biomasseheiz(kraft)werke' = list(
+        class = "mapping",
+        Attribname = "BiomasseWerke_Anzahl",
+        description = tagList(
+          "Auf der Skala von 0 bis 100 bewerte ich ",em("größere Biomasseheiz(kraft)werke")," mit:"
+        )
+      ),
+      'Einzelhausholzheizungen' = list(
+        class = "mapping",
+        Attribname ="Einzelhausbiomasse_Anzahl",
+        description = tagList(
+          "Auf der Skala von 0 bis 100 bewerte ich ",em("holzbefeuerte Heizungen (Einzelhäuser)")," mit:"
+        )
+      ),
+      'Tiefengeothermieanlagen' = list(
+        class = "mapping",
+        Attribname = "Tiefengeothermie_Anzahl",
+        description = tagList(
+          "Auf der Skala von 0 bis 100 bewerte ich ",em("Tiefengeothermieanlagen")," mit:"
+        )
+      )
+      ,
+      'Wärmepumpen' = list(
+        class = "mapping",
+        Attribname = "Wärmepumpen_Oberflächengeothermie_Anzahl",
+        description = tagList(
+          "Auf der Skala von 0 bis 100 bewerte ich ",em("oberflächennahme Geothermieanlagen und Wärmepumpen")," mit:"
+        )
+      )
+    )
+
   )
-#   ,
-# ##TODO
-#   'Ökonomische Effekte' = list (
-#     class = "elements",
-#     description = tagList(
-#       "Wirtschaftliche Effekte: Wie wichtig ist Ihnen, wie sich das ",em("regionale Energiesystem sich in der Region ökonomisch "),"auswirkt? (z.B. Wirkungen auf Arbeitsplätze und Wertschöpfung, Kosten)"
-#     ),
-#     color = "blue",
-#     'Regionale Wirtschaftsentwicklung durch erneuerbare Energien' =
-#       list(
-#         class = "elements",
-#         description = tagList(
-#           "Es ist mir wichtig, dass sich der ",em("Ausbau erneuerbarer Energien")," langfristig ",em("positiv auf die gesamte regionale Wirtschaft")," auswirkt."
-#         ),
-#         'Regionale Wertschöpfung durch erneuerbare Energien - langfristig und übergreifend' =
-#           list(
-#             class = "mapping",
-#             Attribname = NA,
-#             description = tagList(
-#               "Es ist mir wichtig, dass sich der ",em("Ausbau erneuerbarer Energien")," langfristig ",em("positiv auf die gesamte regionale Wertschöpfung")," auswirkt"
-#             )
-#           ),
-#         'Regionale Arbeitsplätze durch erneuerbare Energien - langfristig und übergreifend' =
-#           list(
-#             class = "mapping",
-#             Attribname = NA,
-#             description = tagList(
-#               "Es ist mir wichtig, dass der ",em("Ausbau erneuerbarer Energien")," langfristig für ",em("mehr Arbeitsplätze in der gesamten regionalen Wirtschaft")," sorgt."
-#             )
-#           )
-#
-#       ),
-#     'Ökonomische Effekte im Bereich erneuerbare Energien' = list(
-#       class = "elements",
-#       description = tagList(
-#         "Es ist mir wichtig, dass ",em(" regionale Wirtschaftskraft in den Energiesektor verlagert ")," wird"
-#       ),
-#       'Regionale Wertschöpfung im Bereich erneuerbare Energien' = list(
-#         class = "mapping",
-#         Attribname = NA,
-#         description = tagList(
-#           "Es ist mir wichtig, dass ",em(" regionale Wertschöpfung in den Energiesektor verlagert ")," wird."
-#         )
-#       ),
-#       'Arbeitsplätze im Bereich erneuerbare Energien' = list(
-#         class = "mapping",
-#         Attribname = NA,
-#         description = tagList(
-#           "Es ist mir wichtig, dass es ",em("viele Arbeitsplätze im Energiesektor in der Region")," gibt."
-#         )
-#       )
-#     ),
-#       'Energieerzeugungskosten' = list(
-#         class = "mapping",
-#         Attribname = "Energieerzeugungskosten",
-#         description = tagList(
-#           "Mir ist wichtig, dass die ",em("durchschnittlichen Erzeugungskosten pro KwH (Strom und Wärme) gering ")," sind."
-#         )
-#       ),
-#     'Kosten für Energieimporte' = list(
-#       class = "elements",
-#       description = tagList(
-#         "Es ist mir wichtig, dass es ",em(" Kosten für Energieimporte in die Region möglichst gering")," sind."
-#       ),
-#       'Stromimportkosten' = list(
-#         class = "mapping",
-#         Attribname = "Stromimportkosten",
-#         description = tagList(
-#           "Mir ist wichtig, dass die ",em(" Kosten für Stromimporte bzw. für den Import von Rohstoffen zur Stromerzeugung")," möglichst niedrig sind."
-#         )
-#       ),
-#       'Wärmeimportkosten' = list(
-#         class = "mapping",
-#         Attribname = NA,
-#         description = tagList(
-#           "Mir ist wichtig, dass die ",em("Kosten für Wärmeimporte bzw. für den Import von Rohstoffen zur Wärmeerzeugung")," möglichst niedrig sind."
-#         )
-#       )
-#     ),
-#     'Stromexporterlöse' = list(
-#       class = "mapping",
-#       Attribname = NA,
-#       description = tagList(
-#         "Mir ist wichtig, dass die ",em("regionalen Erlöse aus Stromexporten möglichst hoch")," sind."
-#       )
-#     )
-#   ),
-#   'Umwelteffekte' = list (
-#     class = "elements",
-#     description = tagList(
-#       "Umweltauswirkungen: Wie wichtig ist Ihnen, wie sich das",em("regionale Energiesystem auf die Umwelt")," auswirkt? (z.B. Flächenbeanspruchung; Nutzung von Biomasse)"
-#     ),
-#     color = "green",
-#     'Anteil fossiler Brennstoffe' = list(
-#       class = "mapping",
-#       Attribname = NA,
-#       description = tagList(
-#         "Es ist mir wichtig, dass die ",em("Energieversorgung möglichst CO2-frei")," ist."
-#       )
-#     ),
-#     'Ressourcenbeanspruchung' = list(
-#       class = "mapping",
-#       Attribname = NA,
-#       description = tagList(
-#         "Es ist mir wichtig, dass der ",em("Bau/Rückbau von Energieerzeugungsanlagen möglichst weniger Rohstoffe bedarf/möglichst wenig Müll")," verursacht."
-#       )
-#     ),
-#     'Rückbaumöglichkeit' = list(
-#       class = "mapping",
-#       Attribname = NA,
-#       description = tagList(
-#         "Es ist mir wichtig, dass die ",em("gebauten Energieerzeugungsanlagen einfach rückgebaut")," werden können."
-#       )
-#     ),
-#     'Flächenbeanspruchung' = list(
-#       class = "elements",
-#       description = tagList(
-#         "Es ist mir wichtig, dass der Bau von Energieerzeugungsanlagen möglichst ",em("wenig Fläche")," beansprucht."
-#       ),
-#       'Flächenverbrauch(Abstandsflächen Windkraft)' = list(
-#         class = "mapping",
-#         Attribname = NA,
-#         description = tagList(
-#           "Von den ",em("Abstandsflächen für Windkraftanlagen")," soll wie viel Prozent der Fläche einbezogen werden?"
-#         ),
-#         sliderlabel="returnLabelsProzent"
-#       ),
-#       'Flächenverbrauch(Fundamente und Gebäude Windkraft)' = list(
-#         class = "mapping",
-#         Attribname = NA,
-#         description = tagList(
-#           "Von den ",em("Fundamenten und Gebäuden für Windkraftanlagen")," soll wie viel Prozent der Fläche einbezogen werden?"
-#         ),
-#         sliderlabel="returnLabelsProzent"
-#       ),
-#       'Flächenverbrauch(Solardachflächenanlagen)' = list(
-#         class = "mapping",
-#         Attribname = NA,
-#         description =
-#           list(
-#             "Von den ",em("Solardachflächenanlagen")," soll wie viel Prozent der Fläche einbezogen werden?"
-#           ),
-#         sliderlabel="returnLabelsProzent"
-#       ),
-#       'Flächenverbrauch(Solarfreiflächenanlagen)' = list(
-#         class = "mapping",
-#         Attribname = NA,
-#         description = tagList(
-#           "Von den ",em("Solarfreiflächenanlagen")," soll wie viel Prozent der Fläche einbezogen werden?"
-#         ),
-#         sliderlabel="returnLabelsProzent"
-#       ),
-#       'Flächenverbrauch(tiefe Geothermie)' = list(
-#         class = "mapping",
-#         Attribname = NA,
-#         description = tagList(
-#           "Von den ",em("Geothermieanlagen")," soll wie viel Prozent der Fläche einbezogen werden?"
-#         ),
-#         sliderlabel="returnLabelsProzent"
-#       ),
-#       'Flächenverbrauch(Biomasseanbau)' = list(
-#         class = "mapping",
-#         Attribname = NA,
-#         description = tagList(
-#           "Vom ",em("landwirtschaftlichen Anbau von Biomasse")," soll wie viel Prozent der Fläche einbezogen werden?"
-#         ),
-#         sliderlabel="returnLabelsProzent"
-#       )
-#
-#     ),
-#     'Anteil Energieproduktion an landwirtschaftlicher Produktion' = list(
-#       class = "elements",
-#       description = tagList(
-#         "Es ist mir wichtig, dass vom gesamten ",em("Aufkommen an Mais/Grünland/Gülle/Holz nur ein geringer Anteil "),"zur Energieproduktion verwendet wird."
-#       ),
-#       'Anteil Energieproduktion an Mais' = list(
-#         class = "mapping",
-#         Attribname = NA,
-#         description = tagList(
-#           "Es ist mir wichtig, dass vom ",em("gesamten Aufkommen an Mais")," nur ein geringer Anteil zur Energieproduktion verwendet wird."
-#         )
-#       ),
-#       'Anteil Energieproduktion an Grünschnitt' = list(
-#         class = "mapping",
-#         Attribname = NA,
-#         description = tagList(
-#           "Es ist mir wichtig, dass vom ",em("gesamten Grünschnitt")," nur ein geringer Anteil zur Energieproduktion verwendet wird."
-#         )
-#       ),
-#       'Anteil Energieproduktion an Gülle' = list(
-#         class = "mapping",
-#         Attribname = NA,
-#         description = tagList(
-#           "Es ist mir wichtig, dass vom ",em("gesamten Gülleaufkommen")," nur ein geringer Anteil zur Energieproduktion verwendet wird."
-#         )
-#       ),
-#       'Anteil Energieproduktion an Holzzuwachs' = list(
-#         class = "mapping",
-#         Attribname = NA,
-#         description = tagList(
-#           "Es ist mir wichtig, dass vom ",em("gesamten Holzzuwachs")," nur ein geringer Anteil zur Energieproduktion verwendet wird."
-#         )
-#       )
-#
-#
-#     )
-#
-#   ) ,
-#   'Regionale Auswirkungen' = list (
-#     class = "elements",
-#     description = tagList(
-#       "Mir ist wichtig, welche ",em("sonstigen regionalen und lokalen Auswirkungen durch Energieerzeugungsanlagen")," erzeugt werden (z.B. Verkehrsentwicklung, lokale Emissionsbelastung, Landschaftsbild)."
-#     ),
-#     color = "grey",
-#     'Auswirkungen der Windkraft' = list(
-#       class = "mapping",
-#       Attribname = NA,
-#       description = tagList(
-#         "Es ist mir wichtig, dass es möglichst geringe regionale Auswirkungen durch ",em("Windkraftanlagen")," gibt."
-#       )
-#     ),
-#     'Auswirkungen der PV-Freiflächenanlagen' = list(
-#       class = "mapping",
-#       Attribname = NA,
-#       description = tagList(
-#         "Es ist mir wichtig, dass es möglichst geringe regionale Auswirkungen durch ",em("Solar-Freiflächenanlagen")," gibt."
-#       )
-#     ),
-#     'Auswirkungen der PV-Dachflächenanlagen' = list(
-#       class = "mapping",
-#       Attribname = NA,
-#       description = tagList(
-#         "Es ist mir wichtig, dass es möglichst geringe regionale Auswirkungen durch ",em("Solar-Dachflächenanlagen")," gibt."
-#       )
-#     ),
-#     'Auswirkungen der Wasserkraftanlagen' = list(
-#       class = "mapping",
-#       Attribname = NA,
-#       description = tagList(
-#         "Es ist mir wichtig, dass es möglichst geringe regionale Auswirkungen durch ",em("Wasserkraftanlagen")," gibt."
-#       )
-#     ),
-#     'Auswirkungen der Biogasanlagen' = list(
-#       class = "mapping",
-#       Attribname = NA,
-#       description = tagList(
-#         "Es ist mir wichtig, dass es möglichst geringe regionale Auswirkungen durch ",em("Biogasanlagen")," gibt."
-#       )
-#     ),
-#     'Auswirkungen größerer Biomasseanlagen' = list(
-#       class = "mapping",
-#       Attribname = NA,
-#       description = tagList(
-#         "Es ist mir wichtig, dass es möglichst geringe regionale Auswirkungen durch ",em("größere Biomasseanlagen")," gibt."
-#       )
-#     ),
-#     'Auswirkungen der Einzelhausbiomasseanlagen' = list(
-#       class = "mapping",
-#       Attribname = NA,
-#       description = tagList(
-#         "Es ist mir wichtig, dass es möglichst geringe regionale Auswirkungen durch ",em("Einzelhausbiomasseanlagen")," gibt."
-#       )
-#     ),
-#     'Auswirkungen der Geothermieanlagen' = list(
-#       class = "mapping",
-#       Attribname = NA,
-#       description = tagList(
-#         "Es ist mir wichtig, dass es möglichst geringe regionale Auswirkungen durch ",em("Geothermieanlagen")," gibt."
-#       )
-#     )
-#   )
+
 
 )
 
@@ -443,289 +352,186 @@ texte <- list (
 )
 
 #Speicherkonfiguration --------------------------------------------------------
-speichersettings= list( #method="GoogleSheets",
-                        method="CSV",
-                        place="MCDA_Beispiel_INOLA")
+speichersettings= list( method="GoogleSheets",
+                        #method="CSV",
+                        place="MCDA_Beispiel_INOLA_neu")
 # Speichertemplate --------------------------------------------------------
 
 # library(mcdsupportshiny)
-#dtBisherige <- loadData("CSV", "inst/mcdsupportshinyApp/MCDA_Beispiel_INOLA")
+#dtBisherige <- loadData("CSV", "MCDA_Beispiel_INOLA_neu")
 
-#dput(dtBisherige[1,])
+dput(dtBisherige[1,])
 
-# speicher_template = structure(list(Zeitpunkt = "Fri Jan 18 15:54:28 2019", Sessionstart = "Fri Jan 18 15:52:47 2019",
-#                                    session_id = 753361L, gruppe = NA, url_search = NA, addBtn = 0L,
-#                                    PlaceSlct = "Nicht angegeben", FirsttimeSlct = "Nicht angegeben",
-#                                    GenderSlct = "Nicht angegeben", AgeSl = 0L, ChoiceSlct = "0) Jetzt-Zustand",
-#                                    ChoiceSlctCount = 0L, ChoiceFinalSlct = "0) Jetzt-Zustand",
-#                                    ChoiceFinalSlctCount = 0L, BestesErgebnis = "1)Fortschreibung",
-#                                    Abregelung.sl.originalweights = 30L, Anlagengröße.Stromerzeugung.sl.originalweights = 30L,
-#                                    Anlagengröße.Wärmeerzeugung.sl.originalweights = 30L, Anlagengröße.und.Zentralisierung.sl.originalweights = 30L,
-#                                    Anteil.Energieproduktion.an.Grünschnitt.sl.originalweights = 30L,
-#                                    Anteil.Energieproduktion.an.Gülle.sl.originalweights = 30L,
-#                                    Anteil.Energieproduktion.an.Holzzuwachs.sl.originalweights = 30L,
-#                                    Anteil.Energieproduktion.an.Mais.sl.originalweights = 30L,
-#                                    Anteil.Energieproduktion.an.landwirtschaftlicher.Produktion.sl.originalweights = 30L,
-#                                    Anteil.fossiler.Brennstoffe.sl.originalweights = 30L, Arbeitsplätze.im.Bereich.EE.sl.originalweights = 30L,
-#                                    Auswirkungen.der.Biogasanlagen.sl.originalweights = 30L,
-#                                    Auswirkungen.der.Einzelhausbiomasseanlagen.sl.originalweights = 30L,
-#                                    Auswirkungen.der.Geothermieanlagen.sl.originalweights = 30L,
-#                                    Auswirkungen.der.PV.Dachflächenanlagen.sl.originalweights = 30L,
-#                                    Auswirkungen.der.PV.Freiflächenanlagen.sl.originalweights = 30L,
-#                                    Auswirkungen.der.Wasserkraftanlagen.sl.originalweights = 30L,
-#                                    Auswirkungen.der.Windkraft.sl.originalweights = 30L, Auswirkungen.größerer.Biomasseanlagen.sl.originalweights = 30L,
-#                                    Diversität.der.Stromversorgung.sl.originalweights = 30L,
-#                                    Diversität.der.Wärmeversorgung.sl.originalweights = 30L,
-#                                    Diversität.des.Energieerzeugungssystems.sl.originalweights = 30L,
-#                                    Energieerzeugungskosten.sl.originalweights = 30L, Energiekosten.sl.originalweights = 30L,
-#                                    Energieverbrauch.sl.originalweights = 45L, Energieverbrauch..Strom..sl.originalweights = 45L,
-#                                    Energieverbrauch..Wärme..sl.originalweights = 45L, Energiewendeziel.sl.originalweights = 45L,
-#                                    Flächenbeanspruchung.sl.originalweights = 30L, Flächenverbrauch.Abstandsflächen.Windkraft..sl.originalweights = 30L,
-#                                    Flächenverbrauch.Biomasseanbau..sl.originalweights = 30L,
-#                                    Flächenverbrauch.Fundamente.und.Gebäude.Windkraft..sl.originalweights = 30L,
-#                                    Flächenverbrauch.Solardachflächenanlagen..sl.originalweights = 30L,
-#                                    Flächenverbrauch.Solarfreiflächenanlagen..sl.originalweights = 30L,
-#                                    Flächenverbrauch.tiefe.Geothermie..sl.originalweights = 30L,
-#                                    Gesamtanteil.erneuerbarer.Energien.sl.originalweights = 45L,
-#                                    Importe.Exporte.sl.originalweights = 30L, Kosten.des.Baus.von.EE.Anlagen.sl.originalweights = 30L,
-#                                    Regionale.Arbeitsplätze.durch.EE...langfristig.und.übergreifend.sl.originalweights = 30L,
-#                                    Regionale.Ausgleichsmechanismen.sl.originalweights = 30L,
-#                                    Regionale.Auswirkungen.sl.originalweights = 30L, Regionale.Wertschöpfung.durch.EE..langfristig.und.übergreifend.sl.originalweights = 30L,
-#                                    Regionale.Wertschöpfung.im.Bereich.EE.sl.originalweights = 30L,
-#                                    Regionale.Wirtschaftsentwicklung.durch.EE...langfristig.und.übergreifend.sl.originalweights = 30L,
-#                                    Ressourcenbeanspruchung.sl.originalweights = 30L, Rückbaumöglichkeit.sl.originalweights = 30L,
-#                                    Selbstversorgung.Strom..sl.originalweights = 45L, Selbstversorgung.Wärme..sl.originalweights = 45L,
-#                                    Speicher.sl.originalweights = 30L, Struktur.des.Energiesystems.sl.originalweights = 30L,
-#                                    Umwelteffekte.sl.originalweights = 30L, Ökonomische.Effekte.sl.originalweights = 30L,
-#                                    Ökonomische.Effekte.im.Bereich.EE.sl.originalweights = 30L,
-#                                    Abregelung.sl.finalweight_in_level = 0.333333333333333, Anlagengröße.Stromerzeugung.sl.finalweight_in_level = 0.5,
-#                                    Anlagengröße.Wärmeerzeugung.sl.finalweight_in_level = 0.5,
-#                                    Anlagengröße.und.Zentralisierung.sl.finalweight_in_level = 0.333333333333333,
-#                                    Anteil.Energieproduktion.an.Grünschnitt.sl.finalweight_in_level = 0.25,
-#                                    Anteil.Energieproduktion.an.Gülle.sl.finalweight_in_level = 0.25,
-#                                    Anteil.Energieproduktion.an.Holzzuwachs.sl.finalweight_in_level = 0.25,
-#                                    Anteil.Energieproduktion.an.Mais.sl.finalweight_in_level = 0.25,
-#                                    Anteil.Energieproduktion.an.landwirtschaftlicher.Produktion.sl.finalweight_in_level = 0.2,
-#                                    Anteil.fossiler.Brennstoffe.sl.finalweight_in_level = 0.2,
-#                                    Arbeitsplätze.im.Bereich.EE.sl.finalweight_in_level = 0.5,
-#                                    Auswirkungen.der.Biogasanlagen.sl.finalweight_in_level = 0.125,
-#                                    Auswirkungen.der.Einzelhausbiomasseanlagen.sl.finalweight_in_level = 0.125,
-#                                    Auswirkungen.der.Geothermieanlagen.sl.finalweight_in_level = 0.125,
-#                                    Auswirkungen.der.PV.Dachflächenanlagen.sl.finalweight_in_level = 0.125,
-#                                    Auswirkungen.der.PV.Freiflächenanlagen.sl.finalweight_in_level = 0.125,
-#                                    Auswirkungen.der.Wasserkraftanlagen.sl.finalweight_in_level = 0.125,
-#                                    Auswirkungen.der.Windkraft.sl.finalweight_in_level = 0.125,
-#                                    Auswirkungen.größerer.Biomasseanlagen.sl.finalweight_in_level = 0.125,
-#                                    Diversität.der.Stromversorgung.sl.finalweight_in_level = 0.5,
-#                                    Diversität.der.Wärmeversorgung.sl.finalweight_in_level = 0.5,
-#                                    Diversität.des.Energieerzeugungssystems.sl.finalweight_in_level = 0.333333333333333,
-#                                    Energieerzeugungskosten.sl.finalweight_in_level = 0.5, Energiekosten.sl.finalweight_in_level = 0.333333333333333,
-#                                    Energieverbrauch.sl.finalweight_in_level = 0.25, Energieverbrauch..Strom..sl.finalweight_in_level = 0.5,
-#                                    Energieverbrauch..Wärme..sl.finalweight_in_level = 0.5, Energiewendeziel.sl.finalweight_in_level = 0.272727272727273,
-#                                    Flächenbeanspruchung.sl.finalweight_in_level = 0.2, Flächenverbrauch.Abstandsflächen.Windkraft..sl.finalweight_in_level = 0.166666666666667,
-#                                    Flächenverbrauch.Biomasseanbau..sl.finalweight_in_level = 0.166666666666667,
-#                                    Flächenverbrauch.Fundamente.und.Gebäude.Windkraft..sl.finalweight_in_level = 0.166666666666667,
-#                                    Flächenverbrauch.Solardachflächenanlagen..sl.finalweight_in_level = 0.166666666666667,
-#                                    Flächenverbrauch.Solarfreiflächenanlagen..sl.finalweight_in_level = 0.166666666666667,
-#                                    Flächenverbrauch.tiefe.Geothermie..sl.finalweight_in_level = 0.166666666666667,
-#                                    Gesamtanteil.erneuerbarer.Energien.sl.finalweight_in_level = 0.25,
-#                                    Importe.Exporte.sl.finalweight_in_level = 0.333333333333333,
-#                                    Kosten.des.Baus.von.EE.Anlagen.sl.finalweight_in_level = 0.5,
-#                                    Regionale.Arbeitsplätze.durch.EE...langfristig.und.übergreifend.sl.finalweight_in_level = 0.5,
-#                                    Regionale.Ausgleichsmechanismen.sl.finalweight_in_level = 0.333333333333333,
-#                                    Regionale.Auswirkungen.sl.finalweight_in_level = 0.181818181818182,
-#                                    Regionale.Wertschöpfung.durch.EE..langfristig.und.übergreifend.sl.finalweight_in_level = 0.5,
-#                                    Regionale.Wertschöpfung.im.Bereich.EE.sl.finalweight_in_level = 0.5,
-#                                    Regionale.Wirtschaftsentwicklung.durch.EE...langfristig.und.übergreifend.sl.finalweight_in_level = 0.333333333333333,
-#                                    Ressourcenbeanspruchung.sl.finalweight_in_level = 0.2, Rückbaumöglichkeit.sl.finalweight_in_level = 0.2,
-#                                    Selbstversorgung.Strom..sl.finalweight_in_level = 0.25, Selbstversorgung.Wärme..sl.finalweight_in_level = 0.25,
-#                                    Speicher.sl.finalweight_in_level = 0.333333333333333, Struktur.des.Energiesystems.sl.finalweight_in_level = 0.181818181818182,
-#                                    Umwelteffekte.sl.finalweight_in_level = 0.181818181818182,
-#                                    Ökonomische.Effekte.sl.finalweight_in_level = 0.181818181818182,
-#                                    Ökonomische.Effekte.im.Bereich.EE.sl.finalweight_in_level = 0.333333333333333,
-#                                    Abregelung.sl.finalweight_in_level_corrected = 0L, Anlagengröße.Stromerzeugung.sl.finalweight_in_level_corrected = 0L,
-#                                    Anlagengröße.Wärmeerzeugung.sl.finalweight_in_level_corrected = 0L,
-#                                    Anlagengröße.und.Zentralisierung.sl.finalweight_in_level_corrected = 0.333333333333333,
-#                                    Anteil.Energieproduktion.an.Grünschnitt.sl.finalweight_in_level_corrected = 0L,
-#                                    Anteil.Energieproduktion.an.Gülle.sl.finalweight_in_level_corrected = 0L,
-#                                    Anteil.Energieproduktion.an.Holzzuwachs.sl.finalweight_in_level_corrected = 0L,
-#                                    Anteil.Energieproduktion.an.Mais.sl.finalweight_in_level_corrected = 0L,
-#                                    Anteil.Energieproduktion.an.landwirtschaftlicher.Produktion.sl.finalweight_in_level_corrected = 0.5,
-#                                    Anteil.fossiler.Brennstoffe.sl.finalweight_in_level_corrected = 0L,
-#                                    Arbeitsplätze.im.Bereich.EE.sl.finalweight_in_level_corrected = 0L,
-#                                    Auswirkungen.der.Biogasanlagen.sl.finalweight_in_level_corrected = 0L,
-#                                    Auswirkungen.der.Einzelhausbiomasseanlagen.sl.finalweight_in_level_corrected = 0L,
-#                                    Auswirkungen.der.Geothermieanlagen.sl.finalweight_in_level_corrected = 0L,
-#                                    Auswirkungen.der.PV.Dachflächenanlagen.sl.finalweight_in_level_corrected = 0L,
-#                                    Auswirkungen.der.PV.Freiflächenanlagen.sl.finalweight_in_level_corrected = 0L,
-#                                    Auswirkungen.der.Wasserkraftanlagen.sl.finalweight_in_level_corrected = 0L,
-#                                    Auswirkungen.der.Windkraft.sl.finalweight_in_level_corrected = 0L,
-#                                    Auswirkungen.größerer.Biomasseanlagen.sl.finalweight_in_level_corrected = 0L,
-#                                    Diversität.der.Stromversorgung.sl.finalweight_in_level_corrected = 0L,
-#                                    Diversität.der.Wärmeversorgung.sl.finalweight_in_level_corrected = 0L,
-#                                    Diversität.des.Energieerzeugungssystems.sl.finalweight_in_level_corrected = 0.333333333333333,
-#                                    Energieerzeugungskosten.sl.finalweight_in_level_corrected = 0L,
-#                                    Energiekosten.sl.finalweight_in_level_corrected = 0.333333333333333,
-#                                    Energieverbrauch.sl.finalweight_in_level_corrected = 0.5,
-#                                    Energieverbrauch..Strom..sl.finalweight_in_level_corrected = 0.5,
-#                                    Energieverbrauch..Wärme..sl.finalweight_in_level_corrected = 0.5,
-#                                    Energiewendeziel.sl.finalweight_in_level_corrected = 0.272727272727273,
-#                                    Flächenbeanspruchung.sl.finalweight_in_level_corrected = 0.5,
-#                                    Flächenverbrauch.Abstandsflächen.Windkraft..sl.finalweight_in_level_corrected = 0L,
-#                                    Flächenverbrauch.Biomasseanbau..sl.finalweight_in_level_corrected = 0L,
-#                                    Flächenverbrauch.Fundamente.und.Gebäude.Windkraft..sl.finalweight_in_level_corrected = 0L,
-#                                    Flächenverbrauch.Solardachflächenanlagen..sl.finalweight_in_level_corrected = 0L,
-#                                    Flächenverbrauch.Solarfreiflächenanlagen..sl.finalweight_in_level_corrected = 0L,
-#                                    Flächenverbrauch.tiefe.Geothermie..sl.finalweight_in_level_corrected = 0L,
-#                                    Gesamtanteil.erneuerbarer.Energien.sl.finalweight_in_level_corrected = 0.5,
-#                                    Importe.Exporte.sl.finalweight_in_level_corrected = 0L, Kosten.des.Baus.von.EE.Anlagen.sl.finalweight_in_level_corrected = 0L,
-#                                    Regionale.Arbeitsplätze.durch.EE...langfristig.und.übergreifend.sl.finalweight_in_level_corrected = 0L,
-#                                    Regionale.Ausgleichsmechanismen.sl.finalweight_in_level_corrected = 0.333333333333333,
-#                                    Regionale.Auswirkungen.sl.finalweight_in_level_corrected = 0.181818181818182,
-#                                    Regionale.Wertschöpfung.durch.EE..langfristig.und.übergreifend.sl.finalweight_in_level_corrected = 0L,
-#                                    Regionale.Wertschöpfung.im.Bereich.EE.sl.finalweight_in_level_corrected = 0L,
-#                                    Regionale.Wirtschaftsentwicklung.durch.EE...langfristig.und.übergreifend.sl.finalweight_in_level_corrected = 0.333333333333333,
-#                                    Ressourcenbeanspruchung.sl.finalweight_in_level_corrected = 0L,
-#                                    Rückbaumöglichkeit.sl.finalweight_in_level_corrected = 0L,
-#                                    Selbstversorgung.Strom..sl.finalweight_in_level_corrected = 0L,
-#                                    Selbstversorgung.Wärme..sl.finalweight_in_level_corrected = 0L,
-#                                    Speicher.sl.finalweight_in_level_corrected = 0L, Struktur.des.Energiesystems.sl.finalweight_in_level_corrected = 0.181818181818182,
-#                                    Umwelteffekte.sl.finalweight_in_level_corrected = 0.181818181818182,
-#                                    Ökonomische.Effekte.sl.finalweight_in_level_corrected = 0.181818181818182,
-#                                    Ökonomische.Effekte.im.Bereich.EE.sl.finalweight_in_level_corrected = 0.333333333333333,
-#                                    Anlagengröße.und.Zentralisierung.bsc.timesClicked = 4L, Anteil.Energieproduktion.an.landwirtschaftlicher.Produktion.bsc.timesClicked = 2L,
-#                                    Diversität.des.Energieerzeugungssystems.bsc.timesClicked = 0L,
-#                                    Energiekosten.bsc.timesClicked = 0L, Energieverbrauch.bsc.timesClicked = 0L,
-#                                    Flächenbeanspruchung.bsc.timesClicked = 2L, Regionale.Ausgleichsmechanismen.bsc.timesClicked = 2L,
-#                                    Regionale.Wirtschaftsentwicklung.durch.EE...langfristig.und.übergreifend.bsc.timesClicked = 0L,
-#                                    Ökonomische.Effekte.im.Bereich.EE.bsc.timesClicked = 0L,
-#                                    Anlagengröße.und.Zentralisierung.bsc.visible = FALSE, Anteil.Energieproduktion.an.landwirtschaftlicher.Produktion.bsc.visible = FALSE,
-#                                    Diversität.des.Energieerzeugungssystems.bsc.visible = FALSE,
-#                                    Energiekosten.bsc.visible = FALSE, Energieverbrauch.bsc.visible = FALSE,
-#                                    Flächenbeanspruchung.bsc.visible = FALSE, Regionale.Ausgleichsmechanismen.bsc.visible = FALSE,
-#                                    Regionale.Wirtschaftsentwicklung.durch.EE...langfristig.und.übergreifend.bsc.visible = FALSE,
-#                                    Ökonomische.Effekte.im.Bereich.EE.bsc.visible = FALSE),
-#                               .Names = c("Zeitpunkt",
-#                                          "Sessionstart", "session_id", "gruppe", "url_search", "addBtn",
-#                                          "PlaceSlct", "FirsttimeSlct", "GenderSlct", "AgeSl", "ChoiceSlct",
-#                                          "ChoiceSlctCount", "ChoiceFinalSlct", "ChoiceFinalSlctCount",
-#                                          "BestesErgebnis", "Abregelung.sl.originalweights", "Anlagengröße.Stromerzeugung.sl.originalweights",
-#                                          "Anlagengröße.Wärmeerzeugung.sl.originalweights", "Anlagengröße.und.Zentralisierung.sl.originalweights",
-#                                          "Anteil.Energieproduktion.an.Grünschnitt.sl.originalweights",
-#                                          "Anteil.Energieproduktion.an.Gülle.sl.originalweights", "Anteil.Energieproduktion.an.Holzzuwachs.sl.originalweights",
-#                                          "Anteil.Energieproduktion.an.Mais.sl.originalweights", "Anteil.Energieproduktion.an.landwirtschaftlicher.Produktion.sl.originalweights",
-#                                          "Anteil.fossiler.Brennstoffe.sl.originalweights", "Arbeitsplätze.im.Bereich.EE.sl.originalweights",
-#                                          "Auswirkungen.der.Biogasanlagen.sl.originalweights", "Auswirkungen.der.Einzelhausbiomasseanlagen.sl.originalweights",
-#                                          "Auswirkungen.der.Geothermieanlagen.sl.originalweights", "Auswirkungen.der.PV.Dachflächenanlagen.sl.originalweights",
-#                                          "Auswirkungen.der.PV.Freiflächenanlagen.sl.originalweights",
-#                                          "Auswirkungen.der.Wasserkraftanlagen.sl.originalweights", "Auswirkungen.der.Windkraft.sl.originalweights",
-#                                          "Auswirkungen.größerer.Biomasseanlagen.sl.originalweights", "Diversität.der.Stromversorgung.sl.originalweights",
-#                                          "Diversität.der.Wärmeversorgung.sl.originalweights", "Diversität.des.Energieerzeugungssystems.sl.originalweights",
-#                                          "Energieerzeugungskosten.sl.originalweights", "Energiekosten.sl.originalweights",
-#                                          "Energieverbrauch.sl.originalweights", "Energieverbrauch..Strom..sl.originalweights",
-#                                          "Energieverbrauch..Wärme..sl.originalweights", "Energiewendeziel.sl.originalweights",
-#                                          "Flächenbeanspruchung.sl.originalweights", "Flächenverbrauch.Abstandsflächen.Windkraft..sl.originalweights",
-#                                          "Flächenverbrauch.Biomasseanbau..sl.originalweights", "Flächenverbrauch.Fundamente.und.Gebäude.Windkraft..sl.originalweights",
-#                                          "Flächenverbrauch.Solardachflächenanlagen..sl.originalweights",
-#                                          "Flächenverbrauch.Solarfreiflächenanlagen..sl.originalweights",
-#                                          "Flächenverbrauch.tiefe.Geothermie..sl.originalweights", "Gesamtanteil.erneuerbarer.Energien.sl.originalweights",
-#                                          "Importe.Exporte.sl.originalweights", "Kosten.des.Baus.von.EE.Anlagen.sl.originalweights",
-#                                          "Regionale.Arbeitsplätze.durch.EE...langfristig.und.übergreifend.sl.originalweights",
-#                                          "Regionale.Ausgleichsmechanismen.sl.originalweights", "Regionale.Auswirkungen.sl.originalweights",
-#                                          "Regionale.Wertschöpfung.durch.EE..langfristig.und.übergreifend.sl.originalweights",
-#                                          "Regionale.Wertschöpfung.im.Bereich.EE.sl.originalweights", "Regionale.Wirtschaftsentwicklung.durch.EE...langfristig.und.übergreifend.sl.originalweights",
-#                                          "Ressourcenbeanspruchung.sl.originalweights", "Rückbaumöglichkeit.sl.originalweights",
-#                                          "Selbstversorgung.Strom..sl.originalweights", "Selbstversorgung.Wärme..sl.originalweights",
-#                                          "Speicher.sl.originalweights", "Struktur.des.Energiesystems.sl.originalweights",
-#                                          "Umwelteffekte.sl.originalweights", "Ökonomische.Effekte.sl.originalweights",
-#                                          "Ökonomische.Effekte.im.Bereich.EE.sl.originalweights", "Abregelung.sl.finalweight_in_level",
-#                                          "Anlagengröße.Stromerzeugung.sl.finalweight_in_level", "Anlagengröße.Wärmeerzeugung.sl.finalweight_in_level",
-#                                          "Anlagengröße.und.Zentralisierung.sl.finalweight_in_level", "Anteil.Energieproduktion.an.Grünschnitt.sl.finalweight_in_level",
-#                                          "Anteil.Energieproduktion.an.Gülle.sl.finalweight_in_level",
-#                                          "Anteil.Energieproduktion.an.Holzzuwachs.sl.finalweight_in_level",
-#                                          "Anteil.Energieproduktion.an.Mais.sl.finalweight_in_level", "Anteil.Energieproduktion.an.landwirtschaftlicher.Produktion.sl.finalweight_in_level",
-#                                          "Anteil.fossiler.Brennstoffe.sl.finalweight_in_level", "Arbeitsplätze.im.Bereich.EE.sl.finalweight_in_level",
-#                                          "Auswirkungen.der.Biogasanlagen.sl.finalweight_in_level", "Auswirkungen.der.Einzelhausbiomasseanlagen.sl.finalweight_in_level",
-#                                          "Auswirkungen.der.Geothermieanlagen.sl.finalweight_in_level",
-#                                          "Auswirkungen.der.PV.Dachflächenanlagen.sl.finalweight_in_level",
-#                                          "Auswirkungen.der.PV.Freiflächenanlagen.sl.finalweight_in_level",
-#                                          "Auswirkungen.der.Wasserkraftanlagen.sl.finalweight_in_level",
-#                                          "Auswirkungen.der.Windkraft.sl.finalweight_in_level", "Auswirkungen.größerer.Biomasseanlagen.sl.finalweight_in_level",
-#                                          "Diversität.der.Stromversorgung.sl.finalweight_in_level", "Diversität.der.Wärmeversorgung.sl.finalweight_in_level",
-#                                          "Diversität.des.Energieerzeugungssystems.sl.finalweight_in_level",
-#                                          "Energieerzeugungskosten.sl.finalweight_in_level", "Energiekosten.sl.finalweight_in_level",
-#                                          "Energieverbrauch.sl.finalweight_in_level", "Energieverbrauch..Strom..sl.finalweight_in_level",
-#                                          "Energieverbrauch..Wärme..sl.finalweight_in_level", "Energiewendeziel.sl.finalweight_in_level",
-#                                          "Flächenbeanspruchung.sl.finalweight_in_level", "Flächenverbrauch.Abstandsflächen.Windkraft..sl.finalweight_in_level",
-#                                          "Flächenverbrauch.Biomasseanbau..sl.finalweight_in_level", "Flächenverbrauch.Fundamente.und.Gebäude.Windkraft..sl.finalweight_in_level",
-#                                          "Flächenverbrauch.Solardachflächenanlagen..sl.finalweight_in_level",
-#                                          "Flächenverbrauch.Solarfreiflächenanlagen..sl.finalweight_in_level",
-#                                          "Flächenverbrauch.tiefe.Geothermie..sl.finalweight_in_level",
-#                                          "Gesamtanteil.erneuerbarer.Energien.sl.finalweight_in_level",
-#                                          "Importe.Exporte.sl.finalweight_in_level", "Kosten.des.Baus.von.EE.Anlagen.sl.finalweight_in_level",
-#                                          "Regionale.Arbeitsplätze.durch.EE...langfristig.und.übergreifend.sl.finalweight_in_level",
-#                                          "Regionale.Ausgleichsmechanismen.sl.finalweight_in_level", "Regionale.Auswirkungen.sl.finalweight_in_level",
-#                                          "Regionale.Wertschöpfung.durch.EE..langfristig.und.übergreifend.sl.finalweight_in_level",
-#                                          "Regionale.Wertschöpfung.im.Bereich.EE.sl.finalweight_in_level",
-#                                          "Regionale.Wirtschaftsentwicklung.durch.EE...langfristig.und.übergreifend.sl.finalweight_in_level",
-#                                          "Ressourcenbeanspruchung.sl.finalweight_in_level", "Rückbaumöglichkeit.sl.finalweight_in_level",
-#                                          "Selbstversorgung.Strom..sl.finalweight_in_level", "Selbstversorgung.Wärme..sl.finalweight_in_level",
-#                                          "Speicher.sl.finalweight_in_level", "Struktur.des.Energiesystems.sl.finalweight_in_level",
-#                                          "Umwelteffekte.sl.finalweight_in_level", "Ökonomische.Effekte.sl.finalweight_in_level",
-#                                          "Ökonomische.Effekte.im.Bereich.EE.sl.finalweight_in_level",
-#                                          "Abregelung.sl.finalweight_in_level_corrected", "Anlagengröße.Stromerzeugung.sl.finalweight_in_level_corrected",
-#                                          "Anlagengröße.Wärmeerzeugung.sl.finalweight_in_level_corrected",
-#                                          "Anlagengröße.und.Zentralisierung.sl.finalweight_in_level_corrected",
-#                                          "Anteil.Energieproduktion.an.Grünschnitt.sl.finalweight_in_level_corrected",
-#                                          "Anteil.Energieproduktion.an.Gülle.sl.finalweight_in_level_corrected",
-#                                          "Anteil.Energieproduktion.an.Holzzuwachs.sl.finalweight_in_level_corrected",
-#                                          "Anteil.Energieproduktion.an.Mais.sl.finalweight_in_level_corrected",
-#                                          "Anteil.Energieproduktion.an.landwirtschaftlicher.Produktion.sl.finalweight_in_level_corrected",
-#                                          "Anteil.fossiler.Brennstoffe.sl.finalweight_in_level_corrected",
-#                                          "Arbeitsplätze.im.Bereich.EE.sl.finalweight_in_level_corrected",
-#                                          "Auswirkungen.der.Biogasanlagen.sl.finalweight_in_level_corrected",
-#                                          "Auswirkungen.der.Einzelhausbiomasseanlagen.sl.finalweight_in_level_corrected",
-#                                          "Auswirkungen.der.Geothermieanlagen.sl.finalweight_in_level_corrected",
-#                                          "Auswirkungen.der.PV.Dachflächenanlagen.sl.finalweight_in_level_corrected",
-#                                          "Auswirkungen.der.PV.Freiflächenanlagen.sl.finalweight_in_level_corrected",
-#                                          "Auswirkungen.der.Wasserkraftanlagen.sl.finalweight_in_level_corrected",
-#                                          "Auswirkungen.der.Windkraft.sl.finalweight_in_level_corrected",
-#                                          "Auswirkungen.größerer.Biomasseanlagen.sl.finalweight_in_level_corrected",
-#                                          "Diversität.der.Stromversorgung.sl.finalweight_in_level_corrected",
-#                                          "Diversität.der.Wärmeversorgung.sl.finalweight_in_level_corrected",
-#                                          "Diversität.des.Energieerzeugungssystems.sl.finalweight_in_level_corrected",
-#                                          "Energieerzeugungskosten.sl.finalweight_in_level_corrected",
-#                                          "Energiekosten.sl.finalweight_in_level_corrected", "Energieverbrauch.sl.finalweight_in_level_corrected",
-#                                          "Energieverbrauch..Strom..sl.finalweight_in_level_corrected",
-#                                          "Energieverbrauch..Wärme..sl.finalweight_in_level_corrected",
-#                                          "Energiewendeziel.sl.finalweight_in_level_corrected", "Flächenbeanspruchung.sl.finalweight_in_level_corrected",
-#                                          "Flächenverbrauch.Abstandsflächen.Windkraft..sl.finalweight_in_level_corrected",
-#                                          "Flächenverbrauch.Biomasseanbau..sl.finalweight_in_level_corrected",
-#                                          "Flächenverbrauch.Fundamente.und.Gebäude.Windkraft..sl.finalweight_in_level_corrected",
-#                                          "Flächenverbrauch.Solardachflächenanlagen..sl.finalweight_in_level_corrected",
-#                                          "Flächenverbrauch.Solarfreiflächenanlagen..sl.finalweight_in_level_corrected",
-#                                          "Flächenverbrauch.tiefe.Geothermie..sl.finalweight_in_level_corrected",
-#                                          "Gesamtanteil.erneuerbarer.Energien.sl.finalweight_in_level_corrected",
-#                                          "Importe.Exporte.sl.finalweight_in_level_corrected", "Kosten.des.Baus.von.EE.Anlagen.sl.finalweight_in_level_corrected",
-#                                          "Regionale.Arbeitsplätze.durch.EE...langfristig.und.übergreifend.sl.finalweight_in_level_corrected",
-#                                          "Regionale.Ausgleichsmechanismen.sl.finalweight_in_level_corrected",
-#                                          "Regionale.Auswirkungen.sl.finalweight_in_level_corrected", "Regionale.Wertschöpfung.durch.EE..langfristig.und.übergreifend.sl.finalweight_in_level_corrected",
-#                                          "Regionale.Wertschöpfung.im.Bereich.EE.sl.finalweight_in_level_corrected",
-#                                          "Regionale.Wirtschaftsentwicklung.durch.EE...langfristig.und.übergreifend.sl.finalweight_in_level_corrected",
-#                                          "Ressourcenbeanspruchung.sl.finalweight_in_level_corrected",
-#                                          "Rückbaumöglichkeit.sl.finalweight_in_level_corrected", "Selbstversorgung.Strom..sl.finalweight_in_level_corrected",
-#                                          "Selbstversorgung.Wärme..sl.finalweight_in_level_corrected",
-#                                          "Speicher.sl.finalweight_in_level_corrected", "Struktur.des.Energiesystems.sl.finalweight_in_level_corrected",
-#                                          "Umwelteffekte.sl.finalweight_in_level_corrected", "Ökonomische.Effekte.sl.finalweight_in_level_corrected",
-#                                          "Ökonomische.Effekte.im.Bereich.EE.sl.finalweight_in_level_corrected",
-#                                          "Anlagengröße.und.Zentralisierung.bsc.timesClicked", "Anteil.Energieproduktion.an.landwirtschaftlicher.Produktion.bsc.timesClicked",
-#                                          "Diversität.des.Energieerzeugungssystems.bsc.timesClicked", "Energiekosten.bsc.timesClicked",
-#                                          "Energieverbrauch.bsc.timesClicked", "Flächenbeanspruchung.bsc.timesClicked",
-#                                          "Regionale.Ausgleichsmechanismen.bsc.timesClicked", "Regionale.Wirtschaftsentwicklung.durch.EE...langfristig.und.übergreifend.bsc.timesClicked",
-#                                          "Ökonomische.Effekte.im.Bereich.EE.bsc.timesClicked", "Anlagengröße.und.Zentralisierung.bsc.visible",
-#                                          "Anteil.Energieproduktion.an.landwirtschaftlicher.Produktion.bsc.visible",
-#                                          "Diversität.des.Energieerzeugungssystems.bsc.visible", "Energiekosten.bsc.visible",
-#                                          "Energieverbrauch.bsc.visible", "Flächenbeanspruchung.bsc.visible",
-#                                          "Regionale.Ausgleichsmechanismen.bsc.visible", "Regionale.Wirtschaftsentwicklung.durch.EE...langfristig.und.übergreifend.bsc.visible",
-#                                          "Ökonomische.Effekte.im.Bereich.EE.bsc.visible"),
-#                               row.names = 1L, class = "data.frame")
+speicher_template = structure(list(Zeitpunkt = "Tue Jun 04 14:38:10 2019", Sessionstart = "Tue Jun 04 14:38:02 2019",
+                                   session_id = 172186L, gruppe = NA, url_search = NA, addBtn = 0L,
+                                   PlaceSlct = "Nicht angegeben", FirsttimeSlct = "Nicht angegeben",
+                                   GenderSlct = "Nicht angegeben", AgeSl = 0L, ChoiceSlct = "Fortschreibung",
+                                   ChoiceSlctCount = 0L, ChoiceFinalSlct = "Fortschreibung",
+                                   ChoiceFinalSlctCount = 0L, BestesErgebnis = "Kleinere Anlagen",
+                                   slGui2.Energiewendeziel.sl.originalweights = 30L, slGui2.Energieverbrauch.sl.originalweights = 30L,
+                                   slGui2.EnergieverbrauchStrom.sl.originalweights = 30L, slGui2.EnergieverbrauchWrme.sl.originalweights = 30L,
+                                   slGui2.GesamtanteilerneuerbarerEnergien.sl.originalweights = 30L,
+                                   slGui2.Exportmglichkeit.sl.originalweights = 30L, slGui2.StrukturdesEnergiesystems.sl.originalweights = 30L,
+                                   slGui2.DiversittdesEnergieerzeugungssystems.sl.originalweights = 30L,
+                                   slGui2.AnlagengreundZentralisierung.sl.originalweights = 30L,
+                                   slGui2.AnlagengreStromerzeugung.sl.originalweights = 30L,
+                                   slGui2.AnlagengreWrmeerzeugung.sl.originalweights = 30L,
+                                   slGui2.RegionaleAusgleichsmechanismen.sl.originalweights = 30L,
+                                   slGui2.konomischeEffekte.sl.originalweights = 30L, slGui2.Wirtschaftsentwicklung.sl.originalweights = 30L,
+                                   slGui2.Wertschpfung.sl.originalweights = 30L, slGui2.Arbeitspltze.sl.originalweights = 30L,
+                                   slGui2.Energieerzeugungskosten.sl.originalweights = 30L,
+                                   slGui2.Frderkosten.sl.originalweights = 30L, slGui2.Gewinnbeteiligung.sl.originalweights = 30L,
+                                   slGui2.Planungsbeteiligung.sl.originalweights = 30L, slGui2.Umwelteffekte.sl.originalweights = 30L,
+                                   slGui2.Flchenbeanspruchung.sl.originalweights = 30L, slGui2.Biomassenverwendung.sl.originalweights = 30L,
+                                   slGui2.Maisverwendung.sl.originalweights = 30L, slGui2.Holzverwendung.sl.originalweights = 30L,
+                                   slGui2.RegionaleAuswirkungen.sl.originalweights = 30L, slGui2.PV.Dachflchenanlagen.sl.originalweights = 30L,
+                                   slGui2.PV.Freiflchenanlagen.sl.originalweights = 30L, slGui2.Windkraft.sl.originalweights = 30L,
+                                   slGui2.Wasserkraftanlagen.sl.originalweights = 30L, slGui2.Biogasanlagen.sl.originalweights = 30L,
+                                   slGui2.Biomasseheizkraftwerke.sl.originalweights = 30L, slGui2.Einzelhausholzheizungen.sl.originalweights = 30L,
+                                   slGui2.Tiefengeothermieanlagen.sl.originalweights = 30L,
+                                   slGui2.Wrmepumpen.sl.originalweights = 30L, slGui2.Energiewendeziel.sl.finalweight_in_level = 0.25,
+                                   slGui2.Energieverbrauch.sl.finalweight_in_level = 0.333333333333333,
+                                   slGui2.EnergieverbrauchStrom.sl.finalweight_in_level = 0.5,
+                                   slGui2.EnergieverbrauchWrme.sl.finalweight_in_level = 0.5,
+                                   slGui2.GesamtanteilerneuerbarerEnergien.sl.finalweight_in_level = 0.333333333333333,
+                                   slGui2.Exportmglichkeit.sl.finalweight_in_level = 0.333333333333333,
+                                   slGui2.StrukturdesEnergiesystems.sl.finalweight_in_level = 0.25,
+                                   slGui2.DiversittdesEnergieerzeugungssystems.sl.finalweight_in_level = 0.333333333333333,
+                                   slGui2.AnlagengreundZentralisierung.sl.finalweight_in_level = 0.333333333333333,
+                                   slGui2.AnlagengreStromerzeugung.sl.finalweight_in_level = 0.5,
+                                   slGui2.AnlagengreWrmeerzeugung.sl.finalweight_in_level = 0.5,
+                                   slGui2.RegionaleAusgleichsmechanismen.sl.finalweight_in_level = 0.333333333333333,
+                                   slGui2.konomischeEffekte.sl.finalweight_in_level = 0.25,
+                                   slGui2.Wirtschaftsentwicklung.sl.finalweight_in_level = 0.2,
+                                   slGui2.Wertschpfung.sl.finalweight_in_level = 0.5, slGui2.Arbeitspltze.sl.finalweight_in_level = 0.5,
+                                   slGui2.Energieerzeugungskosten.sl.finalweight_in_level = 0.2,
+                                   slGui2.Frderkosten.sl.finalweight_in_level = 0.2, slGui2.Gewinnbeteiligung.sl.finalweight_in_level = 0.2,
+                                   slGui2.Planungsbeteiligung.sl.finalweight_in_level = 0.2,
+                                   slGui2.Umwelteffekte.sl.finalweight_in_level = 0.25, slGui2.Flchenbeanspruchung.sl.finalweight_in_level = 0.333333333333333,
+                                   slGui2.Biomassenverwendung.sl.finalweight_in_level = 0.333333333333333,
+                                   slGui2.Maisverwendung.sl.finalweight_in_level = 0.5, slGui2.Holzverwendung.sl.finalweight_in_level = 0.5,
+                                   slGui2.RegionaleAuswirkungen.sl.finalweight_in_level = 0.333333333333333,
+                                   slGui2.PV.Dachflchenanlagen.sl.finalweight_in_level = 0.111111111111111,
+                                   slGui2.PV.Freiflchenanlagen.sl.finalweight_in_level = 0.111111111111111,
+                                   slGui2.Windkraft.sl.finalweight_in_level = 0.111111111111111,
+                                   slGui2.Wasserkraftanlagen.sl.finalweight_in_level = 0.111111111111111,
+                                   slGui2.Biogasanlagen.sl.finalweight_in_level = 0.111111111111111,
+                                   slGui2.Biomasseheizkraftwerke.sl.finalweight_in_level = 0.111111111111111,
+                                   slGui2.Einzelhausholzheizungen.sl.finalweight_in_level = 0.111111111111111,
+                                   slGui2.Tiefengeothermieanlagen.sl.finalweight_in_level = 0.111111111111111,
+                                   slGui2.Wrmepumpen.sl.finalweight_in_level = 0.111111111111111,
+                                   slGui2.Energiewendeziel.sl.finalweight_in_level_corrected = 0.333333333333333,
+                                   slGui2.Energieverbrauch.sl.finalweight_in_level_corrected = 0.333333333333333,
+                                   slGui2.EnergieverbrauchStrom.sl.finalweight_in_level_corrected = 0.5,
+                                   slGui2.EnergieverbrauchWrme.sl.finalweight_in_level_corrected = 0.5,
+                                   slGui2.GesamtanteilerneuerbarerEnergien.sl.finalweight_in_level_corrected = 0.333333333333333,
+                                   slGui2.Exportmglichkeit.sl.finalweight_in_level_corrected = 0.333333333333333,
+                                   slGui2.StrukturdesEnergiesystems.sl.finalweight_in_level_corrected = 0.333333333333333,
+                                   slGui2.DiversittdesEnergieerzeugungssystems.sl.finalweight_in_level_corrected = 0.333333333333333,
+                                   slGui2.AnlagengreundZentralisierung.sl.finalweight_in_level_corrected = 0.333333333333333,
+                                   slGui2.AnlagengreStromerzeugung.sl.finalweight_in_level_corrected = 0.5,
+                                   slGui2.AnlagengreWrmeerzeugung.sl.finalweight_in_level_corrected = 0.5,
+                                   slGui2.RegionaleAusgleichsmechanismen.sl.finalweight_in_level_corrected = 0.333333333333333,
+                                   slGui2.konomischeEffekte.sl.finalweight_in_level_corrected = 0L,
+                                   slGui2.Wirtschaftsentwicklung.sl.finalweight_in_level_corrected = 0L,
+                                   slGui2.Wertschpfung.sl.finalweight_in_level_corrected = 0L,
+                                   slGui2.Arbeitspltze.sl.finalweight_in_level_corrected = 0L,
+                                   slGui2.Energieerzeugungskosten.sl.finalweight_in_level_corrected = 0L,
+                                   slGui2.Frderkosten.sl.finalweight_in_level_corrected = 0L,
+                                   slGui2.Gewinnbeteiligung.sl.finalweight_in_level_corrected = 0L,
+                                   slGui2.Planungsbeteiligung.sl.finalweight_in_level_corrected = 0L,
+                                   slGui2.Umwelteffekte.sl.finalweight_in_level_corrected = 0.333333333333333,
+                                   slGui2.Flchenbeanspruchung.sl.finalweight_in_level_corrected = 0L,
+                                   slGui2.Biomassenverwendung.sl.finalweight_in_level_corrected = 0.5,
+                                   slGui2.Maisverwendung.sl.finalweight_in_level_corrected = 0.5,
+                                   slGui2.Holzverwendung.sl.finalweight_in_level_corrected = 0.5,
+                                   slGui2.RegionaleAuswirkungen.sl.finalweight_in_level_corrected = 0.5,
+                                   slGui2.PV.Dachflchenanlagen.sl.finalweight_in_level_corrected = 0.111111111111111,
+                                   slGui2.PV.Freiflchenanlagen.sl.finalweight_in_level_corrected = 0.111111111111111,
+                                   slGui2.Windkraft.sl.finalweight_in_level_corrected = 0.111111111111111,
+                                   slGui2.Wasserkraftanlagen.sl.finalweight_in_level_corrected = 0.111111111111111,
+                                   slGui2.Biogasanlagen.sl.finalweight_in_level_corrected = 0.111111111111111,
+                                   slGui2.Biomasseheizkraftwerke.sl.finalweight_in_level_corrected = 0.111111111111111,
+                                   slGui2.Einzelhausholzheizungen.sl.finalweight_in_level_corrected = 0.111111111111111,
+                                   slGui2.Tiefengeothermieanlagen.sl.finalweight_in_level_corrected = 0.111111111111111,
+                                   slGui2.Wrmepumpen.sl.finalweight_in_level_corrected = 0.111111111111111,
+                                   Anlagengröße.und.Zentralisierung.bsc.timesClicked = 0L, Biomassenverwendung.bsc.timesClicked = 0L,
+                                   Energieverbrauch.bsc.timesClicked = 0L, Regionale.Auswirkungen.bsc.timesClicked = 0L,
+                                   Wirtschaftsentwicklung.bsc.timesClicked = 0L, Anlagengröße.und.Zentralisierung.bsc.visible = FALSE,
+                                   Biomassenverwendung.bsc.visible = FALSE, Energieverbrauch.bsc.visible = FALSE,
+                                   Regionale.Auswirkungen.bsc.visible = FALSE, Wirtschaftsentwicklung.bsc.visible = FALSE),
+                              .Names = c("Zeitpunkt",
+                                         "Sessionstart", "session_id", "gruppe", "url_search", "addBtn",
+                                         "PlaceSlct", "FirsttimeSlct", "GenderSlct", "AgeSl", "ChoiceSlct",
+                                         "ChoiceSlctCount", "ChoiceFinalSlct", "ChoiceFinalSlctCount",
+                                         "BestesErgebnis", "slGui2.Energiewendeziel.sl.originalweights",
+                                         "slGui2.Energieverbrauch.sl.originalweights", "slGui2.EnergieverbrauchStrom.sl.originalweights",
+                                         "slGui2.EnergieverbrauchWrme.sl.originalweights", "slGui2.GesamtanteilerneuerbarerEnergien.sl.originalweights",
+                                         "slGui2.Exportmglichkeit.sl.originalweights", "slGui2.StrukturdesEnergiesystems.sl.originalweights",
+                                         "slGui2.DiversittdesEnergieerzeugungssystems.sl.originalweights",
+                                         "slGui2.AnlagengreundZentralisierung.sl.originalweights", "slGui2.AnlagengreStromerzeugung.sl.originalweights",
+                                         "slGui2.AnlagengreWrmeerzeugung.sl.originalweights", "slGui2.RegionaleAusgleichsmechanismen.sl.originalweights",
+                                         "slGui2.konomischeEffekte.sl.originalweights", "slGui2.Wirtschaftsentwicklung.sl.originalweights",
+                                         "slGui2.Wertschpfung.sl.originalweights", "slGui2.Arbeitspltze.sl.originalweights",
+                                         "slGui2.Energieerzeugungskosten.sl.originalweights", "slGui2.Frderkosten.sl.originalweights",
+                                         "slGui2.Gewinnbeteiligung.sl.originalweights", "slGui2.Planungsbeteiligung.sl.originalweights",
+                                         "slGui2.Umwelteffekte.sl.originalweights", "slGui2.Flchenbeanspruchung.sl.originalweights",
+                                         "slGui2.Biomassenverwendung.sl.originalweights", "slGui2.Maisverwendung.sl.originalweights",
+                                         "slGui2.Holzverwendung.sl.originalweights", "slGui2.RegionaleAuswirkungen.sl.originalweights",
+                                         "slGui2.PV.Dachflchenanlagen.sl.originalweights", "slGui2.PV.Freiflchenanlagen.sl.originalweights",
+                                         "slGui2.Windkraft.sl.originalweights", "slGui2.Wasserkraftanlagen.sl.originalweights",
+                                         "slGui2.Biogasanlagen.sl.originalweights", "slGui2.Biomasseheizkraftwerke.sl.originalweights",
+                                         "slGui2.Einzelhausholzheizungen.sl.originalweights", "slGui2.Tiefengeothermieanlagen.sl.originalweights",
+                                         "slGui2.Wrmepumpen.sl.originalweights", "slGui2.Energiewendeziel.sl.finalweight_in_level",
+                                         "slGui2.Energieverbrauch.sl.finalweight_in_level", "slGui2.EnergieverbrauchStrom.sl.finalweight_in_level",
+                                         "slGui2.EnergieverbrauchWrme.sl.finalweight_in_level", "slGui2.GesamtanteilerneuerbarerEnergien.sl.finalweight_in_level",
+                                         "slGui2.Exportmglichkeit.sl.finalweight_in_level", "slGui2.StrukturdesEnergiesystems.sl.finalweight_in_level",
+                                         "slGui2.DiversittdesEnergieerzeugungssystems.sl.finalweight_in_level",
+                                         "slGui2.AnlagengreundZentralisierung.sl.finalweight_in_level",
+                                         "slGui2.AnlagengreStromerzeugung.sl.finalweight_in_level", "slGui2.AnlagengreWrmeerzeugung.sl.finalweight_in_level",
+                                         "slGui2.RegionaleAusgleichsmechanismen.sl.finalweight_in_level",
+                                         "slGui2.konomischeEffekte.sl.finalweight_in_level", "slGui2.Wirtschaftsentwicklung.sl.finalweight_in_level",
+                                         "slGui2.Wertschpfung.sl.finalweight_in_level", "slGui2.Arbeitspltze.sl.finalweight_in_level",
+                                         "slGui2.Energieerzeugungskosten.sl.finalweight_in_level", "slGui2.Frderkosten.sl.finalweight_in_level",
+                                         "slGui2.Gewinnbeteiligung.sl.finalweight_in_level", "slGui2.Planungsbeteiligung.sl.finalweight_in_level",
+                                         "slGui2.Umwelteffekte.sl.finalweight_in_level", "slGui2.Flchenbeanspruchung.sl.finalweight_in_level",
+                                         "slGui2.Biomassenverwendung.sl.finalweight_in_level", "slGui2.Maisverwendung.sl.finalweight_in_level",
+                                         "slGui2.Holzverwendung.sl.finalweight_in_level", "slGui2.RegionaleAuswirkungen.sl.finalweight_in_level",
+                                         "slGui2.PV.Dachflchenanlagen.sl.finalweight_in_level", "slGui2.PV.Freiflchenanlagen.sl.finalweight_in_level",
+                                         "slGui2.Windkraft.sl.finalweight_in_level", "slGui2.Wasserkraftanlagen.sl.finalweight_in_level",
+                                         "slGui2.Biogasanlagen.sl.finalweight_in_level", "slGui2.Biomasseheizkraftwerke.sl.finalweight_in_level",
+                                         "slGui2.Einzelhausholzheizungen.sl.finalweight_in_level", "slGui2.Tiefengeothermieanlagen.sl.finalweight_in_level",
+                                         "slGui2.Wrmepumpen.sl.finalweight_in_level", "slGui2.Energiewendeziel.sl.finalweight_in_level_corrected",
+                                         "slGui2.Energieverbrauch.sl.finalweight_in_level_corrected",
+                                         "slGui2.EnergieverbrauchStrom.sl.finalweight_in_level_corrected",
+                                         "slGui2.EnergieverbrauchWrme.sl.finalweight_in_level_corrected",
+                                         "slGui2.GesamtanteilerneuerbarerEnergien.sl.finalweight_in_level_corrected",
+                                         "slGui2.Exportmglichkeit.sl.finalweight_in_level_corrected",
+                                         "slGui2.StrukturdesEnergiesystems.sl.finalweight_in_level_corrected",
+                                         "slGui2.DiversittdesEnergieerzeugungssystems.sl.finalweight_in_level_corrected",
+                                         "slGui2.AnlagengreundZentralisierung.sl.finalweight_in_level_corrected",
+                                         "slGui2.AnlagengreStromerzeugung.sl.finalweight_in_level_corrected",
+                                         "slGui2.AnlagengreWrmeerzeugung.sl.finalweight_in_level_corrected",
+                                         "slGui2.RegionaleAusgleichsmechanismen.sl.finalweight_in_level_corrected",
+                                         "slGui2.konomischeEffekte.sl.finalweight_in_level_corrected",
+                                         "slGui2.Wirtschaftsentwicklung.sl.finalweight_in_level_corrected",
+                                         "slGui2.Wertschpfung.sl.finalweight_in_level_corrected", "slGui2.Arbeitspltze.sl.finalweight_in_level_corrected",
+                                         "slGui2.Energieerzeugungskosten.sl.finalweight_in_level_corrected",
+                                         "slGui2.Frderkosten.sl.finalweight_in_level_corrected", "slGui2.Gewinnbeteiligung.sl.finalweight_in_level_corrected",
+                                         "slGui2.Planungsbeteiligung.sl.finalweight_in_level_corrected",
+                                         "slGui2.Umwelteffekte.sl.finalweight_in_level_corrected", "slGui2.Flchenbeanspruchung.sl.finalweight_in_level_corrected",
+                                         "slGui2.Biomassenverwendung.sl.finalweight_in_level_corrected",
+                                         "slGui2.Maisverwendung.sl.finalweight_in_level_corrected", "slGui2.Holzverwendung.sl.finalweight_in_level_corrected",
+                                         "slGui2.RegionaleAuswirkungen.sl.finalweight_in_level_corrected",
+                                         "slGui2.PV.Dachflchenanlagen.sl.finalweight_in_level_corrected",
+                                         "slGui2.PV.Freiflchenanlagen.sl.finalweight_in_level_corrected",
+                                         "slGui2.Windkraft.sl.finalweight_in_level_corrected", "slGui2.Wasserkraftanlagen.sl.finalweight_in_level_corrected",
+                                         "slGui2.Biogasanlagen.sl.finalweight_in_level_corrected", "slGui2.Biomasseheizkraftwerke.sl.finalweight_in_level_corrected",
+                                         "slGui2.Einzelhausholzheizungen.sl.finalweight_in_level_corrected",
+                                         "slGui2.Tiefengeothermieanlagen.sl.finalweight_in_level_corrected",
+                                         "slGui2.Wrmepumpen.sl.finalweight_in_level_corrected", "Anlagengröße.und.Zentralisierung.bsc.timesClicked",
+                                         "Biomassenverwendung.bsc.timesClicked", "Energieverbrauch.bsc.timesClicked",
+                                         "Regionale.Auswirkungen.bsc.timesClicked", "Wirtschaftsentwicklung.bsc.timesClicked",
+                                         "Anlagengröße.und.Zentralisierung.bsc.visible", "Biomassenverwendung.bsc.visible",
+                                         "Energieverbrauch.bsc.visible", "Regionale.Auswirkungen.bsc.visible",
+                                         "Wirtschaftsentwicklung.bsc.visible"), row.names = 1L, class = "data.frame")
