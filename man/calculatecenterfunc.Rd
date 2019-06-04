@@ -4,7 +4,7 @@
 \alias{calculatecenterfunc}
 \title{Title}
 \usage{
-calculatecenterfunc(centervalue, x, offset, trim = 0, na.rm = FALSE)
+calculatecenterfunc(centervalue, x, offset, trim = 0, na.rm = TRUE)
 }
 \arguments{
 \item{na.rm}{}

@@ -15,7 +15,7 @@
 #' @examples
 #'
 #' @export
-calculatecenterfunc <- function(centervalue, x,offset, trim = 0, na.rm = FALSE){
+calculatecenterfunc <- function(centervalue, x,offset, trim = 0, na.rm = TRUE){
   #defaults to mean
   if (is.character(centervalue) ) {
     if(centervalue=="mean"){
@@ -54,6 +54,8 @@ calculatecenterfunc <- function(centervalue, x,offset, trim = 0, na.rm = FALSE){
 utilityfunc <- function(x, type, offset=ifelse(type=="antiprop", 50 ,0),
                         centervalue=calculatecenterfunc("mean", x,offset), scale=100) {
   #cat(as.character(type))
+  # print(str(x))
+  # print(str(offset))
   switch(as.character(type),
          prop = scale* (x+offset)/centervalue ,
          negprop = 2*scale - scale*(x +offset)/centervalue ,

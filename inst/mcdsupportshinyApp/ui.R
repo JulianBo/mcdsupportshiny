@@ -63,7 +63,7 @@ shinyUI(fluidPage(theme="mcdsupportshiny.css",
 
           tags$p(texte$auswahlaufforderungstext),
           selectInput("ChoiceSlct", texte$choiceSlctText ,
-                      choices=levels(dtAlternativen$Titel) ),
+                      choices=levels(dtAlternativen$Pfad) ),
 
           h3("Informationen zu den Alternativen"),
           textOutput("InformationenText"),
@@ -104,61 +104,72 @@ shinyUI(fluidPage(theme="mcdsupportshiny.css",
           # Show Results, Description, ...
           mainPanel(width = 7,
             tabsetPanel(id="MainTabset",
+                        tabPanel("Ergebnisse",
+                        tabsetPanel(
                           tabPanel("Hauptergebnisse",
 
-                                 h2("Ergebnis"),
-                                div(class="results",
-                                   tags$div("Mit den aktuellen Einstellungen hat folgende Alternative die höchste Punktzahl:",
-                                          textOutput("ErgebnisText", inline=TRUE)),
-                                   tags$div("Ursprünglich ausgewählt hatten Sie:",
-                                          textOutput("ChoiceText", inline=TRUE))
-                                 )
-                                 ,
-                                 tags$p("Sie können jetzt sowohl die Einstellungen/Gewichtungen als auch die präferierte Alternative verändern, und dabei sehen, wie sich die Ergebnisse anpassen. Beachten sie, dass manche Indikatoren nicht in die Berechnung eingehen, weil sie nicht ohne weiteres quantifizierbar bzw. mit Zahlen abbildbar sind."),
-
-                                 div(id="abstimmungsDiv",
-                                   tags$p("Wenn Sie mit den Einstellungen zufrieden sind, können Sie diese abspeichern. Damit gehen diese Werte in das Ergebnis ein."),
-                                   selectInput("ChoiceFinalSlct","Welche Alternative präferieren Sie, nachdem Sie diese Ergebnisse gesehen haben?" ,
-                                               choices=levels(dtAlternativen$Titel),
-                                               width = "100%"
-                                               #TODO: Add changecount!
+                                   h2("Ergebnis"),
+                                   div(class="results",
+                                       tags$div("Mit den aktuellen Einstellungen hat folgender Pfad die höchste Punktzahl:",
+                                                textOutput("ErgebnisText", inline=TRUE)),
+                                       tags$div("Ursprünglich ausgewählt hatten Sie:",
+                                                textOutput("ChoiceText", inline=TRUE))
                                    ),
-                                   actionButton("addBtn", "Zufrieden? Dann aktuelle Einstellungen speichern und damit abstimmen!")
-                                 ),
-                                 hidden(
-                                   div(id="dankeDiv",
-                                       tags$p(tags$b("Vielen Dank. Ihre Präferenzen wurden gespeichert"))
-                                   )
-                                 ),
-                                 h3("Gesamtergebnis"),
-                                 fluidRow(
-                                   column(width=6, plotOutput("ErgebnisPlot")),
-                                   column(width=6,tableOutput("ErgebnisTable"))
+                                   tags$div("Hier können sie sehen, welche ",
+                                            tags$a(href="http://inola-region.de", target="_blank", "Geschichte hinter den einzelnen Pfaden steckt."))
+
+                                   ,
+                                   h2("Weiteres Vorgehen"),
+                                   tags$p("Sie können jetzt sowohl die Einstellungen/Gewichtungen als auch die präferierte Alternative verändern, und dabei sehen, wie sich die Ergebnisse anpassen. Beachten sie, dass manche Indikatoren nicht in die Berechnung eingehen, weil sie nicht ohne weiteres quantifizierbar bzw. mit Zahlen abbildbar sind."),
+
+                                   div(id="abstimmungsDiv",
+                                       tags$p("Wenn Sie mit den Einstellungen zufrieden sind, können Sie diese abspeichern. Damit gehen diese Werte in das Ergebnis ein."),
+                                       selectInput("ChoiceFinalSlct","Welchen Pfad präferieren Sie, nachdem Sie diese Ergebnisse gesehen haben?" ,
+                                                   choices=levels(dtAlternativen$Pfad),
+                                                   width = "100%"
+                                                   #TODO: Add changecount!
+                                       ),
+                                       actionButton("addBtn", "Zufrieden? Dann aktuelle Einstellungen speichern und damit abstimmen!")
                                    ),
-                                 h3("Ergebnisse nach Rahmenszenario"),
-                                 plotOutput("SzenarioPlot")
+                                   hidden(
+                                     div(id="dankeDiv",
+                                         tags$p(tags$b("Vielen Dank. Ihre Präferenzen wurden gespeichert"))
+                                     )
+                                   ),
+                                   h3("Gesamtergebnis"),
+                                   fluidRow(
+                                     column(width=6, plotOutput("ErgebnisPlot")),
+                                     column(width=6,tableOutput("ErgebnisTable"))
+                                   ),
+                                   h3("Ergebnisse nach Rahmen"),
+                                   plotOutput("SzenarioPlot")
 
-                                 ),
-                    tabPanel("Detailergebnisse",
-                             ##dtGewichtungen[,.N, by=.(parent, level)][order(level)]
-                             h3("Punktwerte der Kategorien"),
-                             h4("Bereiche"),
-                             plotOutput("BereichPlot"),
+                          ),
+                          tabPanel("Detailergebnisse",
+                                   ##dtGewichtungen[,.N, by=.(parent, level)][order(level)]
+                                   h3("Punktwerte der Kategorien"),
+                                   h4("Bereiche"),
+                                   plotOutput("BereichPlot"),
 
 
-                             h4("Einzelne Bereiche genauer erkunden"),
-                             selectInput("BereichDetailPlotSelect",
-                                         "Bitte Bereich auswählen",
-                                         choices=unique(dtIndikatorensettings[level>0,parent])),
+                                   h4("Einzelne Bereiche genauer erkunden"),
+                                   selectInput("BereichDetailPlotSelect",
+                                               "Bitte Bereich auswählen",
+                                               choices=unique(dtIndikatorensettings[level>0,parent])),
 
-                             plotOutput("BereichDetailPlot"),
-                             h3("Punktwerte als Tabelle"),
-                              DT::dataTableOutput("EntscheidungenTable")
+                                   plotOutput("BereichDetailPlot"),
+                                   h3("Punktwerte als Tabelle"),
+                                   DT::dataTableOutput("EntscheidungenTable")
 
 
-                        ),
-                    tabPanel("Alternativen",
+                          )
+                        )
+                        )
+                          ,
+                    tabPanel("Funktionsweise",
+                             tags$p("Dieses Programm rechnet die einzelnen Indikatoren in Punktzahlen um. Je nach Gewichtung werden diese Schrittweise anteilig aufaddiert - Je höher die Gewichtung ist, desto mehr der Punkte wird benutzt. "),
                              h3("Benutzte Punktzahlen der Indikatoren"),
+                             plotOutput("NutzenPlot"),
                              selectInput(
                                "NutzenPlotOptions",
                                "Bitte Variablen zur Ansicht auswählen",
@@ -167,7 +178,7 @@ shinyUI(fluidPage(theme="mcdsupportshiny.css",
                                multiple=TRUE
 
                              ),
-                             plotOutput("NutzenPlot"),
+
                              h3("Tabelle der Alternativen"),
                              DT::dataTableOutput("AlternativenTable")
                     ),
