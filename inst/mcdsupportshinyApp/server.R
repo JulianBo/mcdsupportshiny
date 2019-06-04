@@ -19,7 +19,8 @@ library(mcdsupportshiny)
 # Initialisieren#########
 
 #source("Setup.R", encoding="UTF-8") #local=FALSE, auch in ui.R sichtbar
-source("Setup_INOLA.R", encoding="UTF-8") #local=FALSE, auch in ui.R sichtbar
+#source("Setup_INOLA.R", encoding="UTF-8") #local=FALSE, auch in ui.R sichtbar
+source("Setup_INOLA_neu.R", encoding="UTF-8") #local=FALSE, auch in ui.R sichtbar
 
 
 validateConfig(configList,dtAlternativen)

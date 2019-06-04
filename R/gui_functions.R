@@ -19,7 +19,7 @@
 #'                 }
 #'                 Maybe in future versions possibilities for putting special Elements on
 #'                 extra pages by name will be added, right now this is not possible.
-#' @param title_text Which paragraph should be added as first element of each page?
+#' @param title_text Which paragraph should be added as first element of each page?TRUE for automatic generation,  FALSE for none.
 #' @param mainpageposition One of "first", "last", "none".
 #'                         Should main page be first or last or be omitted?
 #' @param parents_name Label used to name root when creating fold-out-panel for root.
@@ -175,6 +175,8 @@ recSliderGuiInput<-function(id, x, depth=0,
   if("sliderlabel" %in% names(x) ) sliderlabel <- x$sliderlabel
   #TODO: Element werden bei Root nicht geparsed..
 
+  if("explanation_for_childs" %in% names(x) ) explanation <- x$explanation else explanation <- NULL
+
   ret <- list()
   children_qualitative<-vector(mode = "logical")
 
@@ -295,13 +297,17 @@ recSliderGuiInput<-function(id, x, depth=0,
 
   }#for
 
+  ##Prepend Explanation, if not null
+  if (!is.null(explanation)) ret <- c(list(explanation), ret)
+
   ##Falls nicht mehr offen, muss komplete Sliderliste in ein bsCollapsePanel gepackt werden
 
   if (depth>= open.maxdepth){
     result <- tagList(
       bsCollapse(id=NS(ns(gsub("[^A-Za-z0-9-]", "", parents_name)))("bsc"),
                  bsCollapsePanel(title=sprintf(">>> '%s' genauer einstellen",parents_name ), ##Hier beschreibung einstellen
-                                 value=NS(gsub("[^A-Za-z0-9-]", "", parents_name))("bscPanel"), #No relation to outer namespace; none needed
+                                 value=NS(gsub("[^A-Za-z0-9-]", "", parents_name))("bscPanel"),
+                                 #No relation to outer namespace; none needed
                                  tagList(ret)
                  )#bsCollapsePanel
       )#bsCollapse

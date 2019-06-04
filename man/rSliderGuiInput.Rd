@@ -32,7 +32,7 @@ extra pages by name will be added, right now this is not possible.}
 
 \item{beschreibungs_text}{}
 
-\item{title_text}{Which paragraph should be added as first element of each page?}
+\item{title_text}{Which paragraph should be added as first element of each page?TRUE for automatic generation,  FALSE for none.}
 
 \item{mainpageposition}{One of "first", "last", "none".
 Should main page be first or last or be omitted?}
