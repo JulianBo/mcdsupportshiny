@@ -139,6 +139,7 @@ rgetIndikatorensetting<- function(x, depth=0, parent="Szenarioergebnis",
   for(i in 1:length(x) ){
     list.elem <- x[[i]]
     elem.name<- names(x)[i]
+    #print(elem.name)
 
     ##Attribute parsen
     #Positive Settings
@@ -165,7 +166,7 @@ rgetIndikatorensetting<- function(x, depth=0, parent="Szenarioergebnis",
       retvalue <- data.table(name=elem.name,
                              is_mapping = list.elem$class=="mapping",
                              negative=FALSE,
-                             Attribname=if(list.elem$class=="mapping") list.elem$Attribname else NA,
+                             Attribname=if(list.elem$class=="mapping" & "Attribname" %in% names(list.elem) ) list.elem$Attribname else NA,
                              level=depth,
                              util_func=if(this.include_parent)this.positive_utility_settings$util_func else positive_utility_settings$util_func,
                              util_mean=if(this.include_parent) this.positive_utility_settings$util_mean else positive_utility_settings$util_mean,
@@ -174,7 +175,7 @@ rgetIndikatorensetting<- function(x, depth=0, parent="Szenarioergebnis",
                              agg_func=if(this.include_parent) this.agg_func else agg_func,
                              parent=parent,
                              bscName=if(depth>= open.maxdepth )NS(parent)("bsc") else NA,
-                             standardweight = ifelse(this.include_parent,this.standardweight, standardweight)
+                             standardweight= if(this.include_parent) {this.standardweight} else standardweight
       )
 
       #Falls negativ nötig
@@ -184,7 +185,7 @@ rgetIndikatorensetting<- function(x, depth=0, parent="Szenarioergebnis",
           data.table(name=elem.name,
                      is_mapping = list.elem$class=="mapping",
                      negative=TRUE,
-                     Attribname=if(list.elem$class=="mapping") {
+                     Attribname=if(list.elem$class=="mapping"& "Attribname" %in% names(list.elem)) {
                        ##Falls anderes Attribut für negative Einstellungen.
                        if("negative_Attribname" %in% names(list.elem) ) list.elem$negative_Attribname else list.elem$Attribname
                        } else NA,
@@ -196,7 +197,7 @@ rgetIndikatorensetting<- function(x, depth=0, parent="Szenarioergebnis",
                      agg_func=if(this.include_parent) this.agg_func else agg_func,
                      parent=parent,
                      bscName=if(depth>= open.maxdepth )NS(parent)("bsc") else NA,
-                     standardweight = ifelse(this.include_parent,this.standardweight, standardweight)
+                     standardweight = if(this.include_parent) {this.standardweight} else standardweight
           )
         )
       }
@@ -212,6 +213,13 @@ rgetIndikatorensetting<- function(x, depth=0, parent="Szenarioergebnis",
                                                            minweight = this.minweight,
                                                            standardweight = this.standardweight)
         )
+
+      # print("")
+      # print(paste0("*** ", elem.name))
+      # print("*****ret****")
+      # print(ret)
+      # print("*****retvalue****")
+      # print(retvalue)
 
 
       ret<-rbind(ret,retvalue)
