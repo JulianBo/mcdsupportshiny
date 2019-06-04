@@ -39,6 +39,8 @@ $(document).ready(function() {
     }
 
 
+
+
     var someID = $("[sliderlabel~=returnLabelsNormal] .js-range-slider").ionRangeSlider({ // enter your shiny slider ID here (CSS-Selector?): .js-range-slider #bins
           prettify: returnLabelsNormal
           // ,
@@ -56,6 +58,7 @@ $(document).ready(function() {
         });
 
     });
+
 
 
 

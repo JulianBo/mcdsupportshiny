@@ -59,6 +59,8 @@ utilityfunc <- function(x, type, offset=ifelse(type=="antiprop", 50 ,0),
   switch(as.character(type),
          prop = scale* (x+offset)/centervalue ,
          negprop = 2*scale - scale*(x +offset)/centervalue ,
+         #scale*(s - x/centervalue )
+         ## s -1 =1 --> s=2
          antiprop=scale* centervalue/(x+offset),
          identity= x)
 }

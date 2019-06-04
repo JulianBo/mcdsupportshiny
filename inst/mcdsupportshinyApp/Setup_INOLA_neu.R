@@ -3,11 +3,12 @@
 library (data.table)
 #library(bit64)
 
-dtAlternativen <- fread(file="Alternativen.csv",
+dtAlternativen <- fread(file="alternativen.csv",
                         na.strings="",
                         dec=",",
                         stringsAsFactors=TRUE,
-                        integer64="double")
+                        integer64="double",
+                        encoding="Latin-1")
 #summary(dtAlternativen)
 
 # Konfiguration aufbauen -----------------
@@ -105,7 +106,7 @@ configList <- list (
       description = tagList(
         "Es ist mir wichtig, ob das ",em("Energiesystem in der Region")," vor allem aus ",em("vielen kleineren Anlage oder aus wenigen großen Anlagen")," besteht."
       )
-      ,explanation_for_childs="Dies ist eine Erläuterung, die nach 'Anlagengröße und Zentralisierung' kommen sollte"
+      #,explanation_for_childs="Dies ist eine Erläuterung, die nach 'Anlagengröße und Zentralisierung' kommen sollte"
       ,
 
       'Anlagengröße Stromerzeugung' = list(
@@ -136,8 +137,8 @@ configList <- list (
     util_offset = 10,
     include_parent = TRUE,
     description = tagList(
-      "Die Erzeugung von Strom mit EE-Anlagen unterliegt zeitlichen Schwankungen, die von den Witterungsverhältnissen und vom Technologiemix abhängen.",
-      tags$br(),"Wie wichtig ist es Ihnen, dass  ",em("innerhalb der Region Schwankungen zwischen EE-Stromproduktion und –verbrauch ausgeglichen ")," werden?"
+      "Die Erzeugung von Strom mit Erneuerbare-Energien-Anlagen unterliegt zeitlichen Schwankungen, die von den Witterungsverhältnissen und vom Technologiemix abhängen.",
+      tags$br(),"Wie wichtig ist es Ihnen, dass  ",em("innerhalb der Region Schwankungen zwischen Stromproduktion und Stromverbrauch ausgeglichen ")," werden?"
       )
     )
   ),
@@ -242,31 +243,31 @@ configList <- list (
     ),
     'Regionale Auswirkungen' = list (
       class = "elements",
+      util_func = "negprop",
       description = tagList(
         "Wie wichtig ist es Ihnen, dass ",em("sonstige regionalen und lokalen Auswirkungen durch Energieerzeugungsanlagen"),
-        " möglichst gering sind?",
-        explanation_for_childs=tagList("Welche Anlagen präferieren Sie im Verhältnis zueinander wie stark?",
-                                       em("von 0 = eher nicht, bis 100 = große Zustimmung"))
-      ),
+        " möglichst gering sind?")
+      ,explanation_for_childs= tagList("Die negativen Auswirkungen welcher Anlagen bewerten  Sie im Verhältnis zueinander als wie wichtig? ",
+                                       em("von 0 = keine wichtigen Auswirkungen, bis 100 = stark beeinträchtigende Auswirkungen"))
+      ,
       'PV-Dachflächenanlagen' = list(
         class = "mapping",
         Attribname = "PV_Dach_Kapazität",
-        description = tagList(
-          "Auf der Skala von 0 bis 100 bewerte ich ",em("Dach- und Fassadenanlagen für PV und Solarthermie")," mit:"
+        description = tagList("Auf der Skala von 0 bis 100 bewerte ich ",em("Auswirkungen von Dach- und Fassadenanlagen für PV und Solarthermie")," mit:"
         )
       ),
       'PV-Freiflächenanlagen' = list(
         class = "mapping",
         Attribname = "PV_Frei_Kapazität",
         description = tagList(
-          "Auf der Skala von 0 bis 100 bewerte ich ",em("Freiflächenanlagen für PV und Solarthermie")," mit:"
+          "Auf der Skala von 0 bis 100 bewerte ich ",em("Auswirkungen von Freiflächenanlagen für PV und Solarthermie")," mit:"
         )
       ),
       'Windkraft' = list(
         class = "mapping",
         Attribname = "Windkraft_Anzahl",
         description = tagList(
-          "Auf der Skala von 0 bis 100 bewerte ich ",em("Windkraftanlagen")," mit:"
+          "Auf der Skala von 0 bis 100 bewerte ich ",em("Auswirkungen von Windkraftanlagen")," mit:"
         )
       ),
 
@@ -274,35 +275,35 @@ configList <- list (
         class = "mapping",
         Attribname = "Wasserkraft_Anzahl",
         description = tagList(
-          "Auf der Skala von 0 bis 100 bewerte ich ",em("Wasserkraftanlagen")," mit:"
+          "Auf der Skala von 0 bis 100 bewerte ich ",em("Auswirkungen von Wasserkraftanlagen")," mit:"
         )
       ),
       'Biogasanlagen' = list(
         class = "mapping",
         Attribname = "Biogas_Anzahl",
         description = tagList(
-          "Auf der Skala von 0 bis 100 bewerte ich ",em("Biogasanlagen")," mit:"
+          "Auf der Skala von 0 bis 100 bewerte ich ",em("Auswirkungen von Biogasanlagen")," mit:"
         )
       ),
       'Biomasseheiz(kraft)werke' = list(
         class = "mapping",
         Attribname = "BiomasseWerke_Anzahl",
         description = tagList(
-          "Auf der Skala von 0 bis 100 bewerte ich ",em("größere Biomasseheiz(kraft)werke")," mit:"
+          "Auf der Skala von 0 bis 100 bewerte ich ",em("Auswirkungen von größere Biomasseheiz(kraft)werke")," mit:"
         )
       ),
       'Einzelhausholzheizungen' = list(
         class = "mapping",
         Attribname ="Einzelhausbiomasse_Anzahl",
         description = tagList(
-          "Auf der Skala von 0 bis 100 bewerte ich ",em("holzbefeuerte Heizungen (Einzelhäuser)")," mit:"
+          "Auf der Skala von 0 bis 100 bewerte ich ",em("Auswirkungen von holzbefeuerte Heizungen (Einzelhäuser)")," mit:"
         )
       ),
       'Tiefengeothermieanlagen' = list(
         class = "mapping",
         Attribname = "Tiefengeothermie_Anzahl",
         description = tagList(
-          "Auf der Skala von 0 bis 100 bewerte ich ",em("Tiefengeothermieanlagen")," mit:"
+          "Auf der Skala von 0 bis 100 bewerte ich ",em("Auswirkungen von Tiefengeothermieanlagen")," mit:"
         )
       )
       ,
@@ -310,13 +311,12 @@ configList <- list (
         class = "mapping",
         Attribname = "Wärmepumpen_Oberflächengeothermie_Anzahl",
         description = tagList(
-          "Auf der Skala von 0 bis 100 bewerte ich ",em("oberflächennahme Geothermieanlagen und Wärmepumpen")," mit:"
+          "Auf der Skala von 0 bis 100 bewerte ich ",em("Auswirkungen von oberflächennahme Geothermieanlagen und Wärmepumpen")," mit:"
         )
       )
     )
 
   )
-
 
 )
 
@@ -360,7 +360,7 @@ speichersettings= list( method="GoogleSheets",
 # library(mcdsupportshiny)
 #dtBisherige <- loadData("CSV", "MCDA_Beispiel_INOLA_neu")
 
-dput(dtBisherige[1,])
+#dput(dtBisherige[1,])
 
 speicher_template = structure(list(Zeitpunkt = "Tue Jun 04 14:38:10 2019", Sessionstart = "Tue Jun 04 14:38:02 2019",
                                    session_id = 172186L, gruppe = NA, url_search = NA, addBtn = 0L,
