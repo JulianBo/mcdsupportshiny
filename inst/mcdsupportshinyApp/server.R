@@ -193,7 +193,12 @@ NutzenWerte<- as.matrix(dtNutzen[,.SD,
 # )
 
 
-datastorage <- future(initialize_datastorage( speicher_template, speichersettings$method, speichersettings$place) )
+# datastorage <- future(
+  initialize_datastorage( speicher_template, speichersettings$method, speichersettings$place)
+  # ,
+  # globals=list(speicher_template=speicher_template,
+  #              speichersettings=speichersettings,
+  #              initialize_datastorage=mcdsupportshiny::initialize_datastorage))
 
 
 
@@ -211,7 +216,12 @@ shinyServer(function(input, output, session) {
 
       #print("loading Bisherige")
 
-      future({ as.data.table(loadData(speichersettings$method, speichersettings$place ) ) })
+    # datastorage %...>%
+      future(
+      { as.data.table(loadData(speichersettings$method, speichersettings$place ) ) },
+      globals=list(speichersettings=speichersettings,
+                   as.data.table=data.table::as.data.table,
+                   loadData=mcdsupportshiny::loadData))
 
   }
   )
