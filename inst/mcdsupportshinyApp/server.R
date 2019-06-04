@@ -101,10 +101,16 @@ dtAlternativen_long[,`:=`(nutzen_correct=ifelse(is.na(value),0, nutzen),
                          )]
 
 ##If all of a variable is missing, it is marked as qualitative
-dtIndikatorensettings[ Attribname==dtAlternativen_long[,
-                                                       .(all_missing=all(missing)), by=variable]
-                                       [all_missing==TRUE]$variable,
-                       is_qualitative:=TRUE]
+##QUICK FIX - TODO: Better.
+if(any (dtAlternativen_long[,
+                            .(all_missing=all(missing)), by=variable]
+        [all_missing==TRUE]$variable) ){
+  dtIndikatorensettings[ Attribname==dtAlternativen_long[,
+                                                         .(all_missing=all(missing)), by=variable]
+                         [all_missing==TRUE]$variable,
+                         is_qualitative:=TRUE]
+}
+
 
 ##Recursively set qualitative== TRUE, if all children are qualitative
 for( i in max(  dtIndikatorensettings$level):1){
