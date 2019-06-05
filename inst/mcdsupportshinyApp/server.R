@@ -20,7 +20,7 @@ library(mcdsupportshiny)
 
 #source("Setup.R", encoding="UTF-8") #local=FALSE, auch in ui.R sichtbar
 #source("Setup_INOLA.R", encoding="UTF-8") #local=FALSE, auch in ui.R sichtbar
-source("Setup_INOLA_neu.R", encoding="UTF-8") #local=FALSE, auch in ui.R sichtbar
+source("Setup_INOLA_neu.R",local=TRUE, encoding="UTF-8") #local=FALSE, auch in ui.R sichtbar
 
 
 validateConfig(configList,dtAlternativen)
@@ -461,7 +461,11 @@ shinyServer(function(input, output, session) {
     future( {
       saveData(daten,speichersettings$method, speichersettings$place )
      # message("saving after input$addBtn DONE")
-      })
+      }
+     ,
+     globals=list(speichersettings=speichersettings,
+                  daten=daten,
+                  saveData=mcdsupportshiny::saveData))
     updateSelectInput(session,"ChoiceFinalSlct", selected = input$ChoiceSlct) #TODO BUG doesn't work
     rv$ChoiceFinalSlctCount<-rv$ChoiceFinalSlctCount-1 #account for manual change.
 

@@ -20,7 +20,7 @@ library(mcdsupportshiny)
 
 #source("Setup.R", encoding="UTF-8") #local=FALSE, auch in ui.R sichtbar
 #source("Setup_INOLA.R", encoding="UTF-8") #local=FALSE, auch in ui.R sichtbar
-source("Setup_INOLA_neu.R", encoding="UTF-8") #local=FALSE, auch in ui.R sichtbar
+source("Setup_INOLA_neu.R",local=TRUE, encoding="UTF-8") #local=FALSE, auch in ui.R sichtbar
 
 dtIndikatorensettings<-getIndikatorensetting(configList)
 
@@ -63,7 +63,8 @@ shinyUI(fluidPage(theme="mcdsupportshiny.css",
 
           tags$p(texte$auswahlaufforderungstext),
           selectInput("ChoiceSlct", texte$choiceSlctText ,
-                      choices=levels(dtAlternativen$Pfad) ),
+                      choices=c("Bitte Auswählen", levels(dtAlternativen$Pfad) )
+                      ),
 
           h3("Informationen zu den Alternativen"),
           textOutput("InformationenText"),
@@ -125,7 +126,7 @@ shinyUI(fluidPage(theme="mcdsupportshiny.css",
                                    div(id="abstimmungsDiv",
                                        tags$p("Wenn Sie mit den Einstellungen zufrieden sind, können Sie diese abspeichern. Damit gehen diese Werte in das Ergebnis ein."),
                                        selectInput("ChoiceFinalSlct","Welchen Pfad präferieren Sie, nachdem Sie diese Ergebnisse gesehen haben?" ,
-                                                   choices=levels(dtAlternativen$Pfad),
+                                                   choices=c("Bitte Auswählen", levels(dtAlternativen$Pfad) ),
                                                    width = "100%"
                                                    #TODO: Add changecount!
                                        ),
