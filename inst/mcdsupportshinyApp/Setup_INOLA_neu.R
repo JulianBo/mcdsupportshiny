@@ -11,6 +11,13 @@ dtAlternativen <- fread(file="alternativen.csv",
                         encoding="Latin-1")
 #summary(dtAlternativen)
 
+# pfadcolors=c("Fortschreibung"=,
+#              "Kleinere Anlagen"="c",
+#              "größere Anlagen"=,
+#              "Referenzmodellierung (2019)"=
+#              "mehrere"=,
+#              "Bitte Auswählen")
+
 # Konfiguration aufbauen -----------------
 
 configList <- list (
@@ -113,9 +120,11 @@ configList <- list (
         class = "mapping",
         Attribname = "Anlagengröße_Strom",
         description = tagList(
-          "Ich präferiere ",em("wenige große Anlagen")," zur ",em("Stromerzeugung"),", es ist mir ",em("egal"),", oder ich präferiere ",em("viele kleine Anlagen")," (z.B.: Mehr Verbundkraftwerke anstatt Einzelhausanlagen)."
+          "Ich präferiere ",em("wenige große Anlagen")," zur ",em("Stromerzeugung,"),
+          " es ist mir ",em("egal,")," oder ich präferiere ",em("viele kleine Anlagen")," (z.B.: Mehr Verbundkraftwerke anstatt Einzelhausanlagen)."
         ),
         minweight=-100,
+        standardweight = 0,
         sliderlabel="returnLabelsAnlagengroesse"
       ),
       'Anlagengröße Wärmeerzeugung' = list(
@@ -123,9 +132,11 @@ configList <- list (
         Attribname = "Anlagengröße_Wärme",
         #negative_Attribname = "Anlagengröße_Wärme_negative",
         description = tagList(
-          "Ich präferiere ",em("wenige große Anlagen")," zur ",em("Wärmeerzeugung"),", es ist mir ",em("egal"),", oder ich präferiere ",em("viele kleine Anlagen")," (z.B.: Nahwärmenetze mit großem BHKW vs. Wärmespeicher, Solarthermieanlagen, Wärmepumpe)."
+          "Ich präferiere ",em("wenige große Anlagen")," zur ",em("Wärmeerzeugung,")," es ist mir ",
+          em("egal,")," oder ich präferiere ",em("viele kleine Anlagen")," (z.B.: Nahwärmenetze mit großem BHKW vs. Wärmespeicher, Solarthermieanlagen, Wärmepumpe)."
         ),
         minweight=-100,
+        standardweight = 0,
         sliderlabel="returnLabelsAnlagengroesse"
       )
       )
@@ -138,7 +149,8 @@ configList <- list (
     include_parent = TRUE,
     description = tagList(
       "Die Erzeugung von Strom mit Erneuerbare-Energien-Anlagen unterliegt zeitlichen Schwankungen, die von den Witterungsverhältnissen und vom Technologiemix abhängen.",
-      tags$br(),"Wie wichtig ist es Ihnen, dass  ",em("innerhalb der Region Schwankungen zwischen Stromproduktion und Stromverbrauch ausgeglichen ")," werden?"
+      tags$br(),"Wie wichtig ist es Ihnen, dass  ",
+      em("innerhalb der Region Schwankungen zwischen Stromproduktion und Stromverbrauch ausgeglichen ")," werden?"
       )
     )
   ),
@@ -326,7 +338,7 @@ pfadbeschreibungen<-tagList(
   p(strong("0) Referenzmodellierung:"),"Der modellierte Zustand zu Beginn der Modellierung (2019)."),
   p(strong("1) Fortschreibung:"),"Fortschreibung der aktuellen Ausbauraten: Erneuerbare Energieanlagen werden gebaut, falls sie rentabel sind. Die Region Oberland setzt auf Energieeffizienzmaßnahmen und wirtschaftliches Wachstum und ist grundsätzlich technologieoffen. "),
   p(strong("2) Kleinere Anlagen:"),"Es werden „kleine“ Lösungen fokussiert, zum Beispiel bei gebäudegebundenen Anlagen und Speichern. Haushalte und Firmen sind die primären Investoren. "),
-  p(strong("3) Größere Anlagen:"),"Bei erneuerbaren Energien und Energieeinsparung werden „größere“ Lösungen bevorzugt. Als Investoren treten vor allem Kommunen, Stadtwerke und Genossenschaften als Investoren z.B. für Kombienergiezentralen und Nachwärmenetze sowie (Quartier-)Speicher auf. ")
+  p(strong("3) Größere Anlagen:"),"Es werden „größere“ Anlagen wie Solar-Freiflächenanlagen, Windkraft oder auch Biomasseheizwerke mit Nahwärmenetzen sowie (Quartier-)Speicher verstärkt gefördert. Als Investoren treten neben größeren Investoren auch Kommunen, Stadtwerke und Genossenschaften auf. ")
 )
 
 
@@ -335,8 +347,8 @@ pfadbeschreibungen<-tagList(
 
 texte <- list (
 
-  begruessungstext="Dieses Programm ist eine Entscheidungshilfe. Auf den nächsten Seiten können sie gewichten, wie wichtig ihnen verschiedene Eigenschaften eines regionalen Energiesystems sind. Auf was legen Sie wie viel Wert? Das Programm berechnet dann, welches der verschiedenen Alternativen am meisten Ihren Präferenzen entspricht.",
-  auswahlaufforderungstext="Bitte wählen sie jedoch zuerst aus, welche Alternative Ihnen spontan am besten gefällt.Die einzelnen Alternativen sind unten beschrieben",
+  begruessungstext="Dieses Programm ist eine Entscheidungshilfe. Die simulierten Ausbaupfade erneuerbarer Energien setzen sich aus vielen Faktoren zusammen, die teils nicht auf den ersten Blick ersichtlich werden. Deshalb können Sie auf den nächsten Seiten angeben, wie wichtig Ihnen verschiedene Aspekte des regionalen Energiesystems im Oberland sind. Auf was legen Sie wie viel Wert? Das Programm ermittelt dann, welcher Ausbaupfad am meisten Ihren Präferenzen entspricht.",
+  auswahlaufforderungstext="Bitte wählen Sie zuerst aus, welcher Ausbaupfad Ihnen spontan am besten gefällt. Die einzelnen Ausbaupfade sind nachfolgend kurz beschrieben.",
 
   begruessungstext2= "Bitte stellen sie ein, wie wichtig Ihnen die einzelnen Indikatoren im Verhältnis zu den anderen Indikatoren sind.",
 
