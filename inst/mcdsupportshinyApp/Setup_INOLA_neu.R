@@ -301,14 +301,14 @@ configList <- list (
         class = "mapping",
         Attribname = "BiomasseWerke_Anzahl",
         description = tagList(
-          "Auf der Skala von 0 bis 100 bewerte ich ",em("Auswirkungen von größere Biomasseheiz(kraft)werke")," mit:"
+          "Auf der Skala von 0 bis 100 bewerte ich ",em("Auswirkungen von größeren Biomasseheiz(kraft)werken")," mit:"
         )
       ),
       'Einzelhausholzheizungen' = list(
         class = "mapping",
         Attribname ="Einzelhausbiomasse_Anzahl",
         description = tagList(
-          "Auf der Skala von 0 bis 100 bewerte ich ",em("Auswirkungen von holzbefeuerte Heizungen (Einzelhäuser)")," mit:"
+          "Auf der Skala von 0 bis 100 bewerte ich ",em("Auswirkungen von holzbefeuerten Heizungen (Einzelhäuser)")," mit:"
         )
       ),
       'Tiefengeothermieanlagen' = list(
@@ -323,7 +323,7 @@ configList <- list (
         class = "mapping",
         Attribname = "Wärmepumpen_Oberflächengeothermie_Anzahl",
         description = tagList(
-          "Auf der Skala von 0 bis 100 bewerte ich ",em("Auswirkungen von oberflächennahme Geothermieanlagen und Wärmepumpen")," mit:"
+          "Auf der Skala von 0 bis 100 bewerte ich ",em("Auswirkungen von oberflächennahen Geothermieanlagen und Wärmepumpen")," mit:"
         )
       )
     )
