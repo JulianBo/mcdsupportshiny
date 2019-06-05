@@ -162,7 +162,9 @@ AnalysisPrevious<- function(input, output, session,
       ggplot(.,
              mapping = aes(x=value_new, fill=value_new))+
         geom_bar()+
-        facet_grid(position~modus)+ylab("Anzahl")+xlab("Pfad")
+        facet_grid(position~modus,scales = "free_y")+
+        ylab("Anzahl")+xlab("Pfad")+
+        scale_fill_discrete(name = "Pfad")
     }
   })
 
