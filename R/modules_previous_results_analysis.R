@@ -163,8 +163,7 @@ AnalysisPrevious<- function(input, output, session,
              mapping = aes(x=value_new, fill=value_new))+
         geom_bar()+
         facet_grid(position~modus,scales = "free_y")+
-        ylab("Anzahl")+xlab("Pfad")+
-        scale_fill_discrete(name = "Pfad")
+        labs(fill = "Pfad", x="Pfad", y="Anzahl")
     }
   })
 

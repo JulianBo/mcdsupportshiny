@@ -97,7 +97,7 @@ rSliderGuiInput<-function(id, x,
                                                     ##First: Mainpagetitle
                                                     "Auf welche Bereiche legen Sie wie viel Wert?",
                                                     ##Other Titles
-                                                    sprintf("Worauf legen sie im Bereich '%s' wie viel wert?",
+                                                    sprintf("Worauf legen sie im Bereich '%s' wie viel Wert?",
                                                             first(parent_name))
                                                     )
                                  ),

@@ -578,7 +578,7 @@ shinyServer(function(input, output, session) {
     ggplot(rv_dtSzenarioergebnis(), aes(y=Szenarioergebnis,fill=Pfad,x=Pfad,  shape=Rahmen))+
       geom_col(position="dodge" )+
       scale_shape_manual(values=21:24)+
-      geom_point(colour="Black", position=position_dodge(width=1))+
+      geom_point(colour="Black", position=position_dodge(width=1), size=4)+
       ylab("Punktzahl")+
       annotate("text",
                 label =ifelse(sum(rv_dtGewichtungen()[level==0,
@@ -613,7 +613,7 @@ shinyServer(function(input, output, session) {
       facet_wrap(~name)+
       geom_col(position="dodge" )+
       scale_shape_manual(values=21:24)+
-      geom_point(colour="Black", position=position_dodge(width=1))+
+      geom_point(colour="Black", position=position_dodge(width=1), size=4)+
       ylab("Punktzahl")+
       geom_text(data = rv_dtGewichtungen()[level==0,],
                 mapping=aes(label =ifelse(is_qualitative, "Nicht mit Daten hinterlegt",
@@ -645,7 +645,7 @@ shinyServer(function(input, output, session) {
       facet_wrap(~name)+
       geom_col(position="dodge" )+
       scale_shape_manual(values=21:24)+
-      geom_point(colour="Black", position=position_dodge(width=1))+
+      geom_point(colour="Black", position=position_dodge(width=1), size=4)+
       ylab("Punktzahl")+
       geom_text(data = rv_dtGewichtungen()[parent==input$BereichDetailPlotSelect,],
                  mapping=aes(label =ifelse(is_qualitative, "Nicht mit Daten hinterlegt",
@@ -729,7 +729,7 @@ shinyServer(function(input, output, session) {
       scale_alpha_continuous(range=c(1,0.8),guide = 'none')+
       scale_linetype_discrete( name="Bewertungsbereich",labels=c("positiv", "negativ"))+
       scale_fill_discrete(name="Ausbaupfad")+
-      geom_point(colour="Black")+
+      geom_point(colour="Black", size=4)+
       labs(x="Wert",y="Punktzahl")+
       facet_wrap(~variable, scales = "free_x")+ # facet_wrap nach Slidernamen wäre "name", funktioniert nicht
       geom_path(data =dtNutzenFuncsList[variable %in% input$NutzenPlotOptions],
