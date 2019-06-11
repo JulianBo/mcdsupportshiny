@@ -20,7 +20,7 @@ library(mcdsupportshiny)
 
 #source("Setup.R", encoding="UTF-8") #local=FALSE, auch in ui.R sichtbar
 #source("Setup_INOLA.R", encoding="UTF-8") #local=FALSE, auch in ui.R sichtbar
-source("Setup_INOLA_neu.R",local=TRUE, encoding="UTF-8") #local=FALSE, auch in ui.R sichtbar
+source("Setup_INOLA_neu.R",local=FALSE, encoding="UTF-8") #local=FALSE, auch in ui.R sichtbar
 
 
 validateConfig(configList,dtAlternativen)
@@ -58,8 +58,11 @@ dtAlternativen_long <- merge(melt(dtAlternativen, id.vars=c("Pfad", "Rahmen", "K
 #Berechne Mittelwert
 #Default: Mittelwert der Variablen, über alle Rahmenszenarien
 dtAlternativen_long[,
-                    centervar:=calculatecenterfunc(first(util_mean),value),
-                    by=.(variable, negative)]
+                    `:=`(
+                      x1=calculatecenterfunc(first(util_fit_x1),value),
+                      x2=calculatecenterfunc(first(util_fit_x2),value)
+                      ),
+                    by=.(variable, negative,util_func)]
 
 
 dtAlternativen_long[,`:=`(all_missing=all(is.na(value))), by=variable]
@@ -70,8 +73,10 @@ dtAlternativen_long[,`:=`(all_missing=all(is.na(value))), by=variable]
 dtAlternativen_long[!(all_missing==TRUE),
                     nutzen:=utilityfunc(x=value,
                                         type=first(util_func),
-                                        x2= first(centervar),
-                                        y2=first(util_scale) ),
+                                        x1=first(x1),
+                                        y1=first(y1),
+                                        x2= first(x2),
+                                        y2=first(y2) ),
                     by=.(variable, negative)]
 
 
@@ -83,7 +88,7 @@ dtAlternativen_long[!(all_missing==TRUE),
                              nutzen_min=min(nutzen, na.rm=TRUE)*0.95,
                              nutzen_max=max(nutzen, na.rm=TRUE)*1.05
                              ),
-                    by=.(variable,negative,util_func, util_offset,util_offset, util_scale, centervar)]
+                    by=.(variable,negative,util_func, util_fit_x1,x1, y1,util_fit_x2,x2, y2)]
 
 #FÜge width hinzu, um es beim Plotten benutzen zu können (position_dodge)
 #Siehe: https://stackoverflow.com/questions/48946222/ggplot-with-facets-provide-different-width-to-dodge-with-each-facet
@@ -125,19 +130,24 @@ for( i in max(  dtIndikatorensettings$level):1){
 
 ## Nutzenfunktionen, zum Plotten
 dtNutzenFuncs <-  copy(dtAlternativen_long)[,.N,
-                                            by=.(variable,negative, util_func, util_offset,util_offset, util_scale, centervar,value_min,value_max)]
+                                            by=.(variable,negative, util_func,
+                                                 util_fit_x1,x1, y1,
+                                                 util_fit_x2,x2, y2,
+                                                 value_min,value_max)]
 dtNutzenFuncsList <- crossjoinFunc(dtNutzenFuncs,data.table(n=seq_len(101)-1))
 dtNutzenFuncsList[!is.na(value_min) & !is.na(value_max),
                   `:=`(
-  x= value_min  +(value_max-value_min  )*n*1./100,
-  y=utilityfunc(value_min  +(value_max-value_min  )*n*1./100,
-  # x= value_min -10 +(value_max-value_min +20 )*n*1./100,
-  # y=utilityfunc(value_min -10 +(value_max-value_min +20 )*n*1./100,
-               type=first(util_func),
-  x2= first(centervar),
-  y2=first(util_scale ) )
+                    x= value_min  +(value_max-value_min  )*n*1./100,
+                    y=utilityfunc(value_min  +(value_max-value_min  )*n*1./100,
+                                  # x= value_min -10 +(value_max-value_min +20 )*n*1./100,
+                                  # y=utilityfunc(value_min -10 +(value_max-value_min +20 )*n*1./100,
+                                  type=first(util_func),
+                                  x1=first(x1),
+                                  y1=first(y1),
+                                  x2= first(x2),
+                                  y2=first(y2) )
 
-), by=.(variable,negative )]
+                  ), by=.(variable,negative )]
 
 
 
@@ -729,7 +739,7 @@ shinyServer(function(input, output, session) {
       scale_fill_discrete(name="Ausbaupfad")+
       geom_point(colour="Black", size=4)+
       labs(x="Wert",y="Punktzahl")+
-      facet_wrap(~variable, scales = "free_x")+ # facet_wrap nach Slidernamen wäre "name", funktioniert nicht
+      facet_wrap(~variable, scales = "free_x")+
       geom_path(data =dtNutzenFuncsList[variable %in% input$NutzenPlotOptions],
                 mapping=aes(x=x,y=y, linetype=negative), inherit.aes = FALSE )
    })

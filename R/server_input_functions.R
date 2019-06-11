@@ -41,27 +41,31 @@ validateConfig <- function (configList, dtAlternativen){
 #' Helper function. Standard configuration of utility function
 #'
 #' @param util_func
-#' @param util_mean
-#' @param util_offset
-#' @param util_scale
+#' @param util_fit_x2
+#' @param y2
+#' @param util_fit_x1
+#' @param y1
 #'
-#' @return list of four:
-#'            list(util_func=util_func,
-#'                 util_mean=util_mean,
-#'                 util_offset=util_offset,
-#'                util_scale=util_scale)
+#' @return list of five:
+#' list(util_func=util_func,
+#' util_fit_x1=util_fit_x1,
+#' y1=y1,
+#' util_fit_x2=util_fit_x2,
+#' y2=y2)
 #'
 #'
 #' @export
 #'
 #' @examples
-utility_settings<-function( util_func="prop",util_mean="mean",
-                            util_offset=ifelse(util_func=="antiprop", 10,0),
-                            util_scale=100){
+utility_settings<-function( util_func="prop",
+                            util_fit_x1=NA, y1=NA,
+                            util_fit_x2="mean",
+                            y2=100){
   list(util_func=util_func,
-       util_mean=util_mean,
-       util_offset=util_offset,
-       util_scale=util_scale)
+       util_fit_x1=util_fit_x1,
+       y1=y1,
+       util_fit_x2=util_fit_x2,
+       y2=y2)
 }
 
 #' Get Settings of Indicators
@@ -88,15 +92,34 @@ getIndikatorensetting<- function(x,
 
 
 
+  this.positive_utility_settings<-positive_utility_settings
+  if("util_func" %in% names(x)) this.positive_utility_settings$util_func<-x$util_func
+  if("util_fit_x1" %in% names(x)) this.positive_utility_settings$util_fit_x1<-x$util_fit_x1
+  if("y1" %in% names(x)) this.positive_utility_settings$y1<-x$y1
+  if("util_fit_x2" %in% names(x)) this.positive_utility_settings$util_fit_x2<-x$util_fit_x2
+  if("y2" %in% names(x)) this.positive_utility_settings$y2<-x$y2
+  #Negative Settings
+  this.negative_utility_settings<-negative_utility_settings
+  if("negative_util_func" %in% names(x)) this.negative_utility_settings$util_func<-x$negative_util_func
+  if("negative_util_fit_x1" %in% names(x)) this.negative_utility_settings$util_fit_x1<-x$negative_util_fit_x1
+  if("negative_y1" %in% names(x)) this.negative_utility_settings$y1<-x$negative_y1
+  if("negative_util_fit_x2" %in% names(x)) this.negative_utility_settings$util_fit_x2<-x$negative_util_fit_x2
+  if("negative_y2" %in% names(x)) this.negative_utility_settings$y2<-x$negative_y2
+  #Further Settings
+  this.agg_func <-if("agg_func" %in% names(x))x$agg_func else agg_func
+  this.include_parent <- if("include_parent" %in% names(x) ) x$include_parent else include_parent
+  this.minweight <- if("minweight" %in% names(x) ) x$minweight else minweight
+  this.standardweight <- if("standardweight" %in% names(x) ) x$standardweight else standardweight
+
 
   dtIndikatorensetting <- rgetIndikatorensetting (x,depth=0, parent="Szenarioergebnis",
-                                                  positive_utility_settings=positive_utility_settings,
-                                                  negative_utility_settings= negative_utility_settings,
-                                                  agg_func=agg_func,
-                                                  include_parent=include_parent                                                  ,
-                                                  open.maxdepth=open.maxdepth ,
-                                                  minweight=0, #corresponding to rSliderGuiInput
-                                                  standardweight = standardweight)
+                                                  positive_utility_settings= this.positive_utility_settings,
+                                                  negative_utility_settings= this.negative_utility_settings,
+                                                  agg_func=this.agg_func,
+                                                  include_parent=this.include_parent,
+                                                  open.maxdepth = open.maxdepth,
+                                                  minweight = this.minweight,
+                                                  standardweight = this.standardweight)
 
   return(dtIndikatorensetting)
 
@@ -145,15 +168,17 @@ rgetIndikatorensetting<- function(x, depth=0, parent="Szenarioergebnis",
     #Positive Settings
     this.positive_utility_settings<-positive_utility_settings
     if("util_func" %in% names(list.elem)) this.positive_utility_settings$util_func<-list.elem$util_func
-    if("util_mean" %in% names(list.elem)) this.positive_utility_settings$util_mean<-list.elem$util_mean
-    if("util_offset" %in% names(list.elem)) this.positive_utility_settings$util_offset<-list.elem$util_offset
-    if("util_scale" %in% names(list.elem)) this.positive_utility_settings$util_scale<-list.elem$util_scale
+    if("util_fit_x1" %in% names(list.elem)) this.positive_utility_settings$util_fit_x1<-list.elem$util_fit_x1
+    if("y1" %in% names(list.elem)) this.positive_utility_settings$y1<-list.elem$y1
+    if("util_fit_x2" %in% names(list.elem)) this.positive_utility_settings$util_fit_x2<-list.elem$util_fit_x2
+    if("y2" %in% names(list.elem)) this.positive_utility_settings$y2<-list.elem$y2
     #Negative Settings
     this.negative_utility_settings<-negative_utility_settings
     if("negative_util_func" %in% names(list.elem)) this.negative_utility_settings$util_func<-list.elem$negative_util_func
-    if("negative_util_mean" %in% names(list.elem)) this.negative_utility_settings$util_mean<-list.elem$negative_util_mean
-    if("negative_util_offset" %in% names(list.elem)) this.negative_utility_settings$util_offset<-list.elem$negative_util_offset
-    if("negative_util_scale" %in% names(list.elem)) this.negative_utility_settings$util_scale<-list.elem$negative_util_scale
+    if("negative_util_fit_x1" %in% names(list.elem)) this.negative_utility_settings$util_fit_x1<-list.elem$negative_util_fit_x1
+    if("negative_y1" %in% names(list.elem)) this.negative_utility_settings$y1<-list.elem$negative_y1
+    if("negative_util_fit_x2" %in% names(list.elem)) this.negative_utility_settings$util_fit_x2<-list.elem$negative_util_fit_x2
+    if("negative_y2" %in% names(list.elem)) this.negative_utility_settings$y2<-list.elem$negative_y2
     #Further Settings
     this.agg_func <-if("agg_func" %in% names(list.elem))list.elem$agg_func else agg_func
     this.include_parent <- if("include_parent" %in% names(list.elem) ) list.elem$include_parent else include_parent
@@ -169,9 +194,10 @@ rgetIndikatorensetting<- function(x, depth=0, parent="Szenarioergebnis",
                              Attribname=if(list.elem$class=="mapping" & "Attribname" %in% names(list.elem) ) list.elem$Attribname else NA,
                              level=depth,
                              util_func=if(this.include_parent)this.positive_utility_settings$util_func else positive_utility_settings$util_func,
-                             util_mean=if(this.include_parent) this.positive_utility_settings$util_mean else positive_utility_settings$util_mean,
-                             util_offset=if(this.include_parent) this.positive_utility_settings$util_offset else positive_utility_settings$util_offset,
-                             util_scale=if(this.include_parent) this.positive_utility_settings$util_scale else positive_utility_settings$util_scale,
+                             util_fit_x1=if(this.include_parent) this.positive_utility_settings$util_fit_x1 else positive_utility_settings$util_fit_x,
+                             y1=if(this.include_parent) this.positive_utility_settings$y1 else positive_utility_settings$y1,
+                             util_fit_x2=if(this.include_parent) this.positive_utility_settings$util_fit_x2 else positive_utility_settings$util_fit_x2,
+                             y2=if(this.include_parent) this.positive_utility_settings$y2 else positive_utility_settings$y2,
                              agg_func=if(this.include_parent) this.agg_func else agg_func,
                              parent=parent,
                              bscName=if(depth>= open.maxdepth )NS(parent)("bsc") else NA,
@@ -191,9 +217,10 @@ rgetIndikatorensetting<- function(x, depth=0, parent="Szenarioergebnis",
                        } else NA,
                      level=depth,
                      util_func=if(this.include_parent)this.negative_utility_settings$util_func else negative_utility_settings$util_func,
-                     util_mean=if(this.include_parent) this.negative_utility_settings$util_mean else negative_utility_settings$util_mean,
-                     util_offset=if(this.include_parent) this.negative_utility_settings$util_offset else negative_utility_settings$util_offset,
-                     util_scale=if(this.include_parent) this.negative_utility_settings$util_scale else negative_utility_settings$util_scale,
+                     util_fit_x1=if(this.include_parent) this.negative_utility_settings$util_fit_x1 else negative_utility_settings$util_fit_x1,
+                     y1=if(this.include_parent) this.negative_utility_settings$y1 else negative_utility_settings$y1,
+                     util_fit_x2=if(this.include_parent) this.negative_utility_settings$util_fit_x2 else negative_utility_settings$util_fit_x2,
+                     y2=if(this.include_parent) this.negative_utility_settings$y2 else negative_utility_settings$y2,
                      agg_func=if(this.include_parent) this.agg_func else agg_func,
                      parent=parent,
                      bscName=if(depth>= open.maxdepth )NS(parent)("bsc") else NA,

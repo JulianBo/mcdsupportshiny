@@ -4,19 +4,19 @@
 \alias{utility_settings}
 \title{Helper function. Standard configuration of utility function}
 \usage{
-utility_settings(util_func = "prop", util_mean = "mean",
-  util_offset = ifelse(util_func == "antiprop", 10, 0),
-  util_scale = 100)
+utility_settings(util_func = "prop", util_fit_x1 = NA, y1 = NA,
+  util_fit_x2 = "mean", y2 = 100)
 }
 \arguments{
-\item{util_scale}{}
+\item{y1}{}
 }
 \value{
-list of four:
-           list(util_func=util_func,
-                util_mean=util_mean,
-                util_offset=util_offset,
-               util_scale=util_scale)
+list of five:
+list(util_func=util_func,
+util_fit_x1=util_fit_x1,
+y1=y1,
+util_fit_x2=util_fit_x2,
+y2=y2)
 }
 \description{
 Helper function. Standard configuration of utility function

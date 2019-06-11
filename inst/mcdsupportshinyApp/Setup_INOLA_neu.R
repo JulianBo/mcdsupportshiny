@@ -30,9 +30,23 @@ configList <- list (
   util_func = "prop",
   sliderlabel="returnLabelsNormal",
   #Standardeinstellungen der utilityfunction, zum weiterreichen
-  util_mean = "mean",
-  util_offset = 0,
-  util_scale = 100,
+  util_fit_x1 = "min", #"mean", #mean, min_max, interquartil
+  y1=150  ,
+  negative_util_fit_x1="min",
+  negative_y1=0,
+  util_fit_x2 = "max", #mean, min_max, interquartil
+  y2 = 0 ,
+  negative_util_fit_x2="max",
+  negative_y2=150,
+
+
+
+
+  # util_fit_x1 = 0, #"mean", #mean, min_max, interquartil
+  # y1=0,
+  # util_fit_x2 = "mean", #mean, min_max, interquartil
+  # y2 = 100,
+
 
   #Kindelemente
   Energiewendeziel = list (
@@ -50,7 +64,6 @@ configList <- list (
         class = "mapping",
         Attribname = "Energieverbrauch_Strom",
         util_func = "antiprop",
-        util_offset = 10,
         include_parent = TRUE,
         description = tagList(
           "Wie wichtig ist Ihnen ein ",em("niedriger Stromverbrauch"),"  in der Region Oberland?"
@@ -60,7 +73,6 @@ configList <- list (
         class = "mapping",
         Attribname = "Energieverbrauch_Wärme",
         util_func = "antiprop",
-        util_offset = 10,
         include_parent = TRUE,
         description = tagList(
           "Wie wichtig ist Ihnen ein ",em("niedriger Wärmeverbrauch")," in der Region Oberland?"
@@ -71,7 +83,6 @@ configList <- list (
       #   class = "mapping",
       #   Attribname = "Energieverbrauch_Gas",
       #   util_func = "antiprop",
-      #   util_offset = 10,
       #   include_parent = TRUE,
       #   description = tagList(
       #     "Wie wichtig ist Ihnen ein ",em("niedriger Gasverbrauch")," in der Region Oberland?"
@@ -145,7 +156,6 @@ configList <- list (
     class = "mapping",
     Attribname = "Stromdelta_Summe",
     util_func = "antiprop",
-    util_offset = 10,
     include_parent = TRUE,
     description = tagList(
       "Die Erzeugung von Strom mit Erneuerbare-Energien-Anlagen unterliegt zeitlichen Schwankungen, die von den Witterungsverhältnissen und vom Technologiemix abhängen.",

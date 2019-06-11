@@ -4,7 +4,7 @@
 \alias{crossjoinFunc}
 \title{Crossjoin of two data.tables}
 \usage{
-crossjoinFunc(x1, x2)
+crossjoinFunc(datatable_x1, datatable_x2)
 }
 \arguments{
 \item{x1}{first data.table}

@@ -8,6 +8,10 @@ calculatecenterfunc(centervalue, x, offset = 0, trim = 0,
   na.rm = TRUE)
 }
 \arguments{
+\item{centervalue}{one of mean, min, max, median, q1, q3; numeric value; NA}
+
+\item{trim}{works only for mean}
+
 \item{na.rm}{}
 }
 \value{

@@ -33,9 +33,8 @@ configList <- list (
   util_func = "prop",
   sliderlabel="returnLabelsNormal",
   #Standardeinstellungen der utilityfunction, zum weiterreichen
-  util_mean = "mean",
-  util_offset = 0,
-  util_scale = 100,
+  util_fit_x2 = "mean",
+  y2 = 100,
 
   #Kindelemente
   Energiewendeziel = list (
@@ -58,7 +57,6 @@ configList <- list (
         class = "mapping",
         Attribname = "Energieverbrauch_Strom",
         util_func = "antiprop",
-        util_offset = 10,
         include_parent = TRUE,
         description = tagList(
           "Ein generell ",em("niedriger Stromverbrauch")," in der Region Oberland ist mir wichtig."
@@ -68,7 +66,6 @@ configList <- list (
         class = "mapping",
         Attribname = "Energieverbrauch_Wärme",
         util_func = "antiprop",
-        util_offset = 10,
         include_parent = TRUE,
         description = tagList(
           "Ein generell ",em("niedriger Wärmeverbrauch")," in der Region Oberland ist mir wichtig."

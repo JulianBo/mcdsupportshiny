@@ -49,8 +49,8 @@ getOpen.Maxdepth<- function (x,open.maxdepth=Inf){
 #'
 #' @examples
 #'
-crossjoinFunc<-  function(x1,x2)
-  setkey(x1[,c(k=1,.SD)],k)[x2[,c(k=1,.SD)],allow.cartesian=TRUE][,k:=NULL]
+crossjoinFunc<-  function(datatable_x1,datatable_x2)
+  setkey(datatable_x1[,c(k=1,.SD)],k)[datatable_x2[,c(k=1,.SD)],allow.cartesian=TRUE][,k:=NULL]
 
 
 #' Even spread of difference

@@ -4,20 +4,24 @@
 \alias{utilityfunc}
 \title{Convert Values of Indicators to utility-values.}
 \usage{
-utilityfunc(x, type, x1 = 0, y1 = switch(as.character(type), negprop =
-  200, negantiprop = 1, antiprop = 150, 0),
-  x2 = calculatecenterfunc("mean", x, offset = 0), y2 = 100)
+utilityfunc(x, type, x1 = 0, y1 = switch(as.character(type), prop = 0,
+  negprop = 200, antiprop = 200, 0), x2 = calculatecenterfunc("mean", x,
+  offset = 0), y2 = 100, replace_NA = TRUE)
 }
 \arguments{
 \item{x}{Numeric. Value to be converted.}
 
 \item{type}{One of c("prop", "negprop", antiprop", "identity")}
 
-\item{offset}{Offst to be added to x.}
+\item{x1}{if (replace_NA=TRUE & is.na(x1)): 0}
 
-\item{centervalue}{Numeric. Mean of utility values.}
+\item{y1}{if (replace_NA=TRUE & is.na(y1)): switch(as.character(type),prop=0,negprop=200,antiprop=200,0)}
 
-\item{scale}{Scale.}
+\item{x2}{if (replace_NA=TRUE & is.na(x2)): calculatecenterfunc("mean", x,offset=0)}
+
+\item{y2}{if (replace_NA=TRUE & is.na(y2)): 100}
+
+\item{replace_NA}{should NA be replaced at x1,y1,x2,y2 ??}
 }
 \value{
 switch(as.character(type),

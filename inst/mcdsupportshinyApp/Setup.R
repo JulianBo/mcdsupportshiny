@@ -26,9 +26,8 @@ configList <- list (
   standardweight=20,
   util_func="prop",
   #Standardeinstellungen der utilityfunction, zum weiterreichen
-  util_mean="mean",
-  util_offset=0,
-  util_scale=100,
+  util_fit_x2="mean",
+  y2=100,
 
   #Kindelemente
   #Geschwindigkeit= list(class="mapping", Attribname="Geschwindigkeit"),
@@ -36,7 +35,7 @@ configList <- list (
   Kosten= list (
     class="elements",
     standardweight=45, color="red",
-    util_func="antiprop",   util_offset=10,
+    util_func="antiprop",
     include_parent=FALSE,
     Kaufpreis= list(class="mapping",Attribname="Preis"),
     Treibstoffkosten= list(class="mapping",Attribname="Treibstoffkosten")
