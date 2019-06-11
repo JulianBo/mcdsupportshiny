@@ -58,8 +58,7 @@ dtAlternativen_long <- merge(melt(dtAlternativen, id.vars=c("Pfad", "Rahmen", "K
 #Berechne Mittelwert
 #Default: Mittelwert der Variablen, über alle Rahmenszenarien
 dtAlternativen_long[,
-                    centervar:=calculatecenterfunc(first(util_mean),value, first(util_offset)
-                                                   ),
+                    centervar:=calculatecenterfunc(first(util_mean),value),
                     by=.(variable, negative)]
 
 
@@ -71,9 +70,8 @@ dtAlternativen_long[,`:=`(all_missing=all(is.na(value))), by=variable]
 dtAlternativen_long[!(all_missing==TRUE),
                     nutzen:=utilityfunc(x=value,
                                         type=first(util_func),
-                                        offset = util_offset,
-                                        centervalue = centervar,
-                                        scale=util_scale ),
+                                        x2= first(centervar),
+                                        y2=first(util_scale) ),
                     by=.(variable, negative)]
 
 
@@ -129,15 +127,15 @@ for( i in max(  dtIndikatorensettings$level):1){
 dtNutzenFuncs <-  copy(dtAlternativen_long)[,.N,
                                             by=.(variable,negative, util_func, util_offset,util_offset, util_scale, centervar,value_min,value_max)]
 dtNutzenFuncsList <- crossjoinFunc(dtNutzenFuncs,data.table(n=seq_len(101)-1))
-dtNutzenFuncsList[,`:=`(
+dtNutzenFuncsList[!is.na(value_min) & !is.na(value_max),
+                  `:=`(
   x= value_min  +(value_max-value_min  )*n*1./100,
   y=utilityfunc(value_min  +(value_max-value_min  )*n*1./100,
   # x= value_min -10 +(value_max-value_min +20 )*n*1./100,
   # y=utilityfunc(value_min -10 +(value_max-value_min +20 )*n*1./100,
                type=first(util_func),
-               offset = util_offset,
-               centervalue = centervar,
-               scale=util_scale)
+  x2= first(centervar),
+  y2=first(util_scale ) )
 
 ), by=.(variable,negative )]
 

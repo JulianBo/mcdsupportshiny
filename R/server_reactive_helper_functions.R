@@ -15,7 +15,7 @@
 #' @examples
 #'
 #' @export
-calculatecenterfunc <- function(centervalue, x,offset, trim = 0, na.rm = TRUE){
+calculatecenterfunc <- function(centervalue, x,offset=0, trim = 0, na.rm = TRUE){
   #defaults to mean
   if (is.character(centervalue) ) {
     if(centervalue=="mean"){
@@ -51,17 +51,42 @@ calculatecenterfunc <- function(centervalue, x,offset, trim = 0, na.rm = TRUE){
 #' @export
 #'
 #' @examples
-utilityfunc <- function(x, type, offset=ifelse(type=="antiprop", 50 ,0),
-                        centervalue=calculatecenterfunc("mean", x,offset), scale=100) {
+utilityfunc <- function(x, type,
+                        x1=0,
+                        y1=switch(as.character(type),
+                                  prop=0,
+                                  negprop=200,
+                                  antiprop=200,
+                                  0),
+                        x2=calculatecenterfunc("mean", x,offset=0),
+                        y2=100) {
   #cat(as.character(type))
   # print(str(x))
   # print(str(offset))
+
+  if (x1==x2) {
+
+    if (y1==y2) return(y1) else return (NA_real_)
+
+  } else if (y1==y2) {
+    return (y1)
+  } else {
+
+  # if(x2>x1 &y2<y1){
+  #   x3=x1
+  #   x1=x2
+  #   x2=x2
+  #
+  #   y3=y1
+  #   y1=y2
+  #   y2=y3
+  # }
+
   switch(as.character(type),
-         prop = scale* (x+offset)/centervalue ,
-         negprop = 2*scale - scale*(x +offset)/centervalue ,
-         #scale*(s - x/centervalue )
-         ## s -1 =1 --> s=2
-         antiprop=scale* centervalue/(x+offset),
+         prop = x*(y2-y1)*1./(x2-x1) + (y1*x2 -y2*x1)*1./(x2-x1),
+         negprop = x*(y2-y1)*1./(x2-x1) + (y1*x2 -y2*x1)*1./(x2-x1),
+         antiprop= y1*(x1+ (y1*x1-y2*x2)*1./(y2-y1))/(x+ (y1*x1-y2*x2)*1./(y2-y1)),
          identity= x)
+  }
 }
 

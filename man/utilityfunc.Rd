@@ -4,8 +4,9 @@
 \alias{utilityfunc}
 \title{Convert Values of Indicators to utility-values.}
 \usage{
-utilityfunc(x, type, offset = ifelse(type == "antiprop", 50, 0),
-  centervalue = calculatecenterfunc("mean", x, offset), scale = 100)
+utilityfunc(x, type, x1 = 0, y1 = switch(as.character(type), negprop =
+  200, negantiprop = 1, antiprop = 150, 0),
+  x2 = calculatecenterfunc("mean", x, offset = 0), y2 = 100)
 }
 \arguments{
 \item{x}{Numeric. Value to be converted.}
