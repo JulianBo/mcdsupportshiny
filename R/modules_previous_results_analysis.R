@@ -220,7 +220,7 @@ AnalysisPrevious<- function(input, output, session,
       ggplot(.,aes_string(x=backtick(input$ClusterXSelect),
                           y= backtick(input$ClusterYSelect),
                           color="cluster"))+
-        geom_point(position="jitter")
+        geom_point()
 
     }
   )
