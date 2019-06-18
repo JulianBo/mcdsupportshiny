@@ -145,7 +145,24 @@ shinyUI(fluidPage(theme="mcdsupportshiny.css",
                                    h3("Ergebnisse nach Rahmen"),
                                    plotOutput("SzenarioPlot")
 
-                          )
+                          ),
+                          tabPanel("Detailergebnisse",
+                                   ##dtGewichtungen[,.N, by=.(parent, level)][order(level)]
+                                   h3("Punktwerte der Kategorien"),
+                                   h4("Bereiche"),
+                                   plotOutput("BereichPlot"),
+
+                                   h4("Einzelne Bereiche genauer erkunden"),
+
+                                   selectInput("BereichDetailPlotSelect",
+                                               "Bitte Bereich auswählen",choices=unique(dtIndikatorensettings[level>0,parent])
+                                               ),
+                                   plotOutput("BereichDetailPlot"),
+                                   h3("Punktwerte als Tabelle"),
+
+                                   DT::dataTableOutput("EntscheidungenTable")
+
+                        )
                         )
 
 
@@ -168,12 +185,13 @@ shinyUI(fluidPage(theme="mcdsupportshiny.css",
                         # ),
                         tabPanel("Über dieses Programm",
                                  tags$div(tags$p("Dieses Programm wurde im Rahmen des Projektes INOLA erstellt.
-                                                 Weitere Informationen unter: ", tags$a(href="http://inola-region.de", "inola-region.de") ),
+                                                 Weitere Informationen unter: ", tags$a(href="http://inola-region.de", target="_blank", "inola-region.de") ),
                                           tags$p("Technische Umsetzung: Julian Bothe"),
-                                          tags$p("Der Quellcode des Programms kann unter ", tags$a(href="https://github.com/JulianBo/mcdsupportshiny", "https://github.com/JulianBo/mcdsupportshiny"),
+                                          tags$p("Der Quellcode des Programms kann unter ", tags$a(href="https://github.com/JulianBo/mcdsupportshiny",
+                                                                                                   target="_blank", "https://github.com/JulianBo/mcdsupportshiny"),
                                                  "  heruntergeladen und eingesehen werden.")),
                                  h3("Funktionsweise"),
-                                 tags$p("Dieses Programm rechnet die einzelnen Indikatoren in Punktzahlen um. Je nach Gewichtung werden diese Schrittweise anteilig aufaddiert - Je hÃ¶her die Gewichtung ist, desto mehr der Punkte wird benutzt. "),
+                                 tags$p("Dieses Programm rechnet die einzelnen Indikatoren in Punktzahlen um. Je nach Gewichtung werden diese Schrittweise anteilig aufaddiert - Je höher die Gewichtung ist, desto mehr der Punkte wird benutzt. "),
                                  h4("Benutzte Punktzahlen der Indikatoren"),
                                  plotOutput("NutzenPlot"),
                                  selectInput(
@@ -181,7 +199,9 @@ shinyUI(fluidPage(theme="mcdsupportshiny.css",
                                    "Bitte Variablen zur Ansicht auswählen",
                                    choices= names(dtAlternativen)[-(1:2)],
                                    selected=names(dtAlternativen)[-(1:2)],
-                                   multiple=TRUE
+                                   multiple=TRUE,
+                                   width="100%"
+
 
                                  ),
 

@@ -89,11 +89,11 @@ utilityfunc <- function(x, type,
   } else {
 
 
-  switch(as.character(type),
-         prop = x*(y2-y1)*1./(x2-x1) + (y1*x2 -y2*x1)*1./(x2-x1),
-         negprop = x*(y2-y1)*1./(x2-x1) + (y1*x2 -y2*x1)*1./(x2-x1),
-         antiprop= y1*(x1+ (y1*x1-y2*x2)*1./(y2-y1))/(x+ (y1*x1-y2*x2)*1./(y2-y1)),
-         identity= x)
+    switch(as.character(type),
+           prop = x*(y2-y1)*1./(x2-x1) + (y1*x2 -y2*x1)*1./(x2-x1),
+           negprop = x*(y2-y1)*1./(x2-x1) + (y1*x2 -y2*x1)*1./(x2-x1),
+           antiprop= y1*(x1+ (y1*x1-y2*x2)*1./(y2-y1))/(x+ (y1*x1-y2*x2)*1./(y2-y1)),
+           identity= x)
   }
 }
 

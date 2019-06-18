@@ -6,7 +6,7 @@ library(shiny)
 library(shinyjs)
 
 library (data.table)
-library(plotly)
+#library(plotly)
 library(googlesheets)
 
 

@@ -30,22 +30,22 @@ configList <- list (
   util_func = "prop",
   sliderlabel="returnLabelsNormal",
   #Standardeinstellungen der utilityfunction, zum weiterreichen
-  util_fit_x1 = "min", #"mean", #mean, min_max, interquartil
-  y1=150  ,
-  negative_util_fit_x1="min",
-  negative_y1=0,
-  util_fit_x2 = "max", #mean, min_max, interquartil
-  y2 = 0 ,
-  negative_util_fit_x2="max",
-  negative_y2=150,
+  # util_fit_x1 = "min", #"mean", #mean, min_max, interquartil
+  # y1=150  ,
+  # negative_util_fit_x1="min",
+  # negative_y1=0,
+  # util_fit_x2 = "max", #mean, min_max, interquartil
+  # y2 = 0 ,
+  # negative_util_fit_x2="max",
+  # negative_y2=150,
 
 
 
 
-  # util_fit_x1 = 0, #"mean", #mean, min_max, interquartil
-  # y1=0,
-  # util_fit_x2 = "mean", #mean, min_max, interquartil
-  # y2 = 100,
+  util_fit_x1 = NA, #"mean", #mean, min_max, interquartil
+  y1=NA,
+  util_fit_x2 = "mean", #mean, min_max, interquartil
+  y2 = 100,
 
 
   #Kindelemente
@@ -63,7 +63,7 @@ configList <- list (
       'Energieverbrauch (Strom)' = list(
         class = "mapping",
         Attribname = "Energieverbrauch_Strom",
-        util_func = "antiprop",
+        util_func = "negprop",
         include_parent = TRUE,
         description = tagList(
           "Wie wichtig ist Ihnen ein ",em("niedriger Stromverbrauch"),"  in der Region Oberland?"
@@ -72,7 +72,7 @@ configList <- list (
       'Energieverbrauch (Wärme)' = list(
         class = "mapping",
         Attribname = "Energieverbrauch_Wärme",
-        util_func = "antiprop",
+        util_func = "negprop",
         include_parent = TRUE,
         description = tagList(
           "Wie wichtig ist Ihnen ein ",em("niedriger Wärmeverbrauch")," in der Region Oberland?"
@@ -243,6 +243,7 @@ configList <- list (
     ),
     'Biomassenverwendung' = list(
       class = "elements",
+      util_func="antiprop",
       description = tagList(
         "Wie wichtig ist es Ihnen, dass von ",em("Nahrungs- und Futtermitteln (v. a. Mais) und Holz nur ein geringer Anteil zur Energieproduktion"),
         " verwendet wird? (im Modell wird von der aktuellen Flächennutzung ausgegangen)"
@@ -265,7 +266,7 @@ configList <- list (
     ),
     'Regionale Auswirkungen' = list (
       class = "elements",
-      util_func = "negprop",
+      util_func="antiprop",
       description = tagList(
         "Wie wichtig ist es Ihnen, dass ",em("sonstige regionalen und lokalen Auswirkungen durch Energieerzeugungsanlagen"),
         " möglichst gering sind?")

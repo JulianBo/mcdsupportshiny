@@ -34,14 +34,14 @@ AnalysisPreviousUI<- function(id,dtIndikatorensettings,all_members=FALSE){
       ),
       tabPanel("Gruppenanalyse",
 
-                   numericInput(ns("ClusterNumberNumeric"),
-                                "Bitte Anzahl der Gruppen auswählen",
-                                value=3, min=1, max=6, step=1),
+               numericInput(ns("ClusterNumberNumeric"),
+                            "Bitte Anzahl der Gruppen auswählen",
+                            value=3, min=1, max=6, step=1),
 
                h3("Verteilung der Abstimmungsergebnisse pro Gruppe"),
                selectInput(ns("BisherigeHistsClusterPlotSelect"),
-                  "Bitte Bereich auswählen",
-                  choices=unique(dtIndikatorensettings[,parent])),
+                           "Bitte Bereich auswählen",
+                           choices=unique(dtIndikatorensettings[,parent])),
                plotOutput(ns("BisherigeHistsClusterPlot")),
 
                h3("Zusammenhänge der Abstimmungsergebnisse pro Gruppe"),
