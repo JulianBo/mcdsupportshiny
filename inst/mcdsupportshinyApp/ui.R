@@ -20,7 +20,7 @@ library(mcdsupportshiny)
 
 #source("Setup.R", encoding="UTF-8") #local=FALSE, auch in ui.R sichtbar
 #source("Setup_INOLA.R", encoding="UTF-8") #local=FALSE, auch in ui.R sichtbar
-source("Setup_INOLA_neu.R",local=FALSE, encoding="UTF-8") #local=FALSE, auch in ui.R sichtbar
+source("Setup_INOLA_neu.R",local=TRUE, encoding="UTF-8") #local=FALSE, auch in ui.R sichtbar
 
 dtIndikatorensettings<-getIndikatorensetting(configList)
 
@@ -46,7 +46,7 @@ shinyUI(fluidPage(theme="mcdsupportshiny.css",
   a(href="http://www.inola-region.de",
      img(src="Inola_Logo-rgb_web_transparent.png", style="height: 4em; float:right"),
      style="text-align: right"),
-  titlePanel("Multikriterieller Pfadvergleich"),
+  titlePanel(title_text),
 
 
   ## List of pages - Main Part    ----
@@ -120,7 +120,7 @@ shinyUI(fluidPage(theme="mcdsupportshiny.css",
                                             tags$a(href="http://inola-region.de", target="_blank", "Geschichte hinter den einzelnen Pfaden steckt."))
 
                                    ,
-                                   h2("Weiteres Vorgehen"),
+                                   h2("Jetzt ausprobieren und endgültig abstimmen!"),
                                    tags$p("Sie können jetzt sowohl die Einstellungen/Gewichtungen als auch die präferierte Alternative verändern, und dabei sehen, wie sich die Ergebnisse anpassen. Beachten sie, dass manche Indikatoren nicht in die Berechnung eingehen, weil sie nicht ohne weiteres quantifizierbar bzw. mit Zahlen abbildbar sind."),
 
                                    div(id="abstimmungsDiv",
@@ -145,43 +145,11 @@ shinyUI(fluidPage(theme="mcdsupportshiny.css",
                                    h3("Ergebnisse nach Rahmen"),
                                    plotOutput("SzenarioPlot")
 
-                          ),
-                          tabPanel("Detailergebnisse",
-                                   ##dtGewichtungen[,.N, by=.(parent, level)][order(level)]
-                                   h3("Punktwerte der Kategorien"),
-                                   h4("Bereiche"),
-                                   plotOutput("BereichPlot"),
-
-
-                                   h4("Einzelne Bereiche genauer erkunden"),
-                                   selectInput("BereichDetailPlotSelect",
-                                               "Bitte Bereich auswählen",
-                                               choices=unique(dtIndikatorensettings[level>0,parent])),
-
-                                   plotOutput("BereichDetailPlot"),
-                                   h3("Punktwerte als Tabelle"),
-                                   DT::dataTableOutput("EntscheidungenTable")
-
-
                           )
                         )
-                        )
-                          ,
-                    tabPanel("Funktionsweise",
-                             tags$p("Dieses Programm rechnet die einzelnen Indikatoren in Punktzahlen um. Je nach Gewichtung werden diese Schrittweise anteilig aufaddiert - Je höher die Gewichtung ist, desto mehr der Punkte wird benutzt. "),
-                             h3("Benutzte Punktzahlen der Indikatoren"),
-                             plotOutput("NutzenPlot"),
-                             selectInput(
-                               "NutzenPlotOptions",
-                               "Bitte Variablen zur Ansicht auswählen",
-                               choices= names(dtAlternativen)[-(1:2)],
-                               selected=names(dtAlternativen)[-(1:2)],
-                               multiple=TRUE
 
-                             ),
 
-                             h3("Tabelle der Alternativen"),
-                             DT::dataTableOutput("AlternativenTable")
+
                     ),
                     tabPanel("Bisherige Abstimmungen",
                              AnalysisPreviousUI("AnalysisPrevious",dtIndikatorensettings),
@@ -201,8 +169,26 @@ shinyUI(fluidPage(theme="mcdsupportshiny.css",
                         tabPanel("Über dieses Programm",
                                  tags$div(tags$p("Dieses Programm wurde im Rahmen des Projektes INOLA erstellt.
                                                  Weitere Informationen unter: ", tags$a(href="http://inola-region.de", "inola-region.de") ),
-                                          tags$p("Technische Umsetzung: Julian Bothe") )
-                                 )
+                                          tags$p("Technische Umsetzung: Julian Bothe"),
+                                          tags$p("Der Quellcode des Programms kann unter ", tags$a(href="https://github.com/JulianBo/mcdsupportshiny", "https://github.com/JulianBo/mcdsupportshiny"),
+                                                 "  heruntergeladen und eingesehen werden.")),
+                                 h3("Funktionsweise"),
+                                 tags$p("Dieses Programm rechnet die einzelnen Indikatoren in Punktzahlen um. Je nach Gewichtung werden diese Schrittweise anteilig aufaddiert - Je hÃ¶her die Gewichtung ist, desto mehr der Punkte wird benutzt. "),
+                                 h4("Benutzte Punktzahlen der Indikatoren"),
+                                 plotOutput("NutzenPlot"),
+                                 selectInput(
+                                   "NutzenPlotOptions",
+                                   "Bitte Variablen zur Ansicht auswählen",
+                                   choices= names(dtAlternativen)[-(1:2)],
+                                   selected=names(dtAlternativen)[-(1:2)],
+                                   multiple=TRUE
+
+                                 ),
+
+                                 h4("Tabelle der Alternativen"),
+                                 DT::dataTableOutput("AlternativenTable")
+                        )
+
                         # ,
                         # tabPanel("R Helper",
                         #          textOutput("RoutputPrint"),

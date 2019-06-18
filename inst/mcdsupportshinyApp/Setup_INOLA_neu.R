@@ -342,8 +342,8 @@ configList <- list (
 
 )
 
-# pfadbeschreibungen ------------------------------------------------------
-
+# pfadbeschreibungen & Titel  ------------------------------------------------------
+title_text<-"Persönliches Energiebarometer"
 pfadbeschreibungen<-tagList(
   p(strong("0) Referenzmodellierung:"),"Der modellierte Zustand zu Beginn der Modellierung (2019)."),
   p(strong("1) Fortschreibung:"),"Fortschreibung der aktuellen Ausbauraten: Erneuerbare Energieanlagen werden gebaut, falls sie rentabel sind. Die Region Oberland setzt auf Energieeffizienzmaßnahmen und wirtschaftliches Wachstum und ist grundsätzlich technologieoffen. "),
@@ -356,6 +356,7 @@ pfadbeschreibungen<-tagList(
 # Texte --------------------------------------------------------
 
 texte <- list (
+
 
   begruessungstext="Dieses Programm ist eine Entscheidungshilfe. Die simulierten Ausbaupfade erneuerbarer Energien setzen sich aus vielen Faktoren zusammen, die teils nicht auf den ersten Blick ersichtlich werden. Deshalb können Sie auf den nächsten Seiten angeben, wie wichtig Ihnen verschiedene Aspekte des regionalen Energiesystems im Oberland sind. Auf was legen Sie wie viel Wert? Das Programm ermittelt dann, welcher Ausbaupfad am meisten Ihren Präferenzen entspricht.",
   auswahlaufforderungstext="Bitte wählen Sie zuerst aus, welcher Ausbaupfad Ihnen spontan am besten gefällt. Die einzelnen Ausbaupfade sind nachfolgend kurz beschrieben.",
