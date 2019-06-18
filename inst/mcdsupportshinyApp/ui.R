@@ -74,136 +74,136 @@ shinyUI(fluidPage(theme="mcdsupportshiny.css",
 
       ##SliderGui1 - several pages
       hidden(
-      lapply(seq(NUM_PAGES_slGUI),
-             function(i)div(class = "page",
-                            id = paste0("page", i+1),slGui1[[i]])),#change according to paging
+        lapply(seq(NUM_PAGES_slGUI),
+               function(i)div(class = "page",
+                              id = paste0("page", i+1),slGui1[[i]])),#change according to paging
 
-      #### Demographic Data
-      div(class = "page", id = paste0("page", NUM_PAGES_slGUI+2), #change according to paging
-          p("Bitte geben Sie zum Abschluss noch einige Demographische Daten ein."),
-          h2("Bitte geben sie uns ein paar Informationen über sich."),
-          selectInput("FirsttimeSlct","Haben Sie dieses Tool schon einmal benutzt?" ,
-                      choices=list("Nicht angegeben","Nein", "Ja")),
-          selectInput("PlaceSlct",texte$ortstext ,choices=c("Nicht angegeben",texte$ortslist)),
-          selectInput("GenderSlct","Welches ist Ihr Geschlecht?" ,
-                      choices=list("Nicht angegeben", "Weiblich", "Männlich","Weitere/Divers")),
-          sliderInput("AgeSl", "Wie alt sind Sie?", min=0, max=100, value=0)
+        #### Demographic Data
+        div(class = "page", id = paste0("page", NUM_PAGES_slGUI+2), #change according to paging
+            p("Bitte geben Sie zum Abschluss noch einige Demographische Daten ein."),
+            h2("Bitte geben sie uns ein paar Informationen über sich."),
+            selectInput("FirsttimeSlct","Haben Sie dieses Tool schon einmal benutzt?" ,
+                        choices=list("Nicht angegeben","Nein", "Ja")),
+            selectInput("PlaceSlct",texte$ortstext ,choices=c("Nicht angegeben",texte$ortslist)),
+            selectInput("GenderSlct","Welches ist Ihr Geschlecht?" ,
+                        choices=list("Nicht angegeben", "Weiblich", "Männlich","Weitere/Divers")),
+            sliderInput("AgeSl", "Wie alt sind Sie?", min=0, max=100, value=0)
 
-          ),
+        ),
 
-      ######Final Page
-      ### Sidebar with a slider inputs
-      div(class = "page", id = paste0("page", NUM_PAGES_slGUI+3), #change according to paging
-          hidden(numericInput("NUM_PAGES", label=NULL,value=NUM_PAGES_slGUI+3)), #CHANGE to maximum number of Pages
-        sidebarLayout(position="left",
-          sidebarPanel( width = 5,
-            div(id="slGui2",slGui2 ),
+        ######Final Page
+        ### Sidebar with a slider inputs
+        div(class = "page", id = paste0("page", NUM_PAGES_slGUI+3), #change according to paging
+            hidden(numericInput("NUM_PAGES", label=NULL,value=NUM_PAGES_slGUI+3)), #CHANGE to maximum number of Pages
+            sidebarLayout(position="left",
+                          sidebarPanel( width = 5,
+                                        div(id="slGui2",slGui2 ),
 
-            textOutput("Aux_to_initialise")
-          ),#end of sidebarPanel
+                                        textOutput("Aux_to_initialise")
+                          ),#end of sidebarPanel
 
-          # Show Results, Description, ...
-          mainPanel(width = 7,
-            tabsetPanel(id="MainTabset",
-                        tabPanel("Ergebnisse",
-                        tabsetPanel(
-                          tabPanel("Hauptergebnisse",
+                          # Show Results, Description, ...
+                          mainPanel(width = 7,
+                                    tabsetPanel(id="MainTabset",
+                                                tabPanel("Ergebnisse",
+                                                         tabsetPanel(
+                                                           tabPanel("Hauptergebnisse",
 
-                                   h2("Ergebnis"),
-                                   div(class="results",
-                                       tags$div("Mit den aktuellen Einstellungen hat folgender Pfad die höchste Punktzahl:",
-                                                textOutput("ErgebnisText", inline=TRUE)),
-                                       tags$div("Ursprünglich ausgewählt hatten Sie:",
-                                                textOutput("ChoiceText", inline=TRUE))
-                                   ),
-                                   tags$div("Hier können sie sehen, welche ",
-                                            tags$a(href="http://inola-region.de", target="_blank", "Geschichte hinter den einzelnen Pfaden steckt."))
+                                                                    h2("Ergebnis"),
+                                                                    div(class="results",
+                                                                        tags$div("Mit den aktuellen Einstellungen hat folgender Pfad die höchste Punktzahl:",
+                                                                                 textOutput("ErgebnisText", inline=TRUE)),
+                                                                        tags$div("Ursprünglich ausgewählt hatten Sie:",
+                                                                                 textOutput("ChoiceText", inline=TRUE))
+                                                                    ),
+                                                                    tags$div("Hier können sie sehen, welche ",
+                                                                             tags$a(href="http://inola-region.de", target="_blank", "Geschichte hinter den einzelnen Pfaden steckt."))
 
-                                   ,
-                                   h2("Jetzt ausprobieren und endgültig abstimmen!"),
-                                   tags$p("Sie können jetzt sowohl die Einstellungen/Gewichtungen als auch die präferierte Alternative verändern, und dabei sehen, wie sich die Ergebnisse anpassen. Beachten sie, dass manche Indikatoren nicht in die Berechnung eingehen, weil sie nicht ohne weiteres quantifizierbar bzw. mit Zahlen abbildbar sind."),
+                                                                    ,
+                                                                    h2("Jetzt ausprobieren und endgültig abstimmen!"),
+                                                                    tags$p("Sie können jetzt sowohl die Einstellungen/Gewichtungen als auch die präferierte Alternative verändern, und dabei sehen, wie sich die Ergebnisse anpassen. Beachten sie, dass manche Indikatoren nicht in die Berechnung eingehen, weil sie nicht ohne weiteres quantifizierbar bzw. mit Zahlen abbildbar sind."),
 
-                                   div(id="abstimmungsDiv",
-                                       tags$p("Wenn Sie mit den Einstellungen zufrieden sind, können Sie diese abspeichern. Damit gehen diese Werte in das Ergebnis ein."),
-                                       selectInput("ChoiceFinalSlct","Welchen Pfad präferieren Sie, nachdem Sie diese Ergebnisse gesehen haben?" ,
-                                                   choices=c("Bitte Auswählen", levels(dtAlternativen$Pfad) ),
-                                                   width = "100%"
-                                                   #TODO: Add changecount!
-                                       ),
-                                       actionButton("addBtn", "Zufrieden? Dann aktuelle Einstellungen speichern und damit abstimmen!")
-                                   ),
-                                   hidden(
-                                     div(id="dankeDiv",
-                                         tags$p(tags$b("Vielen Dank. Ihre Präferenzen wurden gespeichert"))
-                                     )
-                                   ),
-                                   h3("Gesamtergebnis"),
-                                   fluidRow(
-                                     column(width=6, plotOutput("ErgebnisPlot")),
-                                     column(width=6,tableOutput("ErgebnisTable"))
-                                   ),
-                                   h3("Ergebnisse nach Rahmen"),
-                                   plotOutput("SzenarioPlot")
+                                                                    div(id="abstimmungsDiv",
+                                                                        tags$p("Wenn Sie mit den Einstellungen zufrieden sind, können Sie diese abspeichern. Damit gehen diese Werte in das Ergebnis ein."),
+                                                                        selectInput("ChoiceFinalSlct","Welchen Pfad präferieren Sie, nachdem Sie diese Ergebnisse gesehen haben?" ,
+                                                                                    choices=c("Bitte Auswählen", levels(dtAlternativen$Pfad) ),
+                                                                                    width = "100%"
+                                                                                    #TODO: Add changecount!
+                                                                        ),
+                                                                        actionButton("addBtn", "Zufrieden? Dann aktuelle Einstellungen speichern und damit abstimmen!")
+                                                                    ),
+                                                                    hidden(
+                                                                      div(id="dankeDiv",
+                                                                          tags$p(tags$b("Vielen Dank. Ihre Präferenzen wurden gespeichert"))
+                                                                      )
+                                                                    ),
+                                                                    h3("Gesamtergebnis"),
+                                                                    fluidRow(
+                                                                      column(width=6, plotOutput("ErgebnisPlot")),
+                                                                      column(width=6,tableOutput("ErgebnisTable"))
+                                                                    ),
+                                                                    h3("Ergebnisse nach Rahmen"),
+                                                                    plotOutput("SzenarioPlot")
 
-                          ),
-                          tabPanel("Detailergebnisse",
-                                   ##dtGewichtungen[,.N, by=.(parent, level)][order(level)]
-                                   h3("Punktwerte der Kategorien"),
-                                   h4("Bereiche"),
-                                   plotOutput("BereichPlot"),
+                                                           ),
+                                                           tabPanel("Detailergebnisse",
+                                                                    ##dtGewichtungen[,.N, by=.(parent, level)][order(level)]
+                                                                    h3("Punktwerte der Kategorien"),
+                                                                    h4("Bereiche"),
+                                                                    plotOutput("BereichPlot"),
 
-                                   h4("Einzelne Bereiche genauer erkunden"),
+                                                                    h4("Einzelne Bereiche genauer erkunden"),
 
-                                   selectInput("BereichDetailPlotSelect",
-                                               "Bitte Bereich auswählen",choices=unique(dtIndikatorensettings[level>0,parent])
-                                               ),
-                                   plotOutput("BereichDetailPlot"),
-                                   h3("Punktwerte als Tabelle"),
+                                                                    selectInput("BereichDetailPlotSelect",
+                                                                                "Bitte Bereich auswählen",choices=unique(dtIndikatorensettings[level>0,parent])
+                                                                    ),
+                                                                    plotOutput("BereichDetailPlot"),
+                                                                    h3("Punktwerte als Tabelle"),
 
-                                   DT::dataTableOutput("EntscheidungenTable")
+                                                                    DT::dataTableOutput("EntscheidungenTable")
 
-                        )
-                        )
-
-
-
-                    ),
-                    tabPanel("Bisherige Abstimmungen",
-                             AnalysisPreviousUI("AnalysisPrevious",dtIndikatorensettings),
-                             actionButton("renewBisherige",
-                                          "Bisherige Abstimmungen neu laden")
+                                                           )
+                                                         )
 
 
-                        ),
-                        # tabPanel("Endgültige Gewichtungen",
-                        #          tableOutput("DirGewichtungenTable")
-                        # ),
+
+                                                ),
+                                                tabPanel("Bisherige Abstimmungen",
+                                                         AnalysisPreviousUI("AnalysisPrevious",dtIndikatorensettings),
+                                                         actionButton("renewBisherige",
+                                                                      "Bisherige Abstimmungen neu laden")
 
 
-                        # tabPanel("Einstellungen für die Indikatoren",
-                        #          tableOutput("Indikatorensettings")
-                        # ),
-                        tabPanel("Über dieses Programm",
-                                 tags$div(tags$p("Dieses Programm wurde im Rahmen des Projektes INOLA erstellt.
+                                                ),
+                                                # tabPanel("Endgültige Gewichtungen",
+                                                #          tableOutput("DirGewichtungenTable")
+                                                # ),
+
+
+                                                # tabPanel("Einstellungen für die Indikatoren",
+                                                #          tableOutput("Indikatorensettings")
+                                                # ),
+                                                tabPanel("Über dieses Programm",
+                                                         tags$div(tags$p("Dieses Programm wurde im Rahmen des Projektes INOLA erstellt.
                                                  Weitere Informationen unter: ", tags$a(href="http://inola-region.de", target="_blank", "inola-region.de") ),
-                                          tags$p("Technische Umsetzung: Julian Bothe"),
-                                          tags$p("Der Quellcode des Programms kann unter ", tags$a(href="https://github.com/JulianBo/mcdsupportshiny",
-                                                                                                   target="_blank", "https://github.com/JulianBo/mcdsupportshiny"),
-                                                 "  heruntergeladen und eingesehen werden.")),
-                                 h3("Funktionsweise"),
-                                 tags$p("Dieses Programm rechnet die einzelnen Indikatoren in Punktzahlen um. Je nach Gewichtung werden diese Schrittweise anteilig aufaddiert - Je höher die Gewichtung ist, desto mehr der Punkte wird benutzt. "),
-                                 h4("Benutzte Punktzahlen der Indikatoren"),
-                                 plotOutput("NutzenPlot"),
-                                 selectInput(
-                                   "NutzenPlotOptions",
-                                   "Bitte Variablen zur Ansicht auswählen",
-                                   choices= names(dtAlternativen)[-(1:2)],
-                                   selected=names(dtAlternativen)[-(1:2)],
-                                   multiple=TRUE,
-                                   width="100%"
+                                                                  tags$p("Technische Umsetzung: Julian Bothe"),
+                                                                  tags$p("Der Quellcode des Programms kann unter ", tags$a(href="https://github.com/JulianBo/mcdsupportshiny",
+                                                                                                                           target="_blank", "https://github.com/JulianBo/mcdsupportshiny"),
+                                                                         "  heruntergeladen und eingesehen werden.")),
+                                                         h3("Funktionsweise"),
+                                                         tags$p("Dieses Programm rechnet die einzelnen Indikatoren in Punktzahlen um. Je nach Gewichtung werden diese Schrittweise anteilig aufaddiert - Je höher die Gewichtung ist, desto mehr der Punkte wird benutzt. "),
+                                                         h4("Benutzte Punktzahlen der Indikatoren"),
+                                                         plotOutput("NutzenPlot"),
+                                                         selectInput(
+                                                           "NutzenPlotOptions",
+                                                           "Bitte Variablen zur Ansicht auswählen",
+                                                           choices= names(dtAlternativen)[-(1:2)],
+                                                           selected=names(dtAlternativen)[-(1:2)],
+                                                           multiple=TRUE,
+                                                           width="100%"
 
 
-                                 ),
+                                                         ),
 
                                  h4("Tabelle der Alternativen"),
                                  DT::dataTableOutput("AlternativenTable")

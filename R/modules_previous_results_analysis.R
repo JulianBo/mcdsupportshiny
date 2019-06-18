@@ -66,7 +66,8 @@ AnalysisPreviousUI<- function(id,dtIndikatorensettings,all_members=FALSE){
 
 
 
-    )
+    ),
+    textOutput(ns("infotext") )
   )
 }
 
@@ -80,6 +81,8 @@ AnalysisPreviousUI<- function(id,dtIndikatorensettings,all_members=FALSE){
 #' @param session
 #' @param data_reactivepromise
 #' @param dtIndikatorensettings
+#' @param check_group one of TRUE FALSE group
+#' @param group
 #'
 #' @return
 #' @export
@@ -87,7 +90,9 @@ AnalysisPreviousUI<- function(id,dtIndikatorensettings,all_members=FALSE){
 #' @examples
 AnalysisPrevious<- function(input, output, session,
                             data_reactivepromise,
-                            dtIndikatorensettings){
+                            dtIndikatorensettings,
+                            check_group=FALSE,
+                            group=NULL){
 
 
 
@@ -98,13 +103,34 @@ AnalysisPrevious<- function(input, output, session,
   #   )
 
 
+  output$infotext <- renderText({
+    if(isTRUE(check_group) ) {
+      paste0("Benutzte Umfragegruppe: `", group,"`")
+    } else if(check_group=="reactive") {
+      paste0("Benutzte Umfragegruppe: ", paste0("`", group,"`", collapse = ","))
+    } else ""
+  })
+
   # 0 Vorbereitende Reactives -----------------------------------------------
 
 
   dtBisherigeDecsMelted<-reactive(
     data_reactivepromise() %...>% {
       # message("####start melting for results####")
-      melted<- melt(.,
+      data<-if(isTRUE(check_group) ) {
+        if (is.na(group)|group==""|group=="NA" ) {
+          .[gruppe==group|gruppe=="NA" | is.na(gruppe)]
+        }else {
+          .[gruppe==group]
+        }
+
+      } else if(check_group=="reactive") {
+        if(isTRUE(group()) ){
+          .
+        } else .[gruppe %in% group()]
+      } else .
+
+      melted<- melt(data,
                     id.vars=c("Zeitpunkt","Sessionstart", "session_id","gruppe", "url_search","addBtn"),
                     measure.vars=c("ChoiceSlct", "ChoiceFinalSlct", "BestesErgebnis" ))
 
@@ -126,9 +152,20 @@ AnalysisPrevious<- function(input, output, session,
       # print("####print bisherige ####")
       # print(.)
       # message("####start melting for originalweights####")
-      melt( .,
+
+      data<-if(isTRUE(check_group) ) {
+        if (is.na(group)|group==""|group=="NA" ) {
+          .[gruppe==group|gruppe=="NA" | is.na(gruppe)]
+        }else {
+          .[gruppe==group]
+        }
+      } else if(check_group=="reactive") {
+        .[gruppe %in% group()]
+      } else .
+
+      melt( data,
             id.vars=c("Zeitpunkt","Sessionstart", "session_id","gruppe", "url_search","addBtn"),
-            measure.vars=grep("sl.*originalweights$", names(.), fixed=FALSE, value=TRUE) )
+            measure.vars=grep("sl.*originalweights$", names(data), fixed=FALSE, value=TRUE) )
 
 
     }
@@ -153,7 +190,6 @@ AnalysisPrevious<- function(input, output, session,
 
   ###1 Ergebnisse ----------
 
-  #output$BisherigeTable<-renderTable(value(data_reactivepromise()) )
   output$BisherigeDecsPlot<- renderPlot({
     # message("outside promise . plotting BisherigeDecsPlot")
 
