@@ -130,16 +130,16 @@ AnalysisPrevious<- function(input, output, session,
         } else .[gruppe %in% group()]
       } else .
 
+
       melted<- melt(data,
                     id.vars=c("Zeitpunkt","Sessionstart", "session_id","gruppe", "url_search","addBtn"),
-                    measure.vars=c("ChoiceSlct", "ChoiceFinalSlct", "BestesErgebnis" ))
+                    measure.vars=c("ChoiceSlct", "BestesErgebnis" ))
 
       melted[,value_new:=ifelse(grepl(",",value),"mehrere",value)]
       melted[,position:=ifelse(addBtn==0,"1) ursprünglich", "2) nach Ansicht")]
       melted[,modus:=ifelse(variable=="BestesErgebnis", "berechnet", "ausgewählt")]
 
-      melted[!(addBtn==1 &variable=="ChoiceSlct")&
-               !(addBtn==0&variable=="ChoiceFinalSlct"),]
+
 
       # message("####melted####")
       # message(melted)
@@ -163,17 +163,27 @@ AnalysisPrevious<- function(input, output, session,
         .[gruppe %in% group()]
       } else .
 
+      #print(data)
+
+
       melt( data,
             id.vars=c("Zeitpunkt","Sessionstart", "session_id","gruppe", "url_search","addBtn"),
-            measure.vars=grep("sl.*originalweights$", names(data), fixed=FALSE, value=TRUE) )
+            measure.vars=grep("*.originalweights$", names(data), fixed=FALSE, value=TRUE) )
 
 
     }
   )
 
   dtBisherigeJoined <- reactive(
-    dtBisherigeMelted() %...>%
-      dtIndikatorensettings[negative==FALSE][., on=.(name_new==variable) ]
+    dtBisherigeMelted() %...>%{
+      print("dtBisherigeMelted() ind dtbisherigejoined")
+      print(.)
+      print("dtIndikatorensettings ind dtbisherigejoined")
+      print(dtIndikatorensettings)
+      dt<-.
+      dtIndikatorensettings[negative==FALSE][dt, on=.(name_new==variable) ]
+    }
+
 
   )
 
@@ -206,7 +216,7 @@ AnalysisPrevious<- function(input, output, session,
   ###2 Abstimmungsergebnisse ----------
   output$BisherigeHistsPlot <- renderPlot({
     dtBisherigeJoined() %...>% {
-      #print(.)
+      print(.)
 
       joined_dt<-.[parent==input$BisherigeHistsPlotSelect]
 

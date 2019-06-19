@@ -20,7 +20,7 @@ library(mcdsupportshiny)
 
 #source("Setup.R", encoding="UTF-8") #local=FALSE, auch in ui.R sichtbar
 #source("Setup_INOLA.R", encoding="UTF-8") #local=FALSE, auch in ui.R sichtbar
-source("Setup_INOLA_neu.R",local=TRUE, encoding="UTF-8") #local=FALSE, auch in ui.R sichtbar
+source("Setup_INOLA_neu.R",local=FALSE, encoding="UTF-8") #local=FALSE, auch in ui.R sichtbar
 
 
 validateConfig(configList,dtAlternativen)
@@ -237,11 +237,11 @@ shinyServer(function(input, output, session) {
   ##Bisherige Daten laden.
 
 
-  reactive_gruppe<- reactive({
+  gruppe<- function(){
     ifelse(is.null(parseQueryString(session$clientData$url_search)[["gruppe"]]),
            "",
            parseQueryString(session$clientData$url_search)[["gruppe"]])
-  })
+  }
 
   # Load Modules -----------------------------
   # sliderCheckboxModules <-sapply(dtGewichtungen$name,
@@ -258,12 +258,11 @@ shinyServer(function(input, output, session) {
 
   AnalysisPrevious1<- callModule(AnalysisPrevious,"AnalysisPrevious",
                                  dtBisherige,
-                                 copy(dtIndikatorensettings)[,name_new:=paste0("slGui2.",
-                                                                               gsub("[^A-Za-z0-9-]", "", name),
-                                                                               ".sl.originalweights")
+                                 copy(dtIndikatorensettings)[,name_new:=paste0(gsub("[ ()]", ".", name),
+                                                                              ".originalweights")
                                                              ],
                                  check_group=TRUE,
-                                 group=reactive_gruppe()
+                                 group=gruppe()
   )
 
   #message(time1)
@@ -410,9 +409,8 @@ shinyServer(function(input, output, session) {
       Zeitpunkt=date(),
       Sessionstart=session_start,
       session_id=session_id,
-      gruppe=reactive_gruppe(),
+      gruppe=gruppe(),
       url_search=session$clientData$url_search ,
-      speichernBtn=input$speichernBtn,
       addBtn=input$addBtn,
 
       ##Umfragedaten
@@ -420,21 +418,19 @@ shinyServer(function(input, output, session) {
       FirsttimeSlct=input$FirsttimeSlct,
       GenderSlct=input$GenderSlct,
       AgeSl=input$AgeSl,
-      ChoiceSlct=input$ChoiceSlct,
-      ChoiceSlctCount=rv$ChoiceSlctCount,
-      ChoiceFinalSlct=input$ChoiceFinalSlct,
-      ChoiceFinalSlctCount=rv$ChoiceFinalSlctCount,
+      ChoiceSlct=if(input$addBtn==0) input$ChoiceSlct else input$ChoiceFinalSlct,
+      ChoiceSlctCount=if(input$addBtn==0) rv$ChoiceSlctCount else rv$ChoiceFinalSlctCount,
       ## Ergebnis
       # Es können auch mehrere beste Ergebnisse sein
       BestesErgebnis= paste(levels(rv_BestesErgebnis())[rv_BestesErgebnis()], collapse=", " ),
 
       ##Gewichtungen
       setNames(rv_dtGewichtungen()$originalweights,
-               paste0(rv_dtGewichtungen()$slname, ".originalweights"  )),
+               paste0(rv_dtGewichtungen()$name, ".originalweights"  )),
       setNames(rv_dtGewichtungen()$finalweight_in_level,
-               paste0(rv_dtGewichtungen()$slname, ".finalweight_in_level"  )),
+               paste0(rv_dtGewichtungen()$name, ".finalweight_in_level"  )),
       setNames(rv_dtGewichtungen()$finalweight_in_level_corrected,
-               paste0(rv_dtGewichtungen()$slname, ".finalweight_in_level_corrected"  )),
+               paste0(rv_dtGewichtungen()$name, ".finalweight_in_level_corrected"  )),
       ## Status CollapsePanels
       #Add timesClicked of slGui1 and slGui2
       setNames(slGui1$collapsePanelValues()$timesClicked + slGui2$collapsePanelValues()$timesClicked ,
