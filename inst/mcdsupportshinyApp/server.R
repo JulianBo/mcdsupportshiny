@@ -20,7 +20,7 @@ library(mcdsupportshiny)
 
 #source("Setup.R", encoding="UTF-8") #local=FALSE, auch in ui.R sichtbar
 #source("Setup_INOLA.R", encoding="UTF-8") #local=FALSE, auch in ui.R sichtbar
-source("Setup_INOLA_neu.R",local=TRUE, encoding="UTF-8") #local=FALSE, auch in ui.R sichtbar
+source("Setup_INOLA_neu.R",local=FALSE, encoding="UTF-8") #local=FALSE, auch in ui.R sichtbar
 
 
 validateConfig(configList,dtAlternativen)
@@ -61,7 +61,7 @@ dtAlternativen_long[,
                     `:=`(
                       x1=calculatecenterfunc(first(util_fit_x1),value),
                       x2=calculatecenterfunc(first(util_fit_x2),value)
-                      ),
+                    ),
                     by=.(variable, negative,util_func)]
 
 
@@ -84,10 +84,10 @@ dtAlternativen_long[!(all_missing==TRUE),
 #nötig um Nutzenfunktionen zu plotten; inkl. 5% außerhalb
 dtAlternativen_long[!(all_missing==TRUE),
                     `:=`(   value_min=min(value, na.rm=TRUE)*0.95,
-                             value_max=max(value, na.rm=TRUE)*1.05,
-                             nutzen_min=min(nutzen, na.rm=TRUE)*0.95,
-                             nutzen_max=max(nutzen, na.rm=TRUE)*1.05
-                             ),
+                            value_max=max(value, na.rm=TRUE)*1.05,
+                            nutzen_min=min(nutzen, na.rm=TRUE)*0.95,
+                            nutzen_max=max(nutzen, na.rm=TRUE)*1.05
+                    ),
                     by=.(variable,negative,util_func, util_fit_x1,x1, y1,util_fit_x2,x2, y2)]
 
 #FÜge width hinzu, um es beim Plotten benutzen zu können (position_dodge)
@@ -98,22 +98,22 @@ dtAlternativen_long[!(all_missing==TRUE),
 #Dodging
 dtAlternativen_long[!(all_missing==TRUE),
                     `:=`( I_group=1:.N,
-                 N_group=.N,
-                 group=.GRP,
-                 #Here the actual dodging is done
-                 value_dodgedx = value - ( (1:.N-0.5) - .N/2) *width_dodge ),
-          , by=.(variable, negative, value, nutzen)]
+                          N_group=.N,
+                          group=.GRP,
+                          #Here the actual dodging is done
+                          value_dodgedx = value - ( (1:.N-0.5) - .N/2) *width_dodge ),
+                    , by=.(variable, negative, value, nutzen)]
 
 
 #Set NA to  and mark them as missing- only after calculating min and max!
 dtAlternativen_long[!(all_missing==TRUE)
                     ,`:=`(nutzen_correct=ifelse(is.na(value),0, nutzen),
-                         missing=is.na(value)
-                         )]
+                          missing=is.na(value)
+                    )]
 
 ##If all of a variable is missing, it is marked as qualitative
 dtIndikatorensettings[ Attribname %in% dtAlternativen_long[all_missing==TRUE,.N, by=variable]$variable,
-                         is_qualitative:=TRUE]
+                       is_qualitative:=TRUE]
 
 
 
@@ -156,8 +156,8 @@ dtNutzenFuncsList[!is.na(value_min) & !is.na(value_max),
 
 dtGewichtungen <- copy(dtIndikatorensettings[,.(colors=first(colors),
                                                 number=first(number)
-                                                ),
-                                             by=.(name, is_mapping, level, parent, bscName, slname, is_qualitative)])
+),
+by=.(name, is_mapping, level, parent, bscName, slname, is_qualitative)])
 dtGewichtungen[, is_calculable:=NA]
 setkey(dtGewichtungen, number)
 
@@ -202,11 +202,11 @@ NutzenWerte<- as.matrix(dtNutzen[,.SD,
 
 
 # datastorage <- future(
-  initialize_datastorage( speicher_template, speichersettings$method, speichersettings$place)
-  # ,
-  # globals=list(speicher_template=speicher_template,
-  #              speichersettings=speichersettings,
-  #              initialize_datastorage=mcdsupportshiny::initialize_datastorage))
+initialize_datastorage( speicher_template, speichersettings$method, speichersettings$place)
+# ,
+# globals=list(speicher_template=speicher_template,
+#              speichersettings=speichersettings,
+#              initialize_datastorage=mcdsupportshiny::initialize_datastorage))
 
 
 
@@ -214,18 +214,18 @@ NutzenWerte<- as.matrix(dtNutzen[,.SD,
 # Define server logic ##########
 shinyServer(function(input, output, session) {
 
-# Session-Data -----------------------------
+  # Session-Data -----------------------------
 
   session_start= date()
   session_id = as.integer(runif(n=1, max=1000000) )
 
   dtBisherige <- reactive({
-      input$renewBisherige
+    input$renewBisherige
 
-      #print("loading Bisherige")
+    #print("loading Bisherige")
 
     # datastorage %...>%
-      future(
+    future(
       { as.data.table(loadData(speichersettings$method, speichersettings$place ) ) },
       globals=list(speichersettings=speichersettings,
                    as.data.table=data.table::as.data.table,
@@ -237,30 +237,37 @@ shinyServer(function(input, output, session) {
   ##Bisherige Daten laden.
 
 
-# Load Modules -----------------------------
+  gruppe<- function(){
+    ifelse(is.null(parseQueryString(session$clientData$url_search)[["gruppe"]]),
+           "",
+           parseQueryString(session$clientData$url_search)[["gruppe"]])
+  }
+
+  # Load Modules -----------------------------
   # sliderCheckboxModules <-sapply(dtGewichtungen$name,
   #                                function(x) callModule(sliderCheckbox,x)
   #                                )
 
   #copy(dtBscCombinations) to separate Counting. Otherwise call-by-reference, to same data.table.
   # time1<- system.time(
-    slGui1<-callModule(rSliderGui,"slGui1", dtGewichtungen$name,copy(dtBscCombinations) )
+  slGui1<-callModule(rSliderGui,"slGui1", dtGewichtungen$name,copy(dtBscCombinations) )
   # )
   # time2<- system.time(
-    slGui2<-callModule(rSliderGui,"slGui2", dtGewichtungen$name,copy(dtBscCombinations) )
+  slGui2<-callModule(rSliderGui,"slGui2", dtGewichtungen$name,copy(dtBscCombinations) )
   # )
 
-    AnalysisPrevious1<- callModule(AnalysisPrevious,"AnalysisPrevious",
-                                   dtBisherige,
-                                   copy(dtIndikatorensettings)[,name_new:=paste0("slGui2.",
-                                                                                 gsub("[^A-Za-z0-9-]", "", name),
-                                                                                 ".sl.originalweights")
-                                                               ]
-                                   )
+  AnalysisPrevious1<- callModule(AnalysisPrevious,"AnalysisPrevious",
+                                 dtBisherige,
+                                 copy(dtIndikatorensettings)[,name_new:=paste0(gsub("[ ()]", ".", name),
+                                                                              ".originalweights")
+                                                             ],
+                                 check_group=TRUE,
+                                 group=gruppe()
+  )
 
   #message(time1)
 
-# Reactives berechnen -----------------------------------------------------
+  # Reactives berechnen -----------------------------------------------------
 
   rv_dtGewichtungen <- reactive({
 
@@ -402,11 +409,8 @@ shinyServer(function(input, output, session) {
       Zeitpunkt=date(),
       Sessionstart=session_start,
       session_id=session_id,
-      gruppe=ifelse(is.null(parseQueryString(session$clientData$url_search)[["gruppe"]]),
-                    NA,
-                    parseQueryString(session$clientData$url_search)[["gruppe"]]),
+      gruppe=gruppe(),
       url_search=session$clientData$url_search ,
-      speichernBtn=input$speichernBtn,
       addBtn=input$addBtn,
 
       ##Umfragedaten
@@ -414,21 +418,19 @@ shinyServer(function(input, output, session) {
       FirsttimeSlct=input$FirsttimeSlct,
       GenderSlct=input$GenderSlct,
       AgeSl=input$AgeSl,
-      ChoiceSlct=input$ChoiceSlct,
-      ChoiceSlctCount=rv$ChoiceSlctCount,
-      ChoiceFinalSlct=input$ChoiceFinalSlct,
-      ChoiceFinalSlctCount=rv$ChoiceFinalSlctCount,
+      ChoiceSlct=if(input$addBtn==0) input$ChoiceSlct else input$ChoiceFinalSlct,
+      ChoiceSlctCount=if(input$addBtn==0) rv$ChoiceSlctCount else rv$ChoiceFinalSlctCount,
       ## Ergebnis
       # Es können auch mehrere beste Ergebnisse sein
       BestesErgebnis= paste(levels(rv_BestesErgebnis())[rv_BestesErgebnis()], collapse=", " ),
 
       ##Gewichtungen
       setNames(rv_dtGewichtungen()$originalweights,
-               paste0(rv_dtGewichtungen()$slname, ".originalweights"  )),
+               paste0(rv_dtGewichtungen()$name, ".originalweights"  )),
       setNames(rv_dtGewichtungen()$finalweight_in_level,
-               paste0(rv_dtGewichtungen()$slname, ".finalweight_in_level"  )),
+               paste0(rv_dtGewichtungen()$name, ".finalweight_in_level"  )),
       setNames(rv_dtGewichtungen()$finalweight_in_level_corrected,
-               paste0(rv_dtGewichtungen()$slname, ".finalweight_in_level_corrected"  )),
+               paste0(rv_dtGewichtungen()$name, ".finalweight_in_level_corrected"  )),
       ## Status CollapsePanels
       #Add timesClicked of slGui1 and slGui2
       setNames(slGui1$collapsePanelValues()$timesClicked + slGui2$collapsePanelValues()$timesClicked ,

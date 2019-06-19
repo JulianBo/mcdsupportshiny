@@ -66,7 +66,8 @@ AnalysisPreviousUI<- function(id,dtIndikatorensettings,all_members=FALSE){
 
 
 
-    )
+    ),
+    textOutput(ns("infotext") )
   )
 }
 
@@ -80,6 +81,8 @@ AnalysisPreviousUI<- function(id,dtIndikatorensettings,all_members=FALSE){
 #' @param session
 #' @param data_reactivepromise
 #' @param dtIndikatorensettings
+#' @param check_group one of TRUE FALSE group
+#' @param group
 #'
 #' @return
 #' @export
@@ -87,7 +90,9 @@ AnalysisPreviousUI<- function(id,dtIndikatorensettings,all_members=FALSE){
 #' @examples
 AnalysisPrevious<- function(input, output, session,
                             data_reactivepromise,
-                            dtIndikatorensettings){
+                            dtIndikatorensettings,
+                            check_group=FALSE,
+                            group=NULL){
 
 
 
@@ -98,22 +103,43 @@ AnalysisPrevious<- function(input, output, session,
   #   )
 
 
+  output$infotext <- renderText({
+    if(isTRUE(check_group) ) {
+      paste0("Benutzte Umfragegruppe: `", group,"`")
+    } else if(check_group=="reactive") {
+      paste0("Benutzte Umfragegruppe: ", paste0("`", group,"`", collapse = ","))
+    } else ""
+  })
+
   # 0 Vorbereitende Reactives -----------------------------------------------
 
 
   dtBisherigeDecsMelted<-reactive(
     data_reactivepromise() %...>% {
       # message("####start melting for results####")
-      melted<- melt(.,
+      data<-if(isTRUE(check_group) ) {
+        if (is.na(group)|group==""|group=="NA" ) {
+          .[gruppe==group|gruppe=="NA" | is.na(gruppe)]
+        }else {
+          .[gruppe==group]
+        }
+
+      } else if(check_group=="reactive") {
+        if(isTRUE(group()) ){
+          .
+        } else .[gruppe %in% group()]
+      } else .
+
+
+      melted<- melt(data,
                     id.vars=c("Zeitpunkt","Sessionstart", "session_id","gruppe", "url_search","addBtn"),
-                    measure.vars=c("ChoiceSlct", "ChoiceFinalSlct", "BestesErgebnis" ))
+                    measure.vars=c("ChoiceSlct", "BestesErgebnis" ))
 
       melted[,value_new:=ifelse(grepl(",",value),"mehrere",value)]
       melted[,position:=ifelse(addBtn==0,"1) ursprünglich", "2) nach Ansicht")]
       melted[,modus:=ifelse(variable=="BestesErgebnis", "berechnet", "ausgewählt")]
 
-      melted[!(addBtn==1 &variable=="ChoiceSlct")&
-               !(addBtn==0&variable=="ChoiceFinalSlct"),]
+
 
       # message("####melted####")
       # message(melted)
@@ -126,17 +152,38 @@ AnalysisPrevious<- function(input, output, session,
       # print("####print bisherige ####")
       # print(.)
       # message("####start melting for originalweights####")
-      melt( .,
+
+      data<-if(isTRUE(check_group) ) {
+        if (is.na(group)|group==""|group=="NA" ) {
+          .[gruppe==group|gruppe=="NA" | is.na(gruppe)]
+        }else {
+          .[gruppe==group]
+        }
+      } else if(check_group=="reactive") {
+        .[gruppe %in% group()]
+      } else .
+
+      #print(data)
+
+
+      melt( data,
             id.vars=c("Zeitpunkt","Sessionstart", "session_id","gruppe", "url_search","addBtn"),
-            measure.vars=grep("sl.*originalweights$", names(.), fixed=FALSE, value=TRUE) )
+            measure.vars=grep("*.originalweights$", names(data), fixed=FALSE, value=TRUE) )
 
 
     }
   )
 
   dtBisherigeJoined <- reactive(
-    dtBisherigeMelted() %...>%
-      dtIndikatorensettings[negative==FALSE][., on=.(name_new==variable) ]
+    dtBisherigeMelted() %...>%{
+      print("dtBisherigeMelted() ind dtbisherigejoined")
+      print(.)
+      print("dtIndikatorensettings ind dtbisherigejoined")
+      print(dtIndikatorensettings)
+      dt<-.
+      dtIndikatorensettings[negative==FALSE][dt, on=.(name_new==variable) ]
+    }
+
 
   )
 
@@ -153,7 +200,6 @@ AnalysisPrevious<- function(input, output, session,
 
   ###1 Ergebnisse ----------
 
-  #output$BisherigeTable<-renderTable(value(data_reactivepromise()) )
   output$BisherigeDecsPlot<- renderPlot({
     # message("outside promise . plotting BisherigeDecsPlot")
 
@@ -170,7 +216,7 @@ AnalysisPrevious<- function(input, output, session,
   ###2 Abstimmungsergebnisse ----------
   output$BisherigeHistsPlot <- renderPlot({
     dtBisherigeJoined() %...>% {
-      #print(.)
+      print(.)
 
       joined_dt<-.[parent==input$BisherigeHistsPlotSelect]
 
