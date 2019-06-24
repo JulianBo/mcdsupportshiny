@@ -169,7 +169,11 @@ shinyUI(fluidPage(theme="mcdsupportshiny.css",
 
                                                 ),
                                                 tabPanel("Bisherige Abstimmungen",
-                                                         AnalysisPreviousUI("AnalysisPrevious",dtIndikatorensettings),
+                                                         AnalysisPreviousUI("AnalysisPrevious",
+                                                                            copy(dtIndikatorensettings)[,name_new:=paste0(name, #gsub("[ ()]", ".", name),
+                                                                                                                          ".originalweights")
+                                                                                                        ]
+                                                                            ),
                                                          actionButton("renewBisherige",
                                                                       "Bisherige Abstimmungen neu laden")
 

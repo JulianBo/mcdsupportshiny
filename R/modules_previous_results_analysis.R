@@ -49,12 +49,12 @@ AnalysisPreviousUI<- function(id,dtIndikatorensettings,all_members=FALSE){
                  column(
                    selectInput(ns("ClusterXSelect"),
                                "Bitte Indikator für X-Achse auswählen",
-                               choices=dtIndikatorensettings[,name]),
+                               choices=setNames(dtIndikatorensettings$name_new, dtIndikatorensettings$name)),
                    width = 6),
                  column(
                    selectInput(ns("ClusterYSelect"),
                                "Bitte Indikator für Y-Achse auswählen",
-                               choices=dtIndikatorensettings[,name]),
+                               choices=setNames(dtIndikatorensettings$name_new, dtIndikatorensettings$name)),
                    width = 6)
                ),
                plotOutput(ns("ClusterPlot")),
@@ -265,7 +265,9 @@ data_checkgroup<-function(data,check_group,group){
       ggplot(.,aes_string(x=backtick(input$ClusterXSelect),
                           y= backtick(input$ClusterYSelect),
                           color="cluster"))+
-        geom_point()
+        geom_point()+
+        xlab(dtIndikatorensettings[name_new==input$ClusterXSelect]$name)+
+        ylab(dtIndikatorensettings[name_new==input$ClusterYSelect]$name)
 
     }
   )

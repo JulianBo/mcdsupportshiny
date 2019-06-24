@@ -194,7 +194,7 @@ configList <- list (
         'Wertschöpfung' =
           list(
             class = "mapping",
-            Attribname="Wertschöpfung",
+            Attribname=NA ,# "Wertschöpfung",
             description = tagList(
               "Wie wichtig ist es Ihnen, dass sich der ",em(" Ausbau erneuerbarer Energien")," langfristig ",
               em(" positiv auf die gesamte regionale Wertschöpfung")," auswirkt?")
@@ -202,7 +202,7 @@ configList <- list (
         'Arbeitsplätze' =
           list(
             class = "mapping",
-            Attribname = "Arbeitsplätze",
+            Attribname = NA, #"Arbeitsplätze",
             description =tagList(
               "Wie wichtig ist es Ihnen, dass der ",em(" Ausbau erneuerbarer Energien")," langfristig für ",
               em("mehr Arbeitsplätze in der gesamten regionalen Wirtschaft "),"sorgt?")
@@ -210,14 +210,14 @@ configList <- list (
         ),
       'Energieerzeugungskosten' = list(
         class = "mapping",
-        Attribname = "Energieerzeugungskosten",
+        Attribname = NA,  #"Energieerzeugungskosten",
         description = tagList(
           "Wie wichtig ist es Ihnen, dass die  ",em("durchschnittlichen Erzeugungskosten pro KwH (Strom und Wärme) gering ")," sind?"
         )
       ),
     'Förderkosten' = list(
       class = "mapping",
-      Attribname = "Förderkosten",
+      Attribname = NA, #"Förderkosten",
       description = tagList(
         "Wie wichtig ist es Ihnen, dass nur ",em("wenig regionale Fördermittel")," benötigt werden?"
       )
@@ -248,14 +248,14 @@ configList <- list (
     color = "green",
     'Nicht erneuerbarer Energieverbrauch' = list(
       class = "mapping",
-      Attribname = "Energie_nicht_gedeckt",
+      Attribname = NA, #"Energie_nicht_gedeckt",
       description = tagList(
         "Wie wichtig ist es Ihnen, dass die ",em("Energieerzeugung möglichst regional und CO2-frei "),
         " ist?")
     ),
     'Flächenbeanspruchung' = list(
       class = "mapping",
-      Attribname = "Flächenbeanspruchung",
+      Attribname = NA, #"Flächenbeanspruchung",
       description = tagList(
         "Wie wichtig ist es Ihnen, dass bei der Energieerzeugung möglichst ",em("wenig Freiflächen versiegelt oder überbaut"),
         " werden? (Es werden Windkraft, PV-Freiflächenanlagen, Biogasanlagen und Kraftwerke berücksichtigt)"
