@@ -29,23 +29,24 @@ configList <- list (
   standardweight = 30,
   util_func = "prop",
   sliderlabel="returnLabelsNormal",
-  #Standardeinstellungen der utilityfunction, zum weiterreichen
-  util_fit_x1 = "min", #"mean", #mean, min_max, interquartil
-  y1=150  ,
-  negative_util_fit_x1="min",
-  negative_y1=0,
-  util_fit_x2 = "max", #mean, min_max, interquartil
-  y2 = 0 ,
-  negative_util_fit_x2="max",
-  negative_y2=150,
+  ####Standardeinstellungen der utilityfunction, zum weiterreichen
+
+  ##Fals alle gleich berechtig sind, alle (kleinsten) Unterschiede den gleichen Punktunterscheid uasmachen
+  # util_fit_x1 = "min", #"mean", #mean, min_max, interquartil
+  # y1=150  ,
+  # negative_util_fit_x1="min",
+  # negative_y1=0,
+  # util_fit_x2 = "max", #mean, min_max, interquartil
+  # y2 = 0 ,
+  # negative_util_fit_x2="max",
+  # negative_y2=150,
 
 
-
-
-  # util_fit_x1 = NA, #"mean", #mean, min_max, interquartil
-  # y1=NA,
-  # util_fit_x2 = "mean", #mean, min_max, interquartil
-  # y2 = 100,
+  ##Grundsätzlich absolute Werte
+  util_fit_x1 = NA, #"mean", #mean, min_max, interquartil
+  y1=NA,
+  util_fit_x2 = "mean", #mean, min_max, interquartil
+  y2 = 100,
 
 
   #Kindelemente
@@ -95,14 +96,18 @@ configList <- list (
         "Wie wichtig ist es Ihnen, dass  ",em("bilanziell ein hoher Anteil des regionalen Energieverbrauchs durch regionale erneuerbare Energien")," erzeugt wird?"
       ),
       'Gesamtanteil erneuerbarer Wärme' = list(
-        class = "elements",
+        class = "mapping",
         Attribname = "Anteil_Erneuerbar_Strom",
+        util_fit_x1=20, #20% Wird als Standard gesetzt
+        include_parent=TRUE,
         description = tagList(
           "Wie wichtig ist es Ihnen, dass bilanziell ein hoher Anteil des regionalen  ",em("Stromverbrauchs")," durch regionale erneuerbare Energien erzeugt wird?"
         )
         ),
         'Gesamtanteil erneuerbarer Strom' = list(
-          class = "elements",
+          class = "mapping",
+          util_fit_x1=20, #20% Wird als Standard gesetzt
+          include_parent=TRUE,
           Attribname = "Anteil_Erneuerbar_Wärme",
           description = tagList(
             "Wie wichtig ist es Ihnen, dass bilanziell ein hoher Anteil des regionalen ",em("Wärmeverbrauchs")," durch regionale erneuerbare Energien erzeugt wird?"
@@ -112,6 +117,8 @@ configList <- list (
     'Stromüberschuss' = list(
       class = "mapping",
       Attribname = "Überschuss",
+      y1=70, # Verringere Einfluss - Annahme: Etwas Überschuss ist immer da.
+      include_parent=TRUE,
       description = tagList(
         "Wie wichtig ist es Ihnen, dass in der Region so viele ",em(" Stromerzeugungsanlagen gebaut werden, dass überschüssiger Strom erzeugt und potentiell exportiert werden könnte?")," (z.B. um Städte wie München mitzuversorgen)"
       )
@@ -212,7 +219,7 @@ configList <- list (
         class = "mapping",
         Attribname = NA,  #"Energieerzeugungskosten",
         description = tagList(
-          "Wie wichtig ist es Ihnen, dass die  ",em("durchschnittlichen Erzeugungskosten pro KwH (Strom und Wärme) gering ")," sind?"
+          "Wie wichtig ist es Ihnen, dass die  ",em("durchschnittlichen Erzeugungskosten pro kWh (Strom und Wärme) gering ")," sind?"
         )
       ),
     'Förderkosten' = list(
@@ -309,6 +316,8 @@ configList <- list (
       'Windkraft' = list(
         class = "mapping",
         Attribname = "Windkraft_Anzahl",
+        y1=150, # Verringere Einfluss .
+        include_parent=TRUE,
         description = tagList(
           "Auf der Skala von 0 bis 100 bewerte ich ",em("Auswirkungen von Windkraftanlagen")," mit:"
         )
