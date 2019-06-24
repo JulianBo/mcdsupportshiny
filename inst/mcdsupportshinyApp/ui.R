@@ -139,11 +139,15 @@ shinyUI(fluidPage(theme="mcdsupportshiny.css",
                                                                     ),
                                                                     h3("Gesamtergebnis"),
                                                                     fluidRow(
-                                                                      column(width=6, plotOutput("ErgebnisPlot")),
-                                                                      column(width=6,tableOutput("ErgebnisTable"))
-                                                                    ),
-                                                                    h3("Ergebnisse nach Rahmen"),
-                                                                    plotOutput("SzenarioPlot")
+                                                                      column(width=8, plotOutput("ErgebnisPlot")),
+                                                                      column(width=4,
+                                                                             h4("Mittelwert pro Pfad"),
+                                                                             tableOutput("ErgebnisTable")
+                                                                             )
+                                                                    )
+                                                                    #,
+                                                                    # h3("Ergebnisse nach Rahmen"),
+                                                                    # plotOutput("SzenarioPlot")
 
                                                            ),
                                                            tabPanel("Detailergebnisse",

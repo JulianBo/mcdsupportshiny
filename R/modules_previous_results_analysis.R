@@ -215,7 +215,7 @@ data_checkgroup<-function(data,check_group,group){
   ###2 Abstimmungsergebnisse ----------
   output$BisherigeHistsPlot <- renderPlot({
     dtBisherigeJoined() %...>% {
-      print(.)
+      #print(.)
 
       joined_dt<-.[parent==input$BisherigeHistsPlotSelect]
 

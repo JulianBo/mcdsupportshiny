@@ -569,8 +569,13 @@ shinyServer(function(input, output, session) {
   })
 
   output$ErgebnisPlot<- renderPlot({
-    ggplot(rv_dtErgebnis(),aes(x=Pfad,y=Gesamtergebnis, fill=Pfad))+
-      geom_col()+
+    ggplot(rv_dtSzenarioergebnis()
+           ,aes(x=Pfad,y=Szenarioergebnis, fill=Pfad,  shape=Rahmen))+
+      scale_shape_manual(values=21:24)+
+      geom_col(position="dodge")+
+      geom_col(data=rv_dtErgebnis(),mapping=aes(shape=NULL,y=Gesamtergebnis, fill=NULL),
+               linetype="longdash", color="black", fill=NA)+
+      geom_point(colour="Black", position=position_dodge(width=1), size=4)+
       ylab("Punktzahl")+
       annotate("text",
                label =ifelse(sum(rv_dtGewichtungen()[level==0,
@@ -583,24 +588,24 @@ shinyServer(function(input, output, session) {
   })
 
 
-  output$ErgebnisTable <- renderTable(rv_dtErgebnis() )
+  output$ErgebnisTable <- renderTable(rv_dtErgebnis()[,.(Pfad, `Mittlere Punktzahl`=Gesamtergebnis)] )
 
-  output$SzenarioPlot<- renderPlot({
-    ggplot(rv_dtSzenarioergebnis(), aes(y=Szenarioergebnis,fill=Pfad,x=Pfad,  shape=Rahmen))+
-      geom_col(position="dodge" )+
-      scale_shape_manual(values=21:24)+
-      geom_point(colour="Black", position=position_dodge(width=1), size=4)+
-      ylab("Punktzahl")+
-      annotate("text",
-                label =ifelse(sum(rv_dtGewichtungen()[level==0,
-                                                      finalweight_in_level_corrected])==0,
-                                          "Nicht berechenbar",
-                                          "" ) ,
-                x = 0, y = 0, color = "red",size=5,
-                vjust=0,  hjust=0, angle = 0)
-
-
-  }  )
+  # output$SzenarioPlot<- renderPlot({
+  #   ggplot(rv_dtSzenarioergebnis(), aes(y=Szenarioergebnis,fill=Pfad,x=Pfad,  shape=Rahmen))+
+  #     geom_col(position="dodge" )+
+  #     scale_shape_manual(values=21:24)+
+  #     geom_point(colour="Black", position=position_dodge(width=1), size=4)+
+  #     ylab("Punktzahl")+
+  #     annotate("text",
+  #               label =ifelse(sum(rv_dtGewichtungen()[level==0,
+  #                                                     finalweight_in_level_corrected])==0,
+  #                                         "Nicht berechenbar",
+  #                                         "" ) ,
+  #               x = 0, y = 0, color = "red",size=5,
+  #               vjust=0,  hjust=0, angle = 0)
+  #
+  #
+  # }  )
 
 
 
@@ -699,7 +704,7 @@ shinyServer(function(input, output, session) {
     rv_dtGewichtungen()[,sum(originalweights)]
 
     #
-    dtBisherige()
+    #dtBisherige()
 
     return("")
   })
