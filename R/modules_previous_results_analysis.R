@@ -113,22 +113,26 @@ AnalysisPrevious<- function(input, output, session,
 
   # 0 Vorbereitende Reactives -----------------------------------------------
 
+data_checkgroup<-function(data,check_group,group){
+  if(isTRUE(check_group) ) {
+    if (is.na(group)|group==""|group=="NA" ) {
+      data[gruppe==group|gruppe=="NA" | is.na(gruppe)]
+    }else {
+      data[gruppe==group]
+    }
+
+  } else if(check_group=="reactive") {
+    if(isTRUE(group()) ){
+      data
+    } else data[gruppe %in% group()]
+  } else data
+}
+
 
   dtBisherigeDecsMelted<-reactive(
     data_reactivepromise() %...>% {
       # message("####start melting for results####")
-      data<-if(isTRUE(check_group) ) {
-        if (is.na(group)|group==""|group=="NA" ) {
-          .[gruppe==group|gruppe=="NA" | is.na(gruppe)]
-        }else {
-          .[gruppe==group]
-        }
-
-      } else if(check_group=="reactive") {
-        if(isTRUE(group()) ){
-          .
-        } else .[gruppe %in% group()]
-      } else .
+      data<-data_checkgroup(data=., check_group = check_group, group=group)
 
 
       melted<- melt(data,
@@ -153,15 +157,7 @@ AnalysisPrevious<- function(input, output, session,
       # print(.)
       # message("####start melting for originalweights####")
 
-      data<-if(isTRUE(check_group) ) {
-        if (is.na(group)|group==""|group=="NA" ) {
-          .[gruppe==group|gruppe=="NA" | is.na(gruppe)]
-        }else {
-          .[gruppe==group]
-        }
-      } else if(check_group=="reactive") {
-        .[gruppe %in% group()]
-      } else .
+      data<-data_checkgroup(data=., check_group = check_group, group=group)
 
       #print(data)
 
@@ -176,10 +172,11 @@ AnalysisPrevious<- function(input, output, session,
 
   dtBisherigeJoined <- reactive(
     dtBisherigeMelted() %...>%{
-      print("dtBisherigeMelted() ind dtbisherigejoined")
-      print(.)
-      print("dtIndikatorensettings ind dtbisherigejoined")
-      print(dtIndikatorensettings)
+      # print("dtBisherigeMelted() ind dtbisherigejoined")
+      # print(.)
+      # print("dtIndikatorensettings ind dtbisherigejoined")
+      # print(dtIndikatorensettings)
+      # print(str(dtIndikatorensettings))
       dt<-.
       dtIndikatorensettings[negative==FALSE][dt, on=.(name_new==variable) ]
     }
@@ -187,16 +184,18 @@ AnalysisPrevious<- function(input, output, session,
 
   )
 
-
-  dtBisherigeWide <- reactive(
-    dtBisherigeJoined()%...>%{
-      dt<-.
-      dcast(dt[!is.na(name)],
-            Zeitpunkt+Sessionstart+session_id+gruppe+url_search+addBtn~ name
-            , value.var  ="value")
-    }
-
-  )
+ ## Not needed any more - cluster changed
+  # dtBisherigeWide <- reactive(
+  #   dtBisherigeJoined()%...>%{
+  #     print("dtBisherigeJoined() ind dtBisherigeWide ")
+  #     print(.)
+  #     dt<-.
+  #     dcast(dt[!is.na(name)],
+  #           Zeitpunkt+Sessionstart+session_id+gruppe+url_search+addBtn~ name
+  #           , value.var  ="value")
+  #   }
+  #
+  # )
 
   ###1 Ergebnisse ----------
 
@@ -247,12 +246,12 @@ AnalysisPrevious<- function(input, output, session,
   ###3 Gruppenanalyse ----------
 
   dtBisherigeCluster <- reactive(
-    dtBisherigeWide()%...>%{
-      wide<-.
-      kmeans_cluster<-kmeans(wide[,7:length(names(wide))],
+    data_reactivepromise()%...>%{
+      wide<-data_checkgroup(data=., check_group = check_group, group=group)
+      kmeans_cluster<-kmeans(wide[,dtIndikatorensettings[, "name_new"][[1]], with=FALSE],
                              input$ClusterNumberNumeric)
 
-      copy(wide)[,cluster:=as.factor(kmeans_cluster$cluster)]
+      wide[,cluster:=as.factor(kmeans_cluster$cluster)]
 
 
     }

@@ -20,7 +20,8 @@ library(mcdsupportshiny)
 
 #source("Setup.R", encoding="UTF-8") #local=FALSE, auch in ui.R sichtbar
 #source("Setup_INOLA.R", encoding="UTF-8") #local=FALSE, auch in ui.R sichtbar
-source("Setup_INOLA_neu.R",local=FALSE, encoding="UTF-8") #local=FALSE, auch in ui.R sichtbar
+source("Setup_INOLA_neu.R",#local=FALSE,
+       encoding="UTF-8") #local=FALSE, auch in ui.R sichtbar
 
 
 validateConfig(configList,dtAlternativen)
@@ -258,7 +259,7 @@ shinyServer(function(input, output, session) {
 
   AnalysisPrevious1<- callModule(AnalysisPrevious,"AnalysisPrevious",
                                  dtBisherige,
-                                 copy(dtIndikatorensettings)[,name_new:=paste0(gsub("[ ()]", ".", name),
+                                 copy(dtIndikatorensettings)[,name_new:=paste0(name, #gsub("[ ()]", ".", name),
                                                                               ".originalweights")
                                                              ],
                                  check_group=TRUE,
