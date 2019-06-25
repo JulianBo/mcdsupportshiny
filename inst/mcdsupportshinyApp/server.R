@@ -8,6 +8,7 @@ library(shinyjs)
 library (data.table)
 #library(plotly)
 library(googlesheets)
+library(ggplot2)
 
 
 library(promises)
@@ -53,7 +54,7 @@ dtBscCombinations[,lastState:=""]
 #visible:=FALSE, Visible lässt sich nur hinterher über opened berechnen, aufgrund BUG
 
 ##TODO: Warning.
-dtAlternativen_long <- merge(melt(dtAlternativen, id.vars=c("Pfad", "Rahmen", "Kombination")),
+dtAlternativen_long <- merge(melt(dtAlternativen, id.vars=c("Pfad", "Rahmen", "Kombination"), verbose=FALSE),
                              dtIndikatorensettings, by.x="variable", by.y="Attribname" )
 
 #Berechne Mittelwert
@@ -259,9 +260,9 @@ shinyServer(function(input, output, session) {
 
   AnalysisPrevious1<- callModule(AnalysisPrevious,"AnalysisPrevious",
                                  dtBisherige,
-                                 copy(dtIndikatorensettings)[,name_new:=paste0(name, #gsub("[ ()]", ".", name),
-                                                                              ".originalweights")
-                                                             ],
+                                 dtIndikatorensettings[,.(number, name, parent, negative,
+                                                          name_new=paste0(name,".originalweights")
+                                                          )],
                                  check_group=TRUE,
                                  group=gruppe()
   )

@@ -272,21 +272,26 @@ data_checkgroup<-function(data,check_group,group){
     }
   )
 
-  output$ClusterTable <- DT::renderDataTable(
+  dtJoinedCluster <- reactive(
     promise_all(joined_df = dtBisherigeJoined(),cluster_df = dtBisherigeCluster()) %...>% with({
       joined_cluster<-joined_df[cluster_df[,.(Zeitpunkt,Sessionstart,session_id,gruppe,url_search,addBtn, cluster)],
-                                on=.(Zeitpunkt,Sessionstart,session_id,gruppe,url_search,addBtn)]
+                                on=.(Zeitpunkt,Sessionstart,session_id,gruppe,url_search,addBtn), allow.cartesian=TRUE]
+    }  )
+  )
+
+  output$ClusterTable <- DT::renderDataTable(
+    dtJoinedCluster() %...>% {
+      joined_cluster<-.
 
       joined_cluster_summary<-joined_cluster[,.(mean=mean(value), sd=sd(value)), by=.(name,cluster)]
 
       joined_cluster_summary[,diff_mean:=max(mean,na.rm=FALSE)-min(mean, na.rm=FALSE), by=.(name) ]
-    })
+    }
   )
 
   output$BisherigeHistsClusterPlot<- renderPlot(
-    promise_all(joined_df = dtBisherigeJoined(),cluster_df = dtBisherigeCluster()) %...>% with({
-      joined_cluster<-joined_df[cluster_df[,.(Zeitpunkt,Sessionstart,session_id,gruppe,url_search,addBtn, cluster)],
-                                on=.(Zeitpunkt,Sessionstart,session_id,gruppe,url_search,addBtn)]
+    dtJoinedCluster() %...>% {
+      joined_cluster<-.
 
       joined_dt<- joined_cluster[parent==input$BisherigeHistsClusterPlotSelect]
 
@@ -309,6 +314,6 @@ data_checkgroup<-function(data,check_group,group){
                   vjust=0, hjust=0, size=3, color="black")+
         facet_grid(name~.)+ylab("Anzahl")+xlab("Wert")
 
-    })
+    }
   )
 }
