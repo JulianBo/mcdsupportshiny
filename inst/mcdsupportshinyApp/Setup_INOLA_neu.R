@@ -11,6 +11,8 @@ dtAlternativen <- fread(file="alternativen.csv",
                         encoding="Latin-1")
 #summary(dtAlternativen)
 
+#print(dtAlternativen$Pfad)
+
 # pfadcolors=c("Krise"=,
 #              "Fortschreibung"=,
 #              "Kleinere Anlagen"="c",
@@ -201,7 +203,7 @@ configList <- list (
         'Wertschöpfung' =
           list(
             class = "mapping",
-            Attribname=NA ,# "Wertschöpfung",
+            Attribname="Wertschöpfung",
             description = tagList(
               "Wie wichtig ist es Ihnen, dass sich der ",em(" Ausbau erneuerbarer Energien")," langfristig ",
               em(" positiv auf die gesamte regionale Wertschöpfung")," auswirkt?")
@@ -209,7 +211,7 @@ configList <- list (
         'Arbeitsplätze' =
           list(
             class = "mapping",
-            Attribname = NA, #"Arbeitsplätze",
+            Attribname = "Arbeitsplätze",
             description =tagList(
               "Wie wichtig ist es Ihnen, dass der ",em(" Ausbau erneuerbarer Energien")," langfristig für ",
               em("mehr Arbeitsplätze in der gesamten regionalen Wirtschaft "),"sorgt?")
@@ -224,7 +226,7 @@ configList <- list (
       ),
     'Förderkosten' = list(
       class = "mapping",
-      Attribname = NA, #"Förderkosten",
+      Attribname = "Förderkosten",
       description = tagList(
         "Wie wichtig ist es Ihnen, dass nur ",em("wenig regionale Fördermittel")," benötigt werden?"
       )
@@ -255,14 +257,14 @@ configList <- list (
     color = "green",
     'Nicht erneuerbarer Energieverbrauch' = list(
       class = "mapping",
-      Attribname = NA, #"Energie_nicht_gedeckt",
+      Attribname = "Energie_nicht_gedeckt",
       description = tagList(
         "Wie wichtig ist es Ihnen, dass die ",em("Energieerzeugung möglichst regional und CO2-frei "),
         " ist?")
     ),
     'Flächenbeanspruchung' = list(
       class = "mapping",
-      Attribname = NA, #"Flächenbeanspruchung",
+      Attribname = "Flächenbeanspruchung",
       description = tagList(
         "Wie wichtig ist es Ihnen, dass bei der Energieerzeugung möglichst ",em("wenig Freiflächen versiegelt oder überbaut"),
         " werden? (Es werden Windkraft, PV-Freiflächenanlagen, Biogasanlagen und Kraftwerke berücksichtigt)"
@@ -373,7 +375,7 @@ configList <- list (
 )
 
 # pfadbeschreibungen & Titel  ------------------------------------------------------
-title_text<-"Persönliches Energiebarometer"
+title_text<-"Energiekompass für das Oberland"
 pfadbeschreibungen<-tagList(
   p(strong("0) Krise:"),"Globale Krisen wirken sich auch auf das Oberland aus und beschränken Maßnahmen und Ausbau."),
   p(strong("1) Fortschreibung:"),"Keine große Änderung der aktuellen  Ausbauraten: Erneuerbare Energieanlagen werden gebaut, falls sie rentabel sind. Die Region Oberland setzt auf Energieeffizienzmaßnahmen und wirtschaftliches Wachstum und ist grundsätzlich technologieoffen. "),

@@ -13,7 +13,7 @@ library(shinyjs)
 
 library(DT)
 
-library(plotly)
+#library(plotly)
 
 
 library(mcdsupportshiny)

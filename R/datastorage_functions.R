@@ -52,7 +52,8 @@ initialize_datastorage <-function(data, method, place){
              googlesheets::gs_edit_cells(sheet,ws = "Daten",
                            input= data,
                            #input= names(data),
-                           byrow=TRUE )
+                           byrow=TRUE,
+                           verbose=FALSE)
              return(FALSE)
            }
 
@@ -87,9 +88,9 @@ saveData <- function(data, method, place) {
          },
          GoogleSheets= {
            # Grab the Google Sheet
-           sheet <- googlesheets::gs_title(place)
+           sheet <- googlesheets::gs_title(place, verbose=FALSE)
            # Add the data as a new row
-           googlesheets::gs_add_row(sheet, input = data, ws ="Daten")
+           googlesheets::gs_add_row(sheet, input = data, ws ="Daten", verbose=FALSE)
 
          } ,{
            stop(paste0("method -",method,"- not supported" ) )
