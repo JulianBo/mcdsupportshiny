@@ -100,15 +100,15 @@ configList <- list (
       'Gesamtanteil erneuerbarer Wärme' = list(
         class = "mapping",
         Attribname = "Anteil_Erneuerbar_Strom",
-        util_fit_x1=20, #20% Wird als Standard gesetzt
+        util_fit_x1=0.20, #20% Wird als Standard gesetzt
         include_parent=TRUE,
         description = tagList(
           "Wie wichtig ist es Ihnen, dass bilanziell ein hoher Anteil des regionalen  ",em("Stromverbrauchs")," durch regionale erneuerbare Energien erzeugt wird?"
         )
         ),
-        'Gesamtanteil erneuerbarer Strom' = list(
+        'Gesamtanteil erneuerbarer Strom' = lisEnert(
           class = "mapping",
-          util_fit_x1=20, #20% Wird als Standard gesetzt
+          util_fit_x1=0.20, #20% Wird als Standard gesetzt
           include_parent=TRUE,
           Attribname = "Anteil_Erneuerbar_Wärme",
           description = tagList(
@@ -144,7 +144,8 @@ configList <- list (
     'Anlagengröße und Zentralisierung' = list(
       class = "elements",
       description = tagList(
-        "Es ist mir wichtig, ob das ",em("Energiesystem in der Region")," vor allem aus ",em("vielen kleineren Anlage oder aus wenigen großen Anlagen")," besteht."
+        "Es ist mir wichtig, ob das ",em("Energiesystem in der Region")," vor allem aus ",em("vielen kleineren Anlage oder aus wenigen großen Anlagen"),
+        " besteht",em(" (Bitte ggf. genauer einstellen).")
       )
       #,explanation_for_childs="Dies ist eine Erläuterung, die nach 'Anlagengröße und Zentralisierung' kommen sollte"
       ,
@@ -251,12 +252,15 @@ configList <- list (
   ),
   'Umwelteffekte' = list (
     class = "elements",
+
     description = tagList(
       "Umweltauswirkungen: Wie wichtig ist Ihnen, wie sich das",em("regionale Energiesystem auf die Umwelt")," auswirkt? (z.B. Flächenbeanspruchung; Nutzung von Biomasse)"
     ),
     color = "green",
     'Nicht erneuerbarer Energieverbrauch' = list(
       class = "mapping",
+      util_func = "negprop",
+      include_parent = TRUE,
       Attribname = "Energie_nicht_gedeckt",
       description = tagList(
         "Wie wichtig ist es Ihnen, dass die ",em("Energieerzeugung möglichst regional und CO2-frei "),
@@ -304,13 +308,13 @@ configList <- list (
       ,
       'PV-Dachflächenanlagen' = list(
         class = "mapping",
-        Attribname = "PV_Dach_Kapazität",
+        Attribname = "PV_Dach_Fläche",
         description = tagList("Auf der Skala von 0 bis 100 bewerte ich ",em("Auswirkungen von Dach- und Fassadenanlagen für PV und Solarthermie")," mit:"
         )
       ),
       'PV-Freiflächenanlagen' = list(
         class = "mapping",
-        Attribname = "PV_Frei_Kapazität",
+        Attribname = "PV_Frei_Fläche",
         description = tagList(
           "Auf der Skala von 0 bis 100 bewerte ich ",em("Auswirkungen von Freiflächenanlagen für PV und Solarthermie")," mit:"
         )
