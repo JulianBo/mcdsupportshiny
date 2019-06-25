@@ -106,7 +106,7 @@ configList <- list (
           "Wie wichtig ist es Ihnen, dass bilanziell ein hoher Anteil des regionalen  ",em("Stromverbrauchs")," durch regionale erneuerbare Energien erzeugt wird?"
         )
         ),
-        'Gesamtanteil erneuerbarer Strom' = lisEnert(
+        'Gesamtanteil erneuerbarer Strom' = list(
           class = "mapping",
           util_fit_x1=0.20, #20% Wird als Standard gesetzt
           include_parent=TRUE,
@@ -135,6 +135,8 @@ configList <- list (
     color = "orange",
     'Diversität des Energieerzeugungssystems' = list(
       class = "mapping",
+      y1=20,
+      include_parent=TRUE,
       Attribname="Diversität",
       description = tagList(
         "Wie wichtig ist es Ihnen, dass das ",em("regionale Energieerzeugungssystem")," aus einem ",em("breiten Mix unterschiedlicher erneuerbarer Energieerzeugungsanlagen")," besteht? (d.h. eine Mischung aus PV, Windkraft, Biomasse, Wasserkraft, Geothermie)"
@@ -179,6 +181,7 @@ configList <- list (
     class = "mapping",
     Attribname = "Stromdelta_Summe",
     util_func = "antiprop",
+    y1=400,
     include_parent = TRUE,
     description = tagList(
       "Die Erzeugung von Strom mit Erneuerbare-Energien-Anlagen unterliegt zeitlichen Schwankungen, die von den Witterungsverhältnissen und vom Technologiemix abhängen.",
@@ -269,6 +272,8 @@ configList <- list (
     'Flächenbeanspruchung' = list(
       class = "mapping",
       Attribname = "Flächenbeanspruchung",
+      util_func = "negprop",
+      include_parent = TRUE,
       description = tagList(
         "Wie wichtig ist es Ihnen, dass bei der Energieerzeugung möglichst ",em("wenig Freiflächen versiegelt oder überbaut"),
         " werden? (Es werden Windkraft, PV-Freiflächenanlagen, Biogasanlagen und Kraftwerke berücksichtigt)"
@@ -276,6 +281,7 @@ configList <- list (
     ),
     'Biomassenverwendung' = list(
       class = "elements",
+      y1=150,
       util_func="antiprop",
       description = tagList(
         "Wie wichtig ist es Ihnen, dass von ",em("Nahrungs- und Futtermitteln (v. a. Mais) und Holz nur ein geringer Anteil zur Energieproduktion"),
@@ -314,6 +320,8 @@ configList <- list (
       ),
       'PV-Freiflächenanlagen' = list(
         class = "mapping",
+        y1=150, # Verringere Einfluss .
+        include_parent=TRUE,
         Attribname = "PV_Frei_Fläche",
         description = tagList(
           "Auf der Skala von 0 bis 100 bewerte ich ",em("Auswirkungen von Freiflächenanlagen für PV und Solarthermie")," mit:"
