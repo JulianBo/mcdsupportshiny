@@ -159,33 +159,37 @@ configList <- list (
     'Anlagengröße und Zentralisierung' = list(
       class = "elements",
       description = tagList(
-        "Es ist mir wichtig, ob das ",em("Energiesystem in der Region")," vor allem aus ",em("vielen kleineren Anlage oder aus wenigen großen Anlagen"),
-        " besteht",em(" (Bitte ggf. genauer einstellen).")
+        "Wie wichtig ist Ihnen,ob das ",em("Energiesystem in der Region")," vor allem aus ",em("vielen (kleineren) Anlage oder aus wenigen (großen) Anlagen"),
+        " besteht? ",em(" (Bitte ggf. genauer einstellen).")
       )
       #,explanation_for_childs="Dies ist eine Erläuterung, die nach 'Anlagengröße und Zentralisierung' kommen sollte"
       ,
 
       'Anlagengröße Stromerzeugung' = list(
         class = "mapping",
-        Attribname = "Anlagengröße_Strom",
+        Attribname = "Anlagenzahl_Strom",
         description = tagList(
-          "Ich präferiere ",em("wenige große Anlagen")," zur ",em("Stromerzeugung,"),
-          " es ist mir ",em("egal,")," oder ich präferiere ",em("viele kleine Anlagen")," (z.B.: Mehr Verbundkraftwerke anstatt Einzelhausanlagen)."
+          "Ich präferiere ",em("wenige (große) Anlagen")," zur ",em("Stromerzeugung,"),
+          " es ist mir ",em("egal,")," oder ich präferiere ",em("viele (kleine) Anlagen")," (z.B.: Mehr Verbundkraftwerke anstatt Einzelhausanlagen)."
         ),
         minweight=-100,
         standardweight = 0,
+        util_func="negprop",
+        negative_util_func="prop",
         sliderlabel="returnLabelsAnlagengroesse"
       ),
       'Anlagengröße Wärmeerzeugung' = list(
         class = "mapping",
-        Attribname = "Anlagengröße_Wärme",
+        Attribname = "Anlagenzahl_Wärme",
         #negative_Attribname = "Anlagengröße_Wärme_negative",
         description = tagList(
-          "Ich präferiere ",em("wenige große Anlagen")," zur ",em("Wärmeerzeugung,")," es ist mir ",
-          em("egal,")," oder ich präferiere ",em("viele kleine Anlagen")," (z.B.: Nahwärmenetze mit großem BHKW vs. Wärmespeicher, Solarthermieanlagen, Wärmepumpe)."
+          "Ich präferiere ",em("wenige (große) Anlagen")," zur ",em("Wärmeerzeugung,")," es ist mir ",
+          em("egal,")," oder ich präferiere ",em("viele (kleine) Anlagen")," (z.B.: Nahwärmenetze mit großem BHKW vs. Wärmespeicher, Solarthermieanlagen, Wärmepumpe)."
         ),
         minweight=-100,
         standardweight = 0,
+        util_func="negprop",
+        negative_util_func="prop",
         sliderlabel="returnLabelsAnlagengroesse"
       )
       )
@@ -251,7 +255,7 @@ configList <- list (
       util_func = "antiprop",
       include_parent=TRUE,
       description = tagList(
-        "Wie wichtig ist es Ihnen, dass nur ",em("wenig  zusätzliche Finanzmittel")," benötigt werden? (Zusätzliche Förderungen auf bundes-, landes-, regionaler, Firmen- oder Haushaltsebene)"
+        "Wie wichtig ist es Ihnen, dass nur ",em("wenig  zusätzliche Finanzmittel")," benötigt werden? (Zusätzliche Förderungen auf Bundes-, Landes-, regionaler, Firmen- oder Haushaltsebene)"
       )
     ),
     'Gewinnbeteiligung' = list(
@@ -407,14 +411,19 @@ configList <- list (
 
 # pfadbeschreibungen & Titel  ------------------------------------------------------
 title_text<-"Energiekompass für das Oberland"
-pfadbeschreibungen<-tagList(p("Es werden drei verschiedene Ausbauoptionen modelliert:", br(),
-  strong("1) Weiter wie bisher:"),"Wir machen weiter wie bisher und es werden keine bestimmten Technologien erneuerbarer Energien bevorzugt (Referenzpfad).",br(),
-  strong("2) Kleine Lösungen:"),"Wir strengen uns an und regionale Aktivitäten fördern kleine Energieerzeugungsanlagen, insbesondere gebäudegebundene Anlagen (Solaranlagen, Haushaltsspeicher, Wärmepumpen) und Energieeinsparung. Investoren sind vor allem Haushalte und Firmen.",br(),
-  strong("3) Große Lösungen:"),"Wir strengen uns an und regionale Aktivitäten fördern größere, nicht-gebäudegebundene Energieerzeugungsanlagen (Windkraft, PV, Quartiersspeicher, Biomasseheizkraftwerke und Nahwärmenetze). Mögliche Investoren sind auch Kommunen, Stadtwerke sowie Energiegenossenschaften.")
+pfadbeschreibungen<-tagList(p("Es werden drei verschiedene Ausbauoptionen modelliert:"),
+  p(
+    strong("1) Weiter wie bisher:"),"Wir machen weiter wie bisher und es werden keine bestimmten Technologien erneuerbarer Energien bevorzugt (Referenzpfad).",br(),
+    strong("2) Kleine Lösungen:"),"Wir strengen uns an und regionale Aktivitäten fördern kleine Energieerzeugungsanlagen, insbesondere gebäudegebundene Anlagen (Solaranlagen, Haushaltsspeicher, Wärmepumpen) und Energieeinsparung. Investoren sind vor allem Haushalte und Firmen.",br(),
+    strong("3) Große Lösungen:"),"Wir strengen uns an und regionale Aktivitäten fördern größere, nicht-gebäudegebundene Energieerzeugungsanlagen (Windkraft, PV, Quartiersspeicher, Biomasseheizkraftwerke und Nahwärmenetze). Mögliche Investoren sind auch Kommunen, Stadtwerke sowie Energiegenossenschaften."
+  ),
+  p("Diese Ausbauoptionen werden dann unter mehren möglichen Rahmenbedingungen bzw. Zukünften getestet.")
 )
 
 rahmenbeschreibungen<-tagList(
-  p("Diese Ausbauoptionen werden dann unter drei möglichen Rahmenbedingungen bzw. Zukünften getestet:",br(),
+
+  h4("Informationen zu den Rahmenbedingungen"),
+  p(
   strong("A) Krise:"),"In globalen Krisenzeiten verlieren Deutschland und das Oberland ihre wirtschaftliche Stärke. Obwohl die Bevölkerung im Oberland wächst, ist die Neubaurate niedrig. Umwelt-, Natur- und Flächenschutz geraten unter die Räder. Für erneuerbare Energien stehen etwas mehr Flächen und Rohstoffe als heute zur Verfügung. Die finanzielle Förderung von erneuerbaren Energien wird hingegen im Vergleich zu heute wesentlich verringert.",br(),
   strong("B) Wachstum:"),"Gesellschaft und Wirtschaft setzen auf Wachstum. Das Oberland boomt, die Bevölkerung wächst, die Neubaurate ist hoch. Umwelt- und Naturschutz werden der Wachstumslogik untergeordnet. Es erfolgt eine bundesweite Förderung von erneuerbare Energien wie es der aktuelle Stand des EEG sowie seine Fortschreibungen inklusive seiner langsamen Senkung vorsehen.",br(),
   strong("C) Nachhaltigkeit:"),"Nachhaltigkeit setzt sich als Ziel in Wirtschaft und Gesellschaft im Oberland und weltweit durch. Das Oberland prosperiert, die Bevölkerung wächst, die Neubaurate ist trotzdem niedrig. Umwelt-, Natur- und Flächenschutz sind wichtig, deshalb stehen weniger Flächen und Rohstoffe für erneuerbare Energien als heute zur Verfügung. Bundesweite Förderung von erneuerbaren Energien, die über den aktuellen Stand der Förderungen hinausgeht.")
