@@ -83,6 +83,7 @@ AnalysisPreviousUI<- function(id,dtIndikatorensettings,all_members=FALSE){
 #' @param dtIndikatorensettings
 #' @param check_group one of TRUE FALSE group
 #' @param group
+#' @param plotcolors Colors for favoured results
 #'
 #' @return
 #' @export
@@ -92,7 +93,8 @@ AnalysisPrevious<- function(input, output, session,
                             data_reactivepromise,
                             dtIndikatorensettings,
                             check_group=FALSE,
-                            group=NULL){
+                            group=NULL,
+                            plotcolors=NULL){
 
 
 
@@ -203,12 +205,19 @@ data_checkgroup<-function(data,check_group,group){
     # message("outside promise . plotting BisherigeDecsPlot")
 
     dtBisherigeDecsMelted() %...>% {
-
-      ggplot(.,
+      plot<-ggplot(.,
              mapping = aes(x=value_new, fill=value_new))+
         geom_bar()+
         facet_grid(position~modus,scales = "free_y")+
         labs(fill = "Pfad", x="Pfad", y="Anzahl")
+
+      if (is.null(plotcolors)
+      ) {plot }
+      else plot + scale_colour_manual(
+        values = plotcolors,
+        aesthetics = c("colour", "fill")
+      )
+
     }
   })
 

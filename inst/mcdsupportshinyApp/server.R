@@ -272,7 +272,8 @@ shinyServer(function(input, output, session) {
                                                           name_new=paste0(name,".originalweights")
                                                           )],
                                  check_group=TRUE,
-                                 group=gruppe()
+                                 group=gruppe(),
+                                 plotcolors=pfadcolors
   )
 
   #message(time1)
