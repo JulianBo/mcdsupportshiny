@@ -159,7 +159,7 @@ configList <- list (
     'Anlagengröße und Zentralisierung' = list(
       class = "elements",
       description = tagList(
-        "Wie wichtig ist Ihnen,ob das ",em("Energiesystem in der Region")," vor allem aus ",em("vielen (kleineren) Anlage oder aus wenigen (großen) Anlagen"),
+        "Wie wichtig ist Ihnen, ob das ",em("Energiesystem in der Region")," vor allem aus ",em("vielen (kleineren) Anlage oder aus wenigen (großen) Anlagen"),
         " besteht? ",em(" (Bitte ggf. genauer einstellen).")
       )
       #,explanation_for_childs="Dies ist eine Erläuterung, die nach 'Anlagengröße und Zentralisierung' kommen sollte"
@@ -219,7 +219,7 @@ configList <- list (
         class = "elements",
         y1=20,
         description = tagList(
-          "Wie wichtigs is es Ihnen, dass sich der ",em("Ausbau erneuerbarer Energien")," langfristig ",em("positiv auf die gesamte regionale Wirtschaft")," auswirkt?"
+          "Wie wichtig ist es Ihnen, dass sich der ",em("Ausbau erneuerbarer Energien")," langfristig ",em("positiv auf die gesamte regionale Wirtschaft")," auswirkt?"
         ),
         'Wertschöpfung' =
           list(
@@ -330,7 +330,7 @@ configList <- list (
       class = "elements",
       util_func="antiprop",
       description = tagList(
-        "Wie wichtig ist es Ihnen, dass ",em("sonstige regionalen und lokalen Auswirkungen durch Energieerzeugungsanlagen"),
+        "Wie wichtig ist es Ihnen, dass ",em("sonstige regionale und lokale Auswirkungen durch Energieerzeugungsanlagen"),
         " möglichst gering sind?")
       ,explanation_for_childs= tagList("Die negativen Auswirkungen welcher Anlagen bewerten  Sie im Verhältnis zueinander als wie wichtig? ",
                                        em("von 0 = keine wichtigen Auswirkungen, bis 100 = stark beeinträchtigende Auswirkungen"))
@@ -425,7 +425,7 @@ rahmenbeschreibungen<-tagList(
   h4("Informationen zu den Rahmenbedingungen"),
   p(
   strong("A) Krise:"),"In globalen Krisenzeiten verlieren Deutschland und das Oberland ihre wirtschaftliche Stärke. Obwohl die Bevölkerung im Oberland wächst, ist die Neubaurate niedrig. Umwelt-, Natur- und Flächenschutz geraten unter die Räder. Für erneuerbare Energien stehen etwas mehr Flächen und Rohstoffe als heute zur Verfügung. Die finanzielle Förderung von erneuerbaren Energien wird hingegen im Vergleich zu heute wesentlich verringert.",br(),
-  strong("B) Wachstum:"),"Gesellschaft und Wirtschaft setzen auf Wachstum. Das Oberland boomt, die Bevölkerung wächst, die Neubaurate ist hoch. Umwelt- und Naturschutz werden der Wachstumslogik untergeordnet. Es erfolgt eine bundesweite Förderung von erneuerbare Energien wie es der aktuelle Stand des EEG sowie seine Fortschreibungen inklusive seiner langsamen Senkung vorsehen.",br(),
+  strong("B) Wachstum:"),"Gesellschaft und Wirtschaft setzen auf Wachstum. Das Oberland boomt, die Bevölkerung wächst, die Neubaurate ist hoch. Umwelt- und Naturschutz werden der Wachstumslogik untergeordnet. Es erfolgt eine bundesweite Förderung von erneuerbaren Energien, wie es der aktuelle Stand des EEG sowie seine Fortschreibungen inklusive seiner langsamen Senkung vorsehen.",br(),
   strong("C) Nachhaltigkeit:"),"Nachhaltigkeit setzt sich als Ziel in Wirtschaft und Gesellschaft im Oberland und weltweit durch. Das Oberland prosperiert, die Bevölkerung wächst, die Neubaurate ist trotzdem niedrig. Umwelt-, Natur- und Flächenschutz sind wichtig, deshalb stehen weniger Flächen und Rohstoffe für erneuerbare Energien als heute zur Verfügung. Bundesweite Förderung von erneuerbaren Energien, die über den aktuellen Stand der Förderungen hinausgeht.")
 )
 
@@ -438,9 +438,9 @@ texte <- list (
   alternativentitel="Informationen zu den Ausbauoptionen",
   auswahlaufforderungstext="Bitte wählen Sie zuerst aus, welcher Ausbaupfad Ihnen spontan am besten gefällt. Die einzelnen Ausbaupfade sind nachfolgend kurz beschrieben.",
 
-  begruessungstext2= "Bitte stellen sie ein, wie wichtig Ihnen die einzelnen Indikatoren im Verhältnis zu den anderen Indikatoren sind.",
+  begruessungstext2= "Bitte stellen Sie ein, wie wichtig Ihnen die einzelnen Indikatoren im Verhältnis zu den anderen Indikatoren sind.",
 
-  choiceSlctText="Welcher Pfad gefällt ihnen spontan am Besten?",
+  choiceSlctText="Welcher Pfad gefällt Ihnen spontan am Besten?",
 
   ortstext="Wohnen Sie im bayerischen Oberland?",
   ortslist=list("Ja, Landkreis Bad Tölz-Wolfratshausen",
