@@ -63,12 +63,13 @@ shinyUI(fluidPage(theme="mcdsupportshiny.css",
 
           tags$p(texte$auswahlaufforderungstext),
           selectInput("ChoiceSlct", texte$choiceSlctText ,
-                      choices=c("Bitte Auswählen", levels(dtAlternativen$Pfad) )
+                      choices=c("Bitte Auswählen", AlternativenLevels  )
                       ),
 
-          h3("Informationen zu den Alternativen"),
+          h3(texte$alternativentitel),
           textOutput("InformationenText"),
-          pfadbeschreibungen
+          pfadbeschreibungen,
+          rahmenbeschreibungen
       ),
 
 
@@ -126,7 +127,7 @@ shinyUI(fluidPage(theme="mcdsupportshiny.css",
                                                                     div(id="abstimmungsDiv",
                                                                         tags$p("Wenn Sie mit den Einstellungen zufrieden sind, können Sie diese abspeichern. Damit gehen diese Werte in das Ergebnis ein."),
                                                                         selectInput("ChoiceFinalSlct","Welchen Pfad präferieren Sie, nachdem Sie diese Ergebnisse gesehen haben?" ,
-                                                                                    choices=c("Bitte Auswählen", levels(dtAlternativen$Pfad) ),
+                                                                                    choices=c("Bitte Auswählen", AlternativenLevels  ),
                                                                                     width = "100%"
                                                                                     #TODO: Add changecount!
                                                                         ),

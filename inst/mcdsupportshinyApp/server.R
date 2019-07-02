@@ -240,9 +240,17 @@ shinyServer(function(input, output, session) {
 
 
   gruppe<- function(){
-    ifelse(is.null(parseQueryString(session$clientData$url_search)[["gruppe"]]),
-           "",
-           parseQueryString(session$clientData$url_search)[["gruppe"]])
+    if(is.null(parseQueryString(session$clientData$url_search)[["gruppe"]])){
+      ""
+    } else parseQueryString(session$clientData$url_search)[["gruppe"]]
+  }
+
+  is_analysis_call<- function(){
+    if(is.null(parseQueryString(session$clientData$url_search)[["action"]]) ){
+      FALSE
+    }else if(is.na(parseQueryString(session$clientData$url_search)[["action"]]) ){
+      FALSE
+    }else parseQueryString(session$clientData$url_search)[["action"]]=="analysis"
   }
 
   # Load Modules -----------------------------
@@ -270,6 +278,8 @@ shinyServer(function(input, output, session) {
   #message(time1)
 
   # Reactives berechnen -----------------------------------------------------
+
+
 
   rv_dtGewichtungen <- reactive({
 
@@ -464,6 +474,7 @@ shinyServer(function(input, output, session) {
                       )
 
 
+
   observeEvent(input$addBtn,{
 
     daten<- rv_dtformData()
@@ -537,7 +548,11 @@ shinyServer(function(input, output, session) {
   output$pageNrText=renderText(paste0("Seite ",rv$page," von ", input$NUM_PAGES))
 
   observeEvent(input$prevBtn, navPage(-1))
-  observeEvent(input$nextBtn, navPage(1))
+  observeEvent(input$nextBtn, {
+
+    if(is_analysis_call()) {rv$page <- input$NUM_PAGES
+    } else navPage(1)
+    })
 
   observeEvent(input$saveBtn, {
     #TODO: SlGui2 updaten - inclduing collapsePanels!.
@@ -585,7 +600,11 @@ shinyServer(function(input, output, session) {
                              "" ) ,
                x = 0, y = 0, color = "red",size=5,
                vjust=0,  hjust=0, angle = 0)+
-      theme(axis.text.x = element_blank(), axis.ticks = element_blank())
+      theme(axis.text.x = element_blank(), axis.ticks = element_blank()) +
+      scale_colour_manual(
+        values = pfadcolors,
+        aesthetics = c("colour", "fill")
+      )
   })
 
 
@@ -640,7 +659,11 @@ shinyServer(function(input, output, session) {
                 ),
                 x = 0.5, y = 0, color = "red",size=5,
                 vjust=0,  hjust=0, angle = 0)+
-    theme(axis.text.x = element_blank(), axis.ticks = element_blank())
+    theme(axis.text.x = element_blank(), axis.ticks = element_blank())+
+      scale_colour_manual(
+        values = pfadcolors,
+        aesthetics = c("colour", "fill")
+      )
 
   })
 
@@ -672,7 +695,11 @@ shinyServer(function(input, output, session) {
                                    ),
                 x = 0.5, y = 0, color = "red",size=5,
                 vjust=0,  hjust=0, angle = 0)+
-   theme(axis.text.x = element_blank(), axis.ticks = element_blank())
+   theme(axis.text.x = element_blank(), axis.ticks = element_blank())+
+      scale_colour_manual(
+        values = pfadcolors,
+        aesthetics = c("colour", "fill")
+      )
 
   })
 
@@ -745,12 +772,15 @@ shinyServer(function(input, output, session) {
       scale_shape_manual(values=21:24)+
       scale_alpha_continuous(range=c(1,0.8),guide = 'none')+
       scale_linetype_discrete( name="Bewertungsbereich",labels=c("positiv", "negativ"))+
-      scale_fill_discrete(name="Ausbaupfad")+
       geom_point(colour="Black", size=4)+
       labs(x="Wert",y="Punktzahl")+
       facet_wrap(~variable, scales = "free_x")+
       geom_path(data =dtNutzenFuncsList[variable %in% input$NutzenPlotOptions],
-                mapping=aes(x=x,y=y, linetype=negative), inherit.aes = FALSE )
+                mapping=aes(x=x,y=y, linetype=negative), inherit.aes = FALSE )+
+      scale_colour_manual(
+        values = pfadcolors,
+        aesthetics = c("colour", "fill")
+      )
    })
 
   #Indikatorensettings

@@ -6,19 +6,32 @@ library (data.table)
 dtAlternativen <- fread(file="alternativen.csv",
                         na.strings="",
                         dec=",",
-                        stringsAsFactors=TRUE,
+                        stringsAsFactors=FALSE,
                         integer64="double",
                         encoding="Latin-1")
-#summary(dtAlternativen)
+dtAlternativen[,
+               `:=`(Rahmen=factor(Rahmen, levels=c("Krise",
+                                                      "Wachstum",
+                                                      "Nachhaltigkeit")),
+                    Pfad=factor(Pfad, levels=c("Weiter wie bisher bei Krise",
+                                                  "Weiter wie bisher bei Wachstum",
+                                                  "Kleine Lösungen",
+                                                  "Große Lösungen")),
+                    Kombination=factor(Kombination))
 
-#print(dtAlternativen$Pfad)
+]
 
-# pfadcolors=c("Krise"=,
-#              "Fortschreibung"=,
-#              "Kleinere Anlagen"="c",
-#              "größere Anlagen"=,
-#              "mehrere"=,
-#              "Bitte Auswählen"=)
+
+AlternativenLevels <- c("Weiter wie bisher",
+                               "Kleine Lösungen",
+                               "Große Lösungen")
+
+ pfadcolors=c("Weiter wie bisher bei Krise"="#003366",
+              "Weiter wie bisher bei Wachstum"="#0037ae",
+              "Kleine Lösungen"= "#2abb1c",
+              "Große Lösungen"="#fe6201",
+              "mehrere"="#999999",
+              "Bitte Auswählen"="#222222")
 
 # Konfiguration aufbauen -----------------
 
@@ -119,7 +132,7 @@ configList <- list (
     'Stromüberschuss' = list(
       class = "mapping",
       Attribname = "Überschuss",
-      y1=70, # Verringere Einfluss - Annahme: Etwas Überschuss ist immer da.
+      y1=80, # Verringere Einfluss - Annahme: Etwas Überschuss ist immer da.
       include_parent=TRUE,
       description = tagList(
         "Wie wichtig ist es Ihnen, dass in der Region so viele ",em(" Stromerzeugungsanlagen gebaut werden, dass überschüssiger Strom erzeugt und potentiell exportiert werden könnte?")," (z.B. um Städte wie München mitzuversorgen)"
@@ -200,9 +213,9 @@ configList <- list (
     'Wirtschaftsentwicklung' =
       list(
         class = "elements",
-
+        y1=20,
         description = tagList(
-          "Es ist mir wichtig, dass sich der ",em("Ausbau erneuerbarer Energien")," langfristig ",em("positiv auf die gesamte regionale Wirtschaft")," auswirkt."
+          "Wie wichtigs is es Ihnen, dass sich der ",em("Ausbau erneuerbarer Energien")," langfristig ",em("positiv auf die gesamte regionale Wirtschaft")," auswirkt?"
         ),
         'Wertschöpfung' =
           list(
@@ -223,16 +236,22 @@ configList <- list (
         ),
       'Energieerzeugungskosten' = list(
         class = "mapping",
-        Attribname = NA,  #"Energieerzeugungskosten",
+        Attribname = "Stromerzeugungskosten",
+        y1=130,
+        util_func = "antiprop",
+        include_parent=TRUE,
         description = tagList(
-          "Wie wichtig ist es Ihnen, dass die  ",em("durchschnittlichen Erzeugungskosten pro kWh (Strom und Wärme) gering ")," sind?"
+          "Wie wichtig ist es Ihnen, dass die  ",em("durchschnittlichen Erzeugungskosten für regional und erneuerbar erzeugten Strom gering ")," sind?"
         )
       ),
     'Förderkosten' = list(
       class = "mapping",
       Attribname = "Förderkosten",
+      y1=150,
+      util_func = "antiprop",
+      include_parent=TRUE,
       description = tagList(
-        "Wie wichtig ist es Ihnen, dass nur ",em("wenig regionale Fördermittel")," benötigt werden?"
+        "Wie wichtig ist es Ihnen, dass nur ",em("wenig  zusätzliche Finanzmittel")," benötigt werden? (Zusätzliche Förderungen auf bundes-, landes-, regionaler, Firmen- oder Haushaltsebene)"
       )
     ),
     'Gewinnbeteiligung' = list(
@@ -275,8 +294,8 @@ configList <- list (
       util_func = "negprop",
       include_parent = TRUE,
       description = tagList(
-        "Wie wichtig ist es Ihnen, dass bei der Energieerzeugung möglichst ",em("wenig Freiflächen versiegelt oder überbaut"),
-        " werden? (Es werden Windkraft, PV-Freiflächenanlagen, Biogasanlagen und Kraftwerke berücksichtigt)"
+        "Wie wichtig ist es Ihnen, dass bei der Energieerzeugung möglichst ",em("wenig Freiflächen versiegelt, überbaut oder zur Produktion von Biomasse"),
+        " verwendet werden? (Es werden Windkraft-, Solar-Freiflächenanlagen, Biogasanlagen sowie Biomasseheizkraftwerke berücksichtigt)"
       )
     ),
     'Biomassenverwendung' = list(
@@ -314,7 +333,7 @@ configList <- list (
       ,
       'PV-Dachflächenanlagen' = list(
         class = "mapping",
-        Attribname = "PV_Dach_Fläche",
+        Attribname = "Solar_Dach_Anzahl",
         description = tagList("Auf der Skala von 0 bis 100 bewerte ich ",em("Auswirkungen von Dach- und Fassadenanlagen für PV und Solarthermie")," mit:"
         )
       ),
@@ -322,7 +341,7 @@ configList <- list (
         class = "mapping",
         y1=150, # Verringere Einfluss .
         include_parent=TRUE,
-        Attribname = "PV_Frei_Fläche",
+        Attribname = "Solar_Frei_Fläche",
         description = tagList(
           "Auf der Skala von 0 bis 100 bewerte ich ",em("Auswirkungen von Freiflächenanlagen für PV und Solarthermie")," mit:"
         )
@@ -388,14 +407,18 @@ configList <- list (
 
 # pfadbeschreibungen & Titel  ------------------------------------------------------
 title_text<-"Energiekompass für das Oberland"
-pfadbeschreibungen<-tagList(
-  p(strong("0) Krise:"),"Globale Krisen wirken sich auch auf das Oberland aus und beschränken Maßnahmen und Ausbau."),
-  p(strong("1) Fortschreibung:"),"Keine große Änderung der aktuellen  Ausbauraten: Erneuerbare Energieanlagen werden gebaut, falls sie rentabel sind. Die Region Oberland setzt auf Energieeffizienzmaßnahmen und wirtschaftliches Wachstum und ist grundsätzlich technologieoffen. "),
-  p(strong("2) Kleinere Anlagen:"),"Es werden „kleine“ Lösungen fokussiert, zum Beispiel bei gebäudegebundenen Anlagen und Speichern. Haushalte und Firmen sind die primären Investoren. "),
-  p(strong("3) Größere Anlagen:"),"Es werden „größere“ Anlagen wie Solar-Freiflächenanlagen, Windkraft oder auch Biomasseheizwerke mit Nahwärmenetzen sowie (Quartier-)Speicher verstärkt gefördert. Als Investoren treten neben größeren Investoren auch Kommunen, Stadtwerke und Genossenschaften auf. ")
+pfadbeschreibungen<-tagList(p("Es werden drei verschiedene Ausbauoptionen modelliert:", br(),
+  strong("1) Weiter wie bisher:"),"Wir machen weiter wie bisher und es werden keine bestimmten Technologien erneuerbarer Energien bevorzugt (Referenzpfad).",br(),
+  strong("2) Kleine Lösungen:"),"Wir strengen uns an und regionale Aktivitäten fördern kleine Energieerzeugungsanlagen, insbesondere gebäudegebundene Anlagen (Solaranlagen, Haushaltsspeicher, Wärmepumpen) und Energieeinsparung. Investoren sind vor allem Haushalte und Firmen.",br(),
+  strong("3) Große Lösungen:"),"Wir strengen uns an und regionale Aktivitäten fördern größere, nicht-gebäudegebundene Energieerzeugungsanlagen (Windkraft, PV, Quartiersspeicher, Biomasseheizkraftwerke und Nahwärmenetze). Mögliche Investoren sind auch Kommunen, Stadtwerke sowie Energiegenossenschaften.")
 )
 
-
+rahmenbeschreibungen<-tagList(
+  p("Diese Ausbauoptionen werden dann unter drei möglichen Rahmenbedingungen bzw. Zukünften getestet:",br(),
+  strong("A) Krise:"),"In globalen Krisenzeiten verlieren Deutschland und das Oberland ihre wirtschaftliche Stärke. Obwohl die Bevölkerung im Oberland wächst, ist die Neubaurate niedrig. Umwelt-, Natur- und Flächenschutz geraten unter die Räder. Für erneuerbare Energien stehen etwas mehr Flächen und Rohstoffe als heute zur Verfügung. Die finanzielle Förderung von erneuerbaren Energien wird hingegen im Vergleich zu heute wesentlich verringert.",br(),
+  strong("B) Wachstum:"),"Gesellschaft und Wirtschaft setzen auf Wachstum. Das Oberland boomt, die Bevölkerung wächst, die Neubaurate ist hoch. Umwelt- und Naturschutz werden der Wachstumslogik untergeordnet. Es erfolgt eine bundesweite Förderung von erneuerbare Energien wie es der aktuelle Stand des EEG sowie seine Fortschreibungen inklusive seiner langsamen Senkung vorsehen.",br(),
+  strong("C) Nachhaltigkeit:"),"Nachhaltigkeit setzt sich als Ziel in Wirtschaft und Gesellschaft im Oberland und weltweit durch. Das Oberland prosperiert, die Bevölkerung wächst, die Neubaurate ist trotzdem niedrig. Umwelt-, Natur- und Flächenschutz sind wichtig, deshalb stehen weniger Flächen und Rohstoffe für erneuerbare Energien als heute zur Verfügung. Bundesweite Förderung von erneuerbaren Energien, die über den aktuellen Stand der Förderungen hinausgeht.")
+)
 
 # Texte --------------------------------------------------------
 
@@ -403,6 +426,7 @@ texte <- list (
 
 
   begruessungstext="Dieses Programm ist eine Entscheidungshilfe. Die von INOLA simulierten Ausbaupfade erneuerbarer Energien setzen sich aus vielen Faktoren zusammen, die teils nicht auf den ersten Blick ersichtlich werden. Deshalb können Sie auf den nächsten Seiten angeben, wie wichtig Ihnen verschiedene Aspekte des regionalen Energiesystems im Oberland sind. Auf was legen Sie wie viel Wert? Das Programm ermittelt dann, welcher Ausbaupfad am meisten Ihren Präferenzen entspricht.",
+  alternativentitel="Informationen zu den Ausbauoptionen",
   auswahlaufforderungstext="Bitte wählen Sie zuerst aus, welcher Ausbaupfad Ihnen spontan am besten gefällt. Die einzelnen Ausbaupfade sind nachfolgend kurz beschrieben.",
 
   begruessungstext2= "Bitte stellen sie ein, wie wichtig Ihnen die einzelnen Indikatoren im Verhältnis zu den anderen Indikatoren sind.",
