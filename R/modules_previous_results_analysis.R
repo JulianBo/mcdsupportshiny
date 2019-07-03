@@ -22,10 +22,12 @@ AnalysisPreviousUI<- function(id,dtIndikatorensettings,all_members=FALSE){
       # ),
 
       tabPanel("Favorisierte Ergebnisse" ,
+               "Diese Pfade wurden bisher abgestimmt und aufgrund der Präferenzen berechnet.",
 
                plotOutput(ns("BisherigeDecsPlot") )
       ),
       tabPanel("Abstimmungsverhalten",
+               "Diese Gewichtungen wurden bisher eingestellt. Angegeben sind jeweils die Verteilungen, die Mittelwerte und die Standardabweichung.",
                selectInput(ns("BisherigeHistsPlotSelect"),
                            "Bitte Bereich auswählen",
                            choices=unique(dtIndikatorensettings[,parent])),
@@ -33,6 +35,7 @@ AnalysisPreviousUI<- function(id,dtIndikatorensettings,all_members=FALSE){
                plotOutput(ns("BisherigeHistsPlot"))
       ),
       tabPanel("Gruppenanalyse",
+               "Bilden sich bei den Gewichtungen Gruppen mit unterschiedlichen Vorlieben heraus? Angegeben sind jeweils die Verteilungen, die Mittelwerte und die Standardabweichung.",
 
                numericInput(ns("ClusterNumberNumeric"),
                             "Bitte Anzahl der Gruppen auswählen",
@@ -67,6 +70,7 @@ AnalysisPreviousUI<- function(id,dtIndikatorensettings,all_members=FALSE){
 
 
     ),
+    "Wenn ein Fehler angegeben ist, haben in Ihrer Umfrage noch nicht genügend Teilnehmende abgestimmt. Bei Live-Umfragen können die  Ergebnisse durch erneutes Laden aktualisiert werden."
     textOutput(ns("infotext") )
   )
 }

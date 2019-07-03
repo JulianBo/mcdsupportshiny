@@ -139,6 +139,7 @@ shinyUI(fluidPage(theme="mcdsupportshiny.css",
                                                                       )
                                                                     ),
                                                                     h3("Gesamtergebnis"),
+                                                                    "Je höher die Punktzahl, desto mehr entspricht der Pfad ihren Präferenzen. Die gestrichelte Linie gibt den Mittelwert der einzelnen Energiepfade unter verschiedenen Rahmenbedingungen an: Je höher, desto besser ist der Pfad unter verschiedenen Rahmenbedingungen.",
                                                                     fluidRow(
                                                                       column(width=8, plotOutput("ErgebnisPlot")),
                                                                       column(width=4,

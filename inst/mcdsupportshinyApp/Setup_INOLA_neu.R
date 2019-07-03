@@ -113,7 +113,7 @@ configList <- list (
       'Gesamtanteil erneuerbarer Wärme' = list(
         class = "mapping",
         Attribname = "Anteil_Erneuerbar_Strom",
-        util_fit_x1=0.20, #20% Wird als Standard gesetzt
+        util_fit_x1=0.30, #30% Wird als Standard gesetzt
         include_parent=TRUE,
         description = tagList(
           "Wie wichtig ist es Ihnen, dass bilanziell ein hoher Anteil des regionalen  ",em("Stromverbrauchs")," durch regionale erneuerbare Energien erzeugt wird?"
@@ -121,7 +121,7 @@ configList <- list (
         ),
         'Gesamtanteil erneuerbarer Strom' = list(
           class = "mapping",
-          util_fit_x1=0.20, #20% Wird als Standard gesetzt
+          util_fit_x1=0.30, #20% Wird als Standard gesetzt
           include_parent=TRUE,
           Attribname = "Anteil_Erneuerbar_Wärme",
           description = tagList(
@@ -143,7 +143,7 @@ configList <- list (
   'Struktur des Energiesystems' = list (
     class = "elements",
     description = tagList(
-      "Struktur des Energiesystems: Wie wichtig ist Ihnen, wie das ",em("regionale Energiesystem technisch ausgestaltet "),"ist?(z.B. Technologien, Anlagengröße, Speicher)"
+      "Struktur des Energiesystems: Wie wichtig ist Ihnen, wie das ",em("regionale Energiesystem technisch ausgestaltet "),"ist? (z.B. Technologien, Anlagengröße, Speicher)"
     ),
     color = "orange",
     'Diversität des Energieerzeugungssystems' = list(
@@ -308,7 +308,7 @@ configList <- list (
       util_func="antiprop",
       description = tagList(
         "Wie wichtig ist es Ihnen, dass von ",em("Nahrungs- und Futtermitteln (v. a. Mais) und Holz nur ein geringer Anteil zur Energieproduktion"),
-        " verwendet wird? (im Modell wird von der aktuellen Flächennutzung ausgegangen)"
+        " verwendet wird? (im Modell wird von der aktuellen Flächennutzung ausgegangen, keine Flächen für die Nutzung zur Energieerzeugung umgewandelt)"
       ),
       'Maisverwendung' = list(
         class = "mapping",
@@ -331,9 +331,13 @@ configList <- list (
       util_func="antiprop",
       description = tagList(
         "Wie wichtig ist es Ihnen, dass ",em("sonstige regionale und lokale Auswirkungen durch Energieerzeugungsanlagen"),
-        " möglichst gering sind?")
-      ,explanation_for_childs= tagList("Die negativen Auswirkungen welcher Anlagen bewerten  Sie im Verhältnis zueinander als wie wichtig? ",
-                                       em("von 0 = keine wichtigen Auswirkungen, bis 100 = stark beeinträchtigende Auswirkungen"))
+        " möglichst gering sind? (z.B. Landschafts- und Ortsbild, Emissionen, ...) ")
+      ,explanation_for_childs= tagList(
+        p("Die negativen Auswirkungen welcher Anlagen bewerten  Sie im Verhältnis zueinander als wie wichtig? ",
+          "Da diese schwer zu quantifizieren und oftmals ortsabhängig sind, können hier nur grundsätzliche Einschätzungen pro Technologie angegeben werden:",
+          em("von 0 = keine wichtigen Auswirkungen, bis 100 = stark beeinträchtigende Auswirkungen")
+          )
+      )
       ,
       'PV-Dachflächenanlagen' = list(
         class = "mapping",
