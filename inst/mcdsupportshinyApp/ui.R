@@ -118,7 +118,9 @@ shinyUI(fluidPage(theme="mcdsupportshiny.css",
                                                                                  textOutput("ChoiceText", inline=TRUE))
                                                                     ),
                                                                     tags$div("Hier können sie sehen, welche ",
-                                                                             tags$a(href="http://inola-region.de", target="_blank", "Geschichte hinter den einzelnen Pfaden steckt."))
+                                                                             tags$a(href="INOLA_Energiepfade_Beschreibung_Rahmen_Pfad_Kombi_20190703.pdf", target="_blank", "Geschichte hinter den einzelnen Pfaden steckt."),
+                                                                             "Mehr Informationen unter ",
+                                                                             tags$a(href="http://inola-region.de", target="_blank", "inola-region.de."))
 
                                                                     ,
                                                                     h2("Jetzt ausprobieren und endgültig abstimmen!"),
