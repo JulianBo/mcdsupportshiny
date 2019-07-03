@@ -70,7 +70,7 @@ AnalysisPreviousUI<- function(id,dtIndikatorensettings,all_members=FALSE){
 
 
     ),
-    "Wenn ein Fehler angegeben ist, haben in Ihrer Umfrage noch nicht genügend Teilnehmende abgestimmt. Bei Live-Umfragen können die  Ergebnisse durch erneutes Laden aktualisiert werden."
+    "Wenn ein Fehler angegeben ist, haben in Ihrer Umfrage noch nicht genügend Teilnehmende abgestimmt. Bei Live-Umfragen können die  Ergebnisse durch erneutes Laden aktualisiert werden.",
     textOutput(ns("infotext") )
   )
 }

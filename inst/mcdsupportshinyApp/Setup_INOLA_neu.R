@@ -458,7 +458,7 @@ texte <- list (
 #Speicherkonfiguration --------------------------------------------------------
 speichersettings= list( method="GoogleSheets",
                         #method="CSV",
-                        place="MCDA_Beispiel_INOLA_neu")
+                        place="Energiekompass_INOLA")
 # Speichertemplate --------------------------------------------------------
 
 # library(mcdsupportshiny)
